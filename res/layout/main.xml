@@ -5,5 +5,5 @@
     android:layout_height="fill_parent"
     >
 
-<ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ButtonStart"></ImageButton>
+<ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ButtonStart" android:src="@drawable/bike" android:tag="@string/hello"></ImageButton>
 </LinearLayout>
