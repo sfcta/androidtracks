@@ -5,5 +5,13 @@
     android:layout_height="fill_parent"
     >
 
-<ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ButtonStart" android:src="@drawable/bike" android:tag="@string/hello"></ImageButton>
+
+
+<Button android:layout_height="wrap_content" android:drawableLeft="@drawable/bike" android:id="@+id/ButtonStart" android:text="@string/startNewTrip" android:layout_width="fill_parent"></Button><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TextViewPreviousTrips" android:text="@string/previous_trips"></TextView><ListView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ListViewPreviousTrips"></ListView>
+
+
+
+
+
+
 </LinearLayout>

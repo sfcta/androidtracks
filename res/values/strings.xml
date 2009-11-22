@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, MainInput!</string>
+    
     <string name="app_name">CycleTracks</string>
+<string name="previous_trips">Previous Trips:</string>
+<string name="startNewTrip">Start New Trip</string>
 </resources>
