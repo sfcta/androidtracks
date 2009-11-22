@@ -12,7 +12,7 @@
         </activity>
 
     <activity android:label="@string/recording_title" android:name="RecordingActivity"></activity>
-<service android:name="CycleTrackService" android:process="cycleTrackService"></service>
+
 </application>
     <uses-sdk android:minSdkVersion="3" />
 
