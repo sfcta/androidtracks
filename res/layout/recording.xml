@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content">
+
+
+<LinearLayout android:id="@+id/LinearLayout01" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android"><RadioGroup android:id="@+id/RadioGroup01" android:layout_width="wrap_content" android:layout_height="wrap_content"><RadioButton android:text="@+id/RadioButton01" android:id="@+id/RadioButton01" android:layout_width="wrap_content" android:layout_height="wrap_content"></RadioButton><RadioButton android:text="@+id/RadioButton02" android:id="@+id/RadioButton02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:drawableLeft="@drawable/icon" android:checked="true"></RadioButton><RadioButton android:text="@+id/RadioButton03" android:id="@+id/RadioButton03" android:layout_width="wrap_content" android:layout_height="wrap_content"></RadioButton>
+<RadioButton android:text="@+id/RadioButton04" android:id="@+id/RadioButton04" android:layout_width="wrap_content" android:layout_height="wrap_content"></RadioButton>
+</RadioGroup>
+
+
 </LinearLayout>
