@@ -13,7 +13,7 @@ public class MainInput extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         final Button startButton = (Button) findViewById(R.id.ButtonStart);
-        Intent i = new Intent(this, RecordingActivity.class);
+        final Intent i = new Intent(this, RecordingActivity.class);
         startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	startActivity(i);
