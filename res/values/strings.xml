@@ -5,6 +5,6 @@
     <string name="app_name">CycleTracks</string>
 <string name="previous_trips">Previous Trips:</string>
 <string name="startNewTrip">Start New Trip</string>
-<string name="pauseButtonLabel">Pause Recording</string>
-<string name="finishedButtonLabel">Stop Recording</string>
+<string name="pauseButtonLabel">Pause</string>
+<string name="finishedButtonLabel">Finish</string>
 </resources>
