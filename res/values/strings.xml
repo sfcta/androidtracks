@@ -7,4 +7,10 @@
 <string name="startNewTrip">Start New Trip</string>
 <string name="pauseButtonLabel">Pause</string>
 <string name="finishedButtonLabel">Finish</string>
+<string-array name="trip_purposes"><item>Commute</item>
+<item>Social</item>
+<item>Exercise</item>
+</string-array>
+<string name="enterTripInfo">And add any comments about your trip here</string>
+<string name="promptPurpose">Select the main purpose of this trip</string>
 </resources>

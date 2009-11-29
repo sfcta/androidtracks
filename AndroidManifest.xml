@@ -3,7 +3,7 @@
       package="org.sfcta.cycletracks"
       android:versionCode="1"
       android:versionName="1.0">
-    <application android:icon="@drawable/icon" android:label="@string/app_name">
+    <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
         <activity android:label="@string/app_name" android:name=".MainInput">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -13,6 +13,7 @@
 
     <activity android:label="@string/recording_title" android:name="RecordingActivity"></activity>
 
+<activity android:name="SaveTrip"></activity>
 </application>
     <uses-sdk android:minSdkVersion="3" />
 

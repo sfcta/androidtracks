@@ -4,7 +4,9 @@
 
 
 <RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
-<LinearLayout android:layout_above="@+id/Button01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:layout_alignParentBottom="true" android:id="@+id/BottomButtons"><Button android:layout_width="wrap_content" android:id="@+id/ButtonPause" android:text="@string/pauseButtonLabel" android:drawableLeft="@android:drawable/ic_media_pause" android:layout_height="fill_parent"></Button><Button android:layout_width="wrap_content" android:id="@+id/ButtonFinished" android:text="@string/finishedButtonLabel" android:drawableLeft="@android:drawable/ic_menu_save" android:layout_height="fill_parent"></Button></LinearLayout>
-
+<TextView android:layout_width="wrap_content" android:id="@+id/TextView01" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:text="Recording...."></TextView>
+<LinearLayout android:layout_above="@+id/Button01" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:layout_alignParentBottom="true" android:id="@+id/BottomButtons" android:layout_width="fill_parent">
+<Button android:id="@+id/ButtonPause" android:text="@string/pauseButtonLabel"  android:layout_height="fill_parent" android:layout_weight="1" android:layout_width="fill_parent"></Button><Button android:id="@+id/ButtonFinished" android:text="@string/finishedButtonLabel" android:layout_height="fill_parent" android:layout_width="fill_parent" android:layout_weight="1"></Button>
+</LinearLayout>
 
 </RelativeLayout>
