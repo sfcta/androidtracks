@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
 
-public class RecordingActivity extends Activity implements LocationListener {
+public class RecordingActivity extends Activity implements LocationListener{ 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,7 +44,7 @@ public class RecordingActivity extends Activity implements LocationListener {
 	private void setNotification() {
 		// Create the notification icon - maybe this goes somewhere else?
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		int icon = R.drawable.icon;
+		int icon = R.drawable.icon25;
 		CharSequence tickerText = "Recording...";
 		long when = System.currentTimeMillis();
 		Notification notification = new Notification(icon, tickerText, when);
@@ -65,15 +65,17 @@ public class RecordingActivity extends Activity implements LocationListener {
 	// LocationListener implementation:
 	@Override
 	public void onLocationChanged(Location loc) {
+
 		if (loc != null) {
 			Toast.makeText(
 					getBaseContext(),
 					"Location changed : Lat: " + loc.getLatitude() + " Lng: "
 							+ loc.getLongitude(), Toast.LENGTH_SHORT).show();
 
-			GeoPoint p = new GeoPoint((int) (loc.getLatitude() * 1E6),
-					(int) (loc.getLongitude() * 1E6));
+//			GeoPoint p = new GeoPoint((int) (loc.getLatitude() * 1E6),
+//					(int) (loc.getLongitude() * 1E6));
 		}
+		
 	}
 
 	@Override
