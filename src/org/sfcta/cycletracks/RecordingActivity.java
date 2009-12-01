@@ -12,7 +12,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 public class RecordingActivity extends Activity {
-	
+	boolean isRecording = true;
+	Intent fi;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -25,12 +27,46 @@ public class RecordingActivity extends Activity {
 		// Create a notification saying we're recording
 		setNotification();
 
+		// Pause button 
+		final Button pauseButton = (Button) findViewById(R.id.ButtonPause);
+		pauseButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				if (isRecording) {
+					CycleTrackData.killListener();
+					pauseButton.setText("Resume");
+					Toast.makeText(getBaseContext(),"Recording paused; GPS now offline", Toast.LENGTH_LONG).show();
+				} else {
+					CycleTrackData.activateListener();
+					pauseButton.setText("Pause");
+					Toast.makeText(getBaseContext(),"GPS restarted. It may take a moment to resync.", Toast.LENGTH_LONG).show();
+				}
+				isRecording = !isRecording;
+			}
+		});
+
 		// Build the finish button and attach it to the finish activity
 		final Button finishButton = (Button) findViewById(R.id.ButtonFinished);
-		final Intent i = new Intent(this, SaveTrip.class);
 		finishButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				startActivity(i);
+				// If we have points, go to the save-trip activity
+				if (CycleTrackData.coords.size()>0) {
+					fi = new Intent(RecordingActivity.this, SaveTrip.class);
+					
+				// Otherwise, cancel and go back to main screen 
+				} else {
+					Toast.makeText(getBaseContext(),"No GPS data acquired; nothing to submit.", Toast.LENGTH_SHORT).show();
+
+					// Remove the notification
+			    	NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			    	mNotificationManager.cancelAll();
+			    	
+			    	// Go back to main screen
+					fi = new Intent(RecordingActivity.this, MainInput.class);
+					CycleTrackData.killListener();
+				}
+				
+				// Either way, activate and kill this task
+				startActivity(fi);
 				RecordingActivity.this.finish();
 			}
 		});

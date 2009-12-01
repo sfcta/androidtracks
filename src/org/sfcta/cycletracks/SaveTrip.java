@@ -29,7 +29,7 @@ public class SaveTrip extends Activity {
 			public void onClick(View v) {
 				Toast.makeText(getBaseContext(),"Trip discarded.", Toast.LENGTH_SHORT).show();
 				startActivity(i);
-				
+				CycleTrackData.killListener();
 				SaveTrip.this.finish();
 			}
 		});
