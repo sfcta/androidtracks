@@ -2,6 +2,7 @@ package org.sfcta.cycletracks;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -58,7 +59,10 @@ public class ShowMap extends MapActivity {
 		mc.animateTo(gpspoints.getItem(0).getPoint());
 		mc.zoomToSpan(lathigh-latlow, lgthigh-lgtlow);
 		mapOverlays.add(gpspoints);
-		
+
+		//TODO: This needs to move.  When we get the database set up, erase coords 
+		// as soon as it's been uploaded. 
+		CycleTrackData.coords = new Vector <Location> ();
 	}
 
 	@Override

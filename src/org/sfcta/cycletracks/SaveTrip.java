@@ -30,8 +30,6 @@ public class SaveTrip extends Activity {
 				Toast.makeText(getBaseContext(),"Trip discarded.", Toast.LENGTH_SHORT).show();
 				startActivity(i);
 				
-				CycleTrackData.killListener();
-				
 				SaveTrip.this.finish();
 			}
 		});
@@ -45,7 +43,7 @@ public class SaveTrip extends Activity {
 				Toast.makeText(getBaseContext(),
 						"Trip submitted with "+CycleTrackData.coords.size()+" points. Thank you!", 
 						Toast.LENGTH_SHORT).show();
-				// CycleTrackData.coords = new Vector <Location> ();
+				CycleTrackData.killListener();
 				SaveTrip.this.finish();
 			}
 		});
