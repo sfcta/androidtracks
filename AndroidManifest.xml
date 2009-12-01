@@ -14,6 +14,8 @@
     <activity android:label="@string/recording_title" android:name="RecordingActivity" android:launchMode="singleInstance"></activity>
 
 <activity android:name="SaveTrip"></activity>
+<uses-library android:name="com.google.android.maps"></uses-library>
+<activity android:name="ShowMap"></activity>
 </application>
     <uses-sdk android:minSdkVersion="3" />
 

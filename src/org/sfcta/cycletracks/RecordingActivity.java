@@ -17,7 +17,6 @@ public class RecordingActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.recording);
-		Toast.makeText(getBaseContext(),"Recording onCreate!", Toast.LENGTH_SHORT).show();
 
 		// Start listening for GPS events
 		CycleTrackData.activity = this;
@@ -39,7 +38,6 @@ public class RecordingActivity extends Activity {
 	
 	@Override
 	public void onDestroy() {
-		Toast.makeText(getBaseContext(),"RecordActivity onDestroy!", Toast.LENGTH_SHORT).show();
 		super.onDestroy();
 	}
 	

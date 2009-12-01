@@ -38,17 +38,16 @@ public class SaveTrip extends Activity {
 
 		// Submit btn 
 		final Button btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
-		final Intent xi = new Intent(this, MainInput.class);
+		final Intent xi = new Intent(this, ShowMap.class);
 		btnSubmit.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				startActivity(xi);
 				Toast.makeText(getBaseContext(),
 						"Trip submitted with "+CycleTrackData.coords.size()+" points. Thank you!", 
 						Toast.LENGTH_SHORT).show();
-				CycleTrackData.coords = new Vector <Location> ();
+				// CycleTrackData.coords = new Vector <Location> ();
 				SaveTrip.this.finish();
 			}
 		});
-
     }
 }
