@@ -7,11 +7,13 @@ import android.view.View;
 import android.widget.Button;
 
 public class MainInput extends Activity {
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
 		final Button startButton = (Button) findViewById(R.id.ButtonStart);
 		final Intent i = new Intent(this, RecordingActivity.class);
 		startButton.setOnClickListener(new View.OnClickListener() {

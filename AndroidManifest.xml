@@ -11,7 +11,7 @@
             </intent-filter>
         </activity>
 
-    <activity android:label="@string/recording_title" android:name="RecordingActivity"></activity>
+    <activity android:label="@string/recording_title" android:name="RecordingActivity" android:launchMode="singleInstance"></activity>
 
 <activity android:name="SaveTrip"></activity>
 </application>
@@ -22,7 +22,7 @@
 <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 
 <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"></uses-permission>
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"></uses-permission>
-<uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"></uses-permission>
+
+
 
 </manifest> 
