@@ -29,37 +29,30 @@ public class ShowMap extends MapActivity {
 		
 		// Set up the point layer
 		mapOverlays = mapView.getOverlays();
-		drawable = getResources().getDrawable(R.drawable.point);
-		gpspoints = new ItemizedOverlayTrack(drawable);
+//		drawable = getResources().getDrawable(R.drawable.point);
+//		gpspoints = new ItemizedOverlayTrack(drawable);
 
 		// Add the GPS points to it!
-		int lathigh,lgthigh,latlow,lgtlow;
-		lathigh = (int)(-100 * 1E6);
-		latlow  = (int)(100 * 1E6);
-		lgtlow  = (int)(360 * 1E6);
-		lgthigh = (int)(-360 * 1E6);
-		
-		for (int i=0; i<CycleTrackData.coords.size(); i++) {
-			Location loc = CycleTrackData.coords.get(i);
-			int lat = (int)(loc.getLatitude() * 1E6);
-			int lgt = (int)(loc.getLongitude() * 1E6);
-			latlow = Math.min(latlow,lat);
-			lathigh = Math.max(lathigh,lat);
-			lgtlow = Math.min(lgtlow,lgt);
-			lgthigh = Math.max(lgthigh,lgt);
-			
-			GeoPoint pt = new GeoPoint(lat,lgt);
+/*		for (CyclePoint pt : CycleTrackData.coords) {
 			OverlayItem opoint = new OverlayItem(pt,"","");
 			gpspoints.addOverlay(opoint);
 		}
+*/		
+		// Find map center and extent
+		CycleTrackData ctd = CycleTrackData.getInstance();
+		int latcenter = (ctd.lathigh+ctd.latlow) / 2;
+		int lgtcenter = (ctd.lgthigh+ctd.lgtlow) / 2;
+		GeoPoint center = new GeoPoint(latcenter,lgtcenter);
 		MapController mc = mapView.getController();
-		mc.animateTo(gpspoints.getItem(0).getPoint());
-		mc.zoomToSpan(lathigh-latlow, lgthigh-lgtlow);
-		mapOverlays.add(gpspoints);
+		mc.animateTo(center);
+		mc.zoomToSpan(ctd.lathigh-ctd.latlow, 
+				ctd.lgthigh-ctd.lgtlow);
+		// And add the points.
+		mapOverlays.add(ctd.gpspoints);
 
 		//TODO: This needs to move.  When we get the database set up, erase coords 
 		// as soon as it's been uploaded. 
-		CycleTrackData.coords = new Vector <Location> ();
+		ctd.initializeData();
 	}
 
 	@Override

@@ -18,7 +18,7 @@ public class SaveTrip extends Activity {
         // Remove the notification
     	NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     	mNotificationManager.cancelAll();
-    	
+    	    	
 		// Discard btn 
 		final Button btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
 		final Intent i = new Intent(this, MainInput.class);
@@ -26,7 +26,7 @@ public class SaveTrip extends Activity {
 			public void onClick(View v) {
 				Toast.makeText(getBaseContext(),"Trip discarded.", Toast.LENGTH_SHORT).show();
 				startActivity(i);
-				CycleTrackData.killListener();
+				CycleTrackData.getInstance().killListener();
 				SaveTrip.this.finish();
 			}
 		});
@@ -36,11 +36,12 @@ public class SaveTrip extends Activity {
 		final Intent xi = new Intent(this, ShowMap.class);
 		btnSubmit.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				startActivity(xi);
+				CycleTrackData.getInstance().killListener();
+				
 				Toast.makeText(getBaseContext(),
-						"Trip submitted with "+CycleTrackData.coords.size()+" points. Thank you!", 
+						"Submitting trip with "+CycleTrackData.getInstance().coords.size()+" points. Thank you!", 
 						Toast.LENGTH_SHORT).show();
-				CycleTrackData.killListener();
+				startActivity(xi);
 				SaveTrip.this.finish();
 			}
 		});

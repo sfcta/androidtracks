@@ -21,8 +21,8 @@ public class RecordingActivity extends Activity {
 		setContentView(R.layout.recording);
 
 		// Start listening for GPS events
-		CycleTrackData.activity = this;
-		CycleTrackData.activateListener();
+		CycleTrackData.getInstance().activity = this;
+		CycleTrackData.getInstance().activateListener();
 		
 		// Create a notification saying we're recording
 		setNotification();
@@ -32,12 +32,14 @@ public class RecordingActivity extends Activity {
 		pauseButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if (isRecording) {
-					CycleTrackData.killListener();
+					CycleTrackData.getInstance().killListener();
 					pauseButton.setText("Resume");
+					RecordingActivity.this.setTitle("CycleTracks - Recording paused...");
 					Toast.makeText(getBaseContext(),"Recording paused; GPS now offline", Toast.LENGTH_LONG).show();
 				} else {
-					CycleTrackData.activateListener();
+					CycleTrackData.getInstance().activateListener();
 					pauseButton.setText("Pause");
+					RecordingActivity.this.setTitle("CycleTracks - Recording your track...");
 					Toast.makeText(getBaseContext(),"GPS restarted. It may take a moment to resync.", Toast.LENGTH_LONG).show();
 				}
 				isRecording = !isRecording;
@@ -49,7 +51,7 @@ public class RecordingActivity extends Activity {
 		finishButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// If we have points, go to the save-trip activity
-				if (CycleTrackData.coords.size()>0) {
+				if (CycleTrackData.getInstance().coords.size()>0) {
 					fi = new Intent(RecordingActivity.this, SaveTrip.class);
 					
 				// Otherwise, cancel and go back to main screen 
@@ -62,7 +64,7 @@ public class RecordingActivity extends Activity {
 			    	
 			    	// Go back to main screen
 					fi = new Intent(RecordingActivity.this, MainInput.class);
-					CycleTrackData.killListener();
+					CycleTrackData.getInstance().killListener();
 				}
 				
 				// Either way, activate and kill this task
