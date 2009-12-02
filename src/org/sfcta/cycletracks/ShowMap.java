@@ -1,13 +1,10 @@
 package org.sfcta.cycletracks;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
