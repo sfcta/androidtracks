@@ -21,8 +21,8 @@ public class RecordingActivity extends Activity {
 		setContentView(R.layout.recording);
 
 		// Start listening for GPS events
-		CycleTrackData.getInstance().activity = this;
-		CycleTrackData.getInstance().activateListener();
+		CycleTrackData.get().activity = this;
+		CycleTrackData.get().activateListener();
 		
 		// Create a notification saying we're recording
 		setNotification();
@@ -32,14 +32,14 @@ public class RecordingActivity extends Activity {
 		pauseButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if (isRecording) {
-					CycleTrackData.getInstance().killListener();
+					CycleTrackData.get().killListener();
 					pauseButton.setText("Resume");
-					RecordingActivity.this.setTitle("CycleTracks - Recording paused...");
+					RecordingActivity.this.setTitle("CycleTracks - Paused...");
 					Toast.makeText(getBaseContext(),"Recording paused; GPS now offline", Toast.LENGTH_LONG).show();
 				} else {
-					CycleTrackData.getInstance().activateListener();
+					CycleTrackData.get().activateListener();
 					pauseButton.setText("Pause");
-					RecordingActivity.this.setTitle("CycleTracks - Recording your track...");
+					RecordingActivity.this.setTitle("CycleTracks - Recording...");
 					Toast.makeText(getBaseContext(),"GPS restarted. It may take a moment to resync.", Toast.LENGTH_LONG).show();
 				}
 				isRecording = !isRecording;
@@ -51,7 +51,7 @@ public class RecordingActivity extends Activity {
 		finishButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// If we have points, go to the save-trip activity
-				if (CycleTrackData.getInstance().coords.size()>0) {
+				if (CycleTrackData.get().coords.size()>0) {
 					fi = new Intent(RecordingActivity.this, SaveTrip.class);
 					
 				// Otherwise, cancel and go back to main screen 
@@ -64,10 +64,10 @@ public class RecordingActivity extends Activity {
 			    	
 			    	// Go back to main screen
 					fi = new Intent(RecordingActivity.this, MainInput.class);
-					CycleTrackData.getInstance().killListener();
+					CycleTrackData.get().killListener();
 				}
 				
-				// Either way, activate and kill this task
+				// Either way, activate next task, and then kill this task
 				startActivity(fi);
 				RecordingActivity.this.finish();
 			}

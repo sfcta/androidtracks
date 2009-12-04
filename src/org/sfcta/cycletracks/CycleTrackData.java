@@ -29,14 +29,15 @@ public class CycleTrackData implements LocationListener {
 	private static class CTDHolder {
 		private static final CycleTrackData INSTANCE = new CycleTrackData();
 	}
-	public static CycleTrackData getInstance() {
+	public static CycleTrackData get() {
+		CycleTrackData ctd = CTDHolder.INSTANCE;
 		return CTDHolder.INSTANCE;
 	}
 	// ---End Singleton design pattern.
 
 	// If we're just starting to record, set initial conditions.
 	void initializeData() {
-//		coords = new Vector <CyclePoint> ();
+		coords = new Vector <CyclePoint> ();
 		startTime = System.currentTimeMillis();
 		latestUpdate = latestlat = latestlgt = 0;
 		lathigh = (int)(-100 * 1E6);
@@ -58,20 +59,23 @@ public class CycleTrackData implements LocationListener {
 	}
 	
 	void killListener() {
-		lm.removeUpdates(this);
+		if (lm != null) lm.removeUpdates(this);
 	}
 
 	void addPointNow(Location loc, double currentTime) {
 		int lat = (int)(loc.getLatitude() * 1E6);
 		int lgt = (int)(loc.getLongitude() *1E6);
-		
+		addPointNow(lat,lgt,currentTime);
+	}
+	
+	void addPointNow(int lat, int lgt, double currentTime) {
 		// Skip duplicates
 		if (latestlat==lat && latestlgt==lgt) return;
 		
 		CyclePoint pt = new CyclePoint(lat,lgt,currentTime); 
 		coords.add(pt);
-		String startMsg = (coords.size()==1 ? "Start" : "");
-		OverlayItem opoint = new OverlayItem(pt,startMsg,"");
+		//String startMsg = (coords.size()==1 ? "Start" : "");
+		OverlayItem opoint = new OverlayItem(pt,"","");
 		gpspoints.addOverlay(opoint);
 		
 		latlow = Math.min (latlow,lat);
@@ -110,10 +114,3 @@ public class CycleTrackData implements LocationListener {
 	// END LocationListener implementation:	
 }
 
-class CyclePoint extends GeoPoint {
-	public double time;
-	public CyclePoint(int lat, int lgt, double currentTime) {
-		super(lat, lgt);
-		this.time = currentTime;
-	}
-}

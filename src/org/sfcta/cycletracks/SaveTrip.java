@@ -1,5 +1,7 @@
 package org.sfcta.cycletracks;
 
+import java.text.DateFormat;
+
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -7,6 +9,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 public class SaveTrip extends Activity {
@@ -26,7 +30,7 @@ public class SaveTrip extends Activity {
 			public void onClick(View v) {
 				Toast.makeText(getBaseContext(),"Trip discarded.", Toast.LENGTH_SHORT).show();
 				startActivity(i);
-				CycleTrackData.getInstance().killListener();
+				CycleTrackData.get().killListener();
 				SaveTrip.this.finish();
 			}
 		});
@@ -36,11 +40,32 @@ public class SaveTrip extends Activity {
 		final Intent xi = new Intent(this, ShowMap.class);
 		btnSubmit.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				CycleTrackData.getInstance().killListener();
+				CycleTrackData ctd = CycleTrackData.get();
+				ctd.killListener();
 				
 				Toast.makeText(getBaseContext(),
-						"Submitting trip with "+CycleTrackData.getInstance().coords.size()+" points. Thank you!", 
+						"Submitting trip with "+ctd.coords.size()+" points. Thank you!", 
 						Toast.LENGTH_SHORT).show();
+				
+				// Find user-entered info
+				Spinner purpose = (Spinner) findViewById(R.id.SpinnerPurp);
+				EditText notes = (EditText) findViewById(R.id.NotesField);
+				
+				// Save this trip to the database.  W00t!
+		        DbAdapter mDbHelper = new DbAdapter(SaveTrip.this);
+		        mDbHelper.open();
+		        String fancystarttime = DateFormat.getInstance().format(ctd.startTime);
+		        long tripid = mDbHelper.createTrip(
+		        		purpose.getSelectedItem().toString(),
+		        		ctd.startTime,
+		        		fancystarttime, 
+		        		notes.getEditableText().toString()
+		        );
+		        
+		        mDbHelper.createCoordsForTrip(tripid, ctd.coords);
+		        mDbHelper.close();
+				
+				// Show the map!
 				startActivity(xi);
 				SaveTrip.this.finish();
 			}

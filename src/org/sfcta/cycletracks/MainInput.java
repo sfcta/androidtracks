@@ -8,11 +8,16 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 public class MainInput extends Activity {
 	ArrayList savedtrips = new ArrayList<HashMap>();
@@ -22,9 +27,19 @@ public class MainInput extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
-		populateList();
-
+		
+		// Set up the list view of saved trips
+		ListView listSavedTrips = (ListView) findViewById(R.id.ListSavedTrips);
+		populateList(listSavedTrips);
+		listSavedTrips.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			public void onItemClick(AdapterView parent, View v, int pos, long id) {
+				Intent i = new Intent(MainInput.this, ShowMap.class);
+				i.putExtra("showtrip", id);
+				startActivity(i);
+			}
+		});
+        
+		// And set up the record button
 		final Button startButton = (Button) findViewById(R.id.ButtonStart);
 		final Intent i = new Intent(this, RecordingActivity.class);
 		startButton.setOnClickListener(new View.OnClickListener() {
@@ -35,23 +50,36 @@ public class MainInput extends Activity {
 		});
 	}
 
-	void populateList() {
-		ListView listSavedTrips = (ListView) findViewById(R.id.ListSavedTrips);
-		FakeAdapter fa = new FakeAdapter(this, savedtrips,
-				R.layout.twolinelist, new String[] { "line1", "line2" },
-				new int[] { R.id.TextView01, R.id.TextView02 });
-		for (int i = 0; i < 8; i++) {
-			HashMap map = new HashMap();
-			map.put("line1", "Trip " + i);
-			map.put("line2", "This is fun " + i);
-			savedtrips.add(map);
+	void populateList(ListView lv) {
+		// Get list from the real phone database.  W00t!
+        DbAdapter mDbHelper = new DbAdapter(MainInput.this);
+        mDbHelper.open();
+        try {
+	        Cursor allTrips = mDbHelper.fetchAllTrips();
+	
+			SimpleCursorAdapter sca = new SimpleCursorAdapter(this, 
+					R.layout.twolinelist,
+					allTrips,
+					new String[] {"purp", "note", "fancystart"},
+					new int[] { R.id.TextView01, R.id.TextView02, R.id.TextView03 }
+			);
+			
+			lv.setAdapter(sca);
+			TextView counter = (TextView) findViewById(R.id.TextViewPreviousTrips);
+			int numtrips = allTrips.getCount(); 
+			switch (numtrips) {
+				case 0: counter.setText("No saved trips."); break; 
+				case 1: counter.setText("1 saved trip:"); break;
+				default: counter.setText(""+numtrips+" saved trips.");
+			}
+        } catch (SQLException sqle) {
+			// Do nothing, for now!
 		}
-		listSavedTrips.setAdapter(fa);
+        mDbHelper.close();        
 	}
 }
 
 class FakeAdapter extends SimpleAdapter {
-
 	public FakeAdapter(Context context, List<? extends Map<String, ?>> data,
 			int resource, String[] from, int[] to) {
 		super(context, data, resource, from, to);

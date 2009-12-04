@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="recording_title">Recording your track</string>
+    <string name="recording_title">CycleTracks - Recording...</string>
     
     <string name="app_name">CycleTracks</string>
 <string name="previous_trips">Saved Trips:</string>
-<string name="startNewTrip">Start New Trip</string>
+<string name="startNewTrip">Start Trip!</string>
 <string name="pauseButtonLabel">Pause</string>
 <string name="finishedButtonLabel">Finish</string>
 <string-array name="trip_purposes"><item>Commute</item>
-<item>Social</item>
-<item>Exercise</item>
+<item>Exercise</item><item>Social</item>
+
+<item>Shopping</item>
+<item>Other</item>
 </string-array>
 <string name="enterTripInfo">And add any comments about your trip here</string>
 <string name="promptPurpose">Select the main purpose of this trip</string>
