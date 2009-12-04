@@ -27,18 +27,20 @@ public class MainInput extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
+
 		// Set up the list view of saved trips
 		ListView listSavedTrips = (ListView) findViewById(R.id.ListSavedTrips);
 		populateList(listSavedTrips);
-		listSavedTrips.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			public void onItemClick(AdapterView parent, View v, int pos, long id) {
-				Intent i = new Intent(MainInput.this, ShowMap.class);
-				i.putExtra("showtrip", id);
-				startActivity(i);
-			}
-		});
-        
+		listSavedTrips
+				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+					public void onItemClick(AdapterView parent, View v,
+							int pos, long id) {
+						Intent i = new Intent(MainInput.this, ShowMap.class);
+						i.putExtra("showtrip", id);
+						startActivity(i);
+					}
+				});
+
 		// And set up the record button
 		final Button startButton = (Button) findViewById(R.id.ButtonStart);
 		final Intent i = new Intent(this, RecordingActivity.class);
@@ -51,31 +53,34 @@ public class MainInput extends Activity {
 	}
 
 	void populateList(ListView lv) {
-		// Get list from the real phone database.  W00t!
-        DbAdapter mDbHelper = new DbAdapter(MainInput.this);
-        mDbHelper.open();
-        try {
-	        Cursor allTrips = mDbHelper.fetchAllTrips();
-	
-			SimpleCursorAdapter sca = new SimpleCursorAdapter(this, 
-					R.layout.twolinelist,
-					allTrips,
-					new String[] {"purp", "note", "fancystart"},
-					new int[] { R.id.TextView01, R.id.TextView02, R.id.TextView03 }
-			);
-			
+		// Get list from the real phone database. W00t!
+		DbAdapter mDbHelper = new DbAdapter(MainInput.this);
+		mDbHelper.open();
+		try {
+			Cursor allTrips = mDbHelper.fetchAllTrips();
+
+			SimpleCursorAdapter sca = new SimpleCursorAdapter(this,
+					R.layout.twolinelist, allTrips, new String[] { "purp",
+							"note", "fancystart" }, new int[] {
+							R.id.TextView01, R.id.TextView02, R.id.TextView03 });
+
 			lv.setAdapter(sca);
 			TextView counter = (TextView) findViewById(R.id.TextViewPreviousTrips);
-			int numtrips = allTrips.getCount(); 
+			int numtrips = allTrips.getCount();
 			switch (numtrips) {
-				case 0: counter.setText("No saved trips."); break; 
-				case 1: counter.setText("1 saved trip:"); break;
-				default: counter.setText(""+numtrips+" saved trips.");
+			case 0:
+				counter.setText("No saved trips.");
+				break;
+			case 1:
+				counter.setText("1 saved trip:");
+				break;
+			default:
+				counter.setText("" + numtrips + " saved trips:");
 			}
-        } catch (SQLException sqle) {
+		} catch (SQLException sqle) {
 			// Do nothing, for now!
 		}
-        mDbHelper.close();        
+		mDbHelper.close();
 	}
 }
 

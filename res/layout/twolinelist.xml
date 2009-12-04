@@ -2,8 +2,8 @@
 <LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_height="wrap_content" android:orientation="vertical" android:layout_width="fill_parent">
-<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content"><TextView android:text="@+id/TextView01" android:id="@+id/TextView01" android:layout_height="wrap_content" android:textStyle="bold" android:textSize="20px" android:layout_width="wrap_content" android:layout_alignParentLeft="true"></TextView><TextView android:text="@+id/TextView03" android:id="@+id/TextView03" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:textSize="20px" android:layout_alignParentRight="true"></TextView></RelativeLayout>
-<TextView android:text="@+id/TextView02" android:id="@+id/TextView02" android:layout_height="wrap_content" android:layout_width="fill_parent" android:textSize="14px"></TextView>
+<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingLeft="4px" android:paddingTop="4px" android:paddingRight="8px"><TextView android:text="@+id/TextView01" android:id="@+id/TextView01" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentLeft="true" android:layout_marginLeft="2px" android:textSize="20px"></TextView><TextView android:text="@+id/TextView03" android:id="@+id/TextView03" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:textSize="20px"></TextView></RelativeLayout>
+<TextView android:text="@+id/TextView02" android:id="@+id/TextView02" android:layout_height="wrap_content" android:layout_width="fill_parent" android:paddingLeft="7px" android:textSize="14px" android:paddingBottom="8px"></TextView>
 
 
 </LinearLayout>

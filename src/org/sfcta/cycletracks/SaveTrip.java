@@ -15,60 +15,61 @@ import android.widget.Toast;
 
 public class SaveTrip extends Activity {
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.save);
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.save);
 
-        // Remove the notification
-    	NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-    	mNotificationManager.cancelAll();
-    	    	
-		// Discard btn 
+		// Remove the notification
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.cancelAll();
+
+		CycleTrackData.get().killListener();
+
+		// Discard btn
 		final Button btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
 		final Intent i = new Intent(this, MainInput.class);
 		btnDiscard.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Toast.makeText(getBaseContext(),"Trip discarded.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getBaseContext(), "Trip discarded.",
+						Toast.LENGTH_SHORT).show();
 				startActivity(i);
-				CycleTrackData.get().killListener();
 				SaveTrip.this.finish();
 			}
 		});
 
-		// Submit btn 
+		// Submit btn
 		final Button btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
 		final Intent xi = new Intent(this, ShowMap.class);
 		btnSubmit.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				CycleTrackData ctd = CycleTrackData.get();
-				ctd.killListener();
-				
-				Toast.makeText(getBaseContext(),
-						"Submitting trip with "+ctd.coords.size()+" points. Thank you!", 
-						Toast.LENGTH_SHORT).show();
-				
+
+				Toast.makeText(
+						getBaseContext(),
+						"Submitting trip with " + ctd.coords.size()
+								+ " points. Thank you!", Toast.LENGTH_SHORT)
+						.show();
+
 				// Find user-entered info
 				Spinner purpose = (Spinner) findViewById(R.id.SpinnerPurp);
 				EditText notes = (EditText) findViewById(R.id.NotesField);
-				
-				// Save this trip to the database.  W00t!
-		        DbAdapter mDbHelper = new DbAdapter(SaveTrip.this);
-		        mDbHelper.open();
-		        String fancystarttime = DateFormat.getInstance().format(ctd.startTime);
-		        long tripid = mDbHelper.createTrip(
-		        		purpose.getSelectedItem().toString(),
-		        		ctd.startTime,
-		        		fancystarttime, 
-		        		notes.getEditableText().toString()
-		        );
-		        
-		        mDbHelper.createCoordsForTrip(tripid, ctd.coords);
-		        mDbHelper.close();
-				
+
+				// Save this trip to the database. W00t!
+				DbAdapter mDbHelper = new DbAdapter(SaveTrip.this);
+				mDbHelper.open();
+				String fancystarttime = DateFormat.getInstance().format(
+						ctd.startTime);
+				long tripid = mDbHelper.createTrip(purpose.getSelectedItem()
+						.toString(), ctd.startTime, fancystarttime, notes
+						.getEditableText().toString());
+
+				mDbHelper.createCoordsForTrip(tripid, ctd.coords);
+				mDbHelper.close();
+
 				// Show the map!
 				startActivity(xi);
 				SaveTrip.this.finish();
 			}
 		});
-    }
+	}
 }
