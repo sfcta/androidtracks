@@ -1,5 +1,6 @@
 package org.sfcta.cycletracks;
 
+import java.text.DateFormat;
 import java.util.Vector;
 
 import android.content.ContentValues;
@@ -42,13 +43,14 @@ public class DbAdapter {
     private static final String TAG = "DbAdapter";
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
+    private int seq = 1;
     
     /**
      * Database creation sql statement
      */
     private static final String TABLE_CREATE_TRIPS =
             "create table trips (_id integer primary key autoincrement, "
-                    + "purp text not null, start double, fancystart text, note text);";
+                    + "purp text, start double, fancystart text, note text);";
     
     private static final String TABLE_CREATE_COORDS =
             "create table coords (_id integer primary key autoincrement, "
@@ -117,33 +119,54 @@ public class DbAdapter {
     
     /**
      * Create a set of coords for a trip using the data provided. If the coords are
-     * all successfully created, return true; otherwise return false
+     * all successfully created, return true; otherwise return false.
+     * TODO: This method is really slow! :-(
      */
     public boolean createCoordsForTrip(long tripid, Vector <CyclePoint> points) {
+    	boolean success = true;
+    	mDb.beginTransaction();
+    	
     	for (int i=0; i<points.size(); i++) {
             ContentValues rowValues = new ContentValues();
             rowValues.put(K_POINT_TRIP, tripid);
-            rowValues.put(K_POINT_SEQ, i+1);
+            rowValues.put(K_POINT_SEQ, i);
             
     		CyclePoint pt = points.elementAt(i);
     		rowValues.put(K_POINT_LAT, pt.getLatitudeE6());
     		rowValues.put(K_POINT_LGT, pt.getLongitudeE6());
     		rowValues.put(K_POINT_TIME, pt.time);
-    		rowValues.put(K_POINT_ACC, 0); //TODO: Store accuracy!
+    		//rowValues.put(K_POINT_ACC, 0); //TODO: Store accuracy!
             
             long rtn = mDb.insert(DATA_TABLE_COORDS, null, rowValues);
-            if (rtn<0) return false;    		
+            if (rtn<0) {
+            	success = false;
+            	break;    		
+            }
     	}
-    	return true;
-    };
+    	mDb.endTransaction();
+    	return success;
+    }
+
+    public boolean addCoordToTrip(long tripid, CyclePoint pt) {
+        ContentValues rowValues = new ContentValues();
+        rowValues.put(K_POINT_TRIP, tripid);
+        rowValues.put(K_POINT_SEQ, seq++);
+        
+		rowValues.put(K_POINT_LAT, pt.getLatitudeE6());
+		rowValues.put(K_POINT_LGT, pt.getLongitudeE6());
+		rowValues.put(K_POINT_TIME, pt.time);
+		//rowValues.put(K_POINT_ACC, 0); //TODO: Store accuracy!
+            
+        return mDb.insert(DATA_TABLE_COORDS, null, rowValues) > 0;
+    }
     
     public boolean deleteAllCoordsForTrip(long tripid) {
         return mDb.delete(DATA_TABLE_COORDS, K_POINT_TRIP + "=" + tripid, null) > 0;
-    };
+    }
     
     public Cursor fetchAllCoordsForTrip(long tripid) {
         Cursor mCursor =mDb.query(true, DATA_TABLE_COORDS, 
-        		new String[] {K_POINT_TRIP, K_POINT_SEQ, K_POINT_LAT, K_POINT_LGT, K_POINT_TIME, K_POINT_ACC},
+        		new String[] {K_POINT_SEQ, K_POINT_LAT, K_POINT_LGT, K_POINT_TIME},
         		K_POINT_TRIP + "=" + tripid, 
         		null, null, null, null, null);
         
@@ -151,7 +174,7 @@ public class DbAdapter {
             mCursor.moveToFirst();
         }
         return mCursor;
-    };
+    }
 
     // #### Trip table methods ####
 
@@ -166,8 +189,15 @@ public class DbAdapter {
         initialValues.put(K_TRIP_START, starttime);
         initialValues.put(K_TRIP_FANCYSTART, fancystart);
         initialValues.put(K_TRIP_NOTE, note);
-
+        
+        // Start numbering points for this trip from 1 
+        seq = 1;
+        
         return mDb.insert(DATA_TABLE_TRIPS, null, initialValues);
+    }
+    
+    public long createTrip() {
+    	return createTrip("",0,"","");
     }
 
     /**
@@ -210,22 +240,13 @@ public class DbAdapter {
         return mCursor;
     }
 
-    /**
-     * Update the trip using the details provided. The trip to be updated is
-     * specified using the rowId, and it is altered according to data passed in
-     * 
-     * @param rowId id of note to update
-     * @param title value to set note title to
-     * @param body value to set note body to
-     * @return true if the note was successfully updated, false otherwise
-     */
-    /*
-    public boolean updateNote(long rowId, String title, String body) {
-        ContentValues args = new ContentValues();
-        args.put(KEY_TITLE, title);
-        args.put(KEY_BODY, body);
+    public boolean updateTrip(long tripid, String purp, double starttime, String fancystart, String note) {
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(K_TRIP_PURP, purp);
+        initialValues.put(K_TRIP_START, starttime);
+        initialValues.put(K_TRIP_FANCYSTART, fancystart);
+        initialValues.put(K_TRIP_NOTE, note);
 
-        return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
+        return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "=" + tripid, null) > 0;
     }
-    */
 }

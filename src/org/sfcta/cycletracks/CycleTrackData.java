@@ -20,7 +20,9 @@ public class CycleTrackData implements LocationListener {
 	ItemizedOverlayTrack gpspoints;
 	int lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
 	boolean idle = true;
-
+	DbAdapter mDb;
+	long tripid;
+	
 	// ---Singleton design pattern! Only one CTD should ever exist.
 	private CycleTrackData() {
 	}
@@ -32,7 +34,6 @@ public class CycleTrackData implements LocationListener {
 	public static CycleTrackData get() {
 		return CTDHolder.INSTANCE;
 	}
-
 	// ---End Singleton design pattern.
 
 	// If we're just starting to record, set initial conditions.
@@ -54,7 +55,16 @@ public class CycleTrackData implements LocationListener {
 		if (idle) {
 			idle = false;
 			initializeData();
+
+			// Reset database
+			try {
+				mDb = new DbAdapter(activity);
+				mDb.open();
+			} catch (Exception e) {}
+			
+			tripid = mDb.createTrip();
 		}
+		
 		lm = (LocationManager) activity
 				.getSystemService(Context.LOCATION_SERVICE);
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
@@ -65,6 +75,11 @@ public class CycleTrackData implements LocationListener {
 			lm.removeUpdates(this);
 	}
 
+	void dropTrip() {
+		mDb.deleteAllCoordsForTrip(tripid);
+		mDb.deleteTrip(tripid);
+	}
+	
 	void addPointNow(Location loc, double currentTime) {
 		int lat = (int) (loc.getLatitude() * 1E6);
 		int lgt = (int) (loc.getLongitude() * 1E6);
@@ -78,7 +93,10 @@ public class CycleTrackData implements LocationListener {
 
 		CyclePoint pt = new CyclePoint(lat, lgt, currentTime);
 		coords.add(pt);
-		// String startMsg = (coords.size()==1 ? "Start" : "");
+		
+		// Only add point to database if we're live (i.e. not just showing a saved map)
+		if (!idle) mDb.addCoordToTrip(tripid, pt);
+		
 		OverlayItem opoint = new OverlayItem(pt, "", "");
 		gpspoints.addOverlay(opoint);
 
