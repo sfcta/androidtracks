@@ -87,13 +87,17 @@ public class CycleTrackData implements LocationListener {
 	void addPointNow(Location loc, double currentTime) {
 		int lat = (int) (loc.getLatitude() * 1E6);
 		int lgt = (int) (loc.getLongitude() * 1E6);
+		float accuracy = loc.getAccuracy();
+		double altiude = loc.getAltitude();
+		float speed = loc.getSpeed();
 
 		// Skip duplicates
 		if (latestlat == lat && latestlgt == lgt)
 			return;
 
 		needToSave = true;
-		CyclePoint pt = new CyclePoint(lat, lgt, currentTime);
+		CyclePoint pt = new CyclePoint(lat, lgt, currentTime, accuracy,
+				altiude, speed);
 		coords.add(pt);
 
 		// Only add point to database if we're live (i.e. not just showing a
