@@ -24,13 +24,17 @@ import android.util.Log;
  * **This code borrows heavily from Google demo app "Notepad" in the Android SDK**
  */
 public class DbAdapter {
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 11;
 
     public static final String K_TRIP_ROWID = "_id";
     public static final String K_TRIP_PURP  = "purp";
     public static final String K_TRIP_START = "start";
     public static final String K_TRIP_FANCYSTART = "fancystart";
     public static final String K_TRIP_NOTE  = "note";
+    public static final String K_TRIP_LATHI  = "lathi";
+    public static final String K_TRIP_LATLO  = "latlo";
+    public static final String K_TRIP_LGTHI  = "lgthi";
+    public static final String K_TRIP_LGTLO  = "lgtlo";
 
     public static final String K_POINT_ROWID = "_id";
     public static final String K_POINT_TRIP  = "trip";
@@ -50,7 +54,8 @@ public class DbAdapter {
      */
     private static final String TABLE_CREATE_TRIPS =
             "create table trips (_id integer primary key autoincrement, "
-                    + "purp text, start double, fancystart text, note text);";
+                    + "purp text, start double, fancystart text, note text,"
+                    + "lathi integer, latlo integer, lgthi integer, lgtlo integer);";
     
     private static final String TABLE_CREATE_COORDS =
             "create table coords (_id integer primary key autoincrement, "
@@ -231,7 +236,7 @@ public class DbAdapter {
      */
     public Cursor fetchTrip(long rowId) throws SQLException {
         Cursor mCursor =mDb.query(true, DATA_TABLE_TRIPS, 
-        		new String[] {K_TRIP_ROWID, K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART, K_TRIP_NOTE},
+        		new String[] {K_TRIP_ROWID, K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART, K_TRIP_NOTE, K_TRIP_LATHI, K_TRIP_LATLO, K_TRIP_LGTHI, K_TRIP_LGTLO},
         		K_TRIP_ROWID + "=" + rowId, 
         		null, null, null, null, null);
         if (mCursor != null) {
@@ -240,12 +245,17 @@ public class DbAdapter {
         return mCursor;
     }
 
-    public boolean updateTrip(long tripid, String purp, double starttime, String fancystart, String note) {
+    public boolean updateTrip(long tripid, String purp, double starttime, String fancystart, String note,
+    		int lathigh, int latlow, int lgthigh, int lgtlow) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(K_TRIP_PURP, purp);
         initialValues.put(K_TRIP_START, starttime);
         initialValues.put(K_TRIP_FANCYSTART, fancystart);
         initialValues.put(K_TRIP_NOTE, note);
+        initialValues.put(K_TRIP_LATHI, lathigh);
+        initialValues.put(K_TRIP_LATLO, latlow);
+        initialValues.put(K_TRIP_LGTHI, lgthigh);
+        initialValues.put(K_TRIP_LGTLO, lgtlow);
 
         return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "=" + tripid, null) > 0;
     }

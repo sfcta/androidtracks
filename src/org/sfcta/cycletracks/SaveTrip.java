@@ -66,7 +66,8 @@ public class SaveTrip extends Activity {
 				mDbHelper.updateTrip(ctd.tripid,
 						purpose.getSelectedItem().toString(), 
 						ctd.startTime, 
-						fancystarttime, notes.getEditableText().toString()
+						fancystarttime, notes.getEditableText().toString(),
+						ctd.lathigh,ctd.latlow,ctd.lgthigh,ctd.lgtlow
 				);
 				
 				// mDbHelper.createCoordsForTrip(tripid, ctd.coords);

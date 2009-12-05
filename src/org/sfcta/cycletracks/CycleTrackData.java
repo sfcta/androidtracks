@@ -83,10 +83,7 @@ public class CycleTrackData implements LocationListener {
 	void addPointNow(Location loc, double currentTime) {
 		int lat = (int) (loc.getLatitude() * 1E6);
 		int lgt = (int) (loc.getLongitude() * 1E6);
-		addPointNow(lat, lgt, currentTime);
-	}
-
-	void addPointNow(int lat, int lgt, double currentTime) {
+		
 		// Skip duplicates
 		if (latestlat == lat && latestlgt == lgt)
 			return;
@@ -104,6 +101,14 @@ public class CycleTrackData implements LocationListener {
 		lathigh = Math.max(lathigh, lat);
 		lgtlow = Math.min(lgtlow, lgt);
 		lgthigh = Math.max(lgthigh, lgt);
+	}
+
+	void addPointToSavedMap(int lat, int lgt, double currentTime) {
+		CyclePoint pt = new CyclePoint(lat, lgt, currentTime);
+//		coords.add(pt);
+		
+		OverlayItem opoint = new OverlayItem(pt, "", "");
+		gpspoints.addOverlay(opoint);
 	}
 
 	// LocationListener implementation:
