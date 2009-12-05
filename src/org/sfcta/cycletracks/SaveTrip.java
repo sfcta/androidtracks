@@ -1,6 +1,7 @@
 package org.sfcta.cycletracks;
 
 import java.text.DateFormat;
+
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -13,7 +14,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 public class SaveTrip extends Activity {
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -22,19 +23,20 @@ public class SaveTrip extends Activity {
 		// Remove the notification
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.cancelAll();
-		
+
 		// Turn of GPS updates
 		CycleTrackData ctd = CycleTrackData.get();
 		ctd.activity = this;
-		ctd.killListener();		
+		ctd.killListener();
 
 		// Discard btn
 		final Button btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
 		final Intent i = new Intent(this, MainInput.class);
 		btnDiscard.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Toast.makeText(getBaseContext(), "Trip discarded.",Toast.LENGTH_SHORT).show();
-				
+				Toast.makeText(getBaseContext(), "Trip discarded.",
+						Toast.LENGTH_SHORT).show();
+
 				CycleTrackData.get().dropTrip();
 				startActivity(i);
 				SaveTrip.this.finish();
@@ -61,15 +63,15 @@ public class SaveTrip extends Activity {
 				// Save the trip coords to the database. W00t!
 				DbAdapter mDbHelper = new DbAdapter(SaveTrip.this);
 				mDbHelper.open();
-				String fancystarttime = DateFormat.getInstance().format(ctd.startTime);
-				
-				mDbHelper.updateTrip(ctd.tripid,
-						purpose.getSelectedItem().toString(), 
-						ctd.startTime, 
-						fancystarttime, notes.getEditableText().toString(),
-						ctd.lathigh,ctd.latlow,ctd.lgthigh,ctd.lgtlow
-				);
-				
+				String fancystarttime = DateFormat.getInstance().format(
+						ctd.startTime);
+
+				mDbHelper.updateTrip(ctd.tripid, purpose.getSelectedItem()
+						.toString(), ctd.startTime, fancystarttime, notes
+						.getEditableText().toString(), ctd.lathigh, ctd.latlow,
+						ctd.lgthigh, ctd.lgtlow);
+
+				ctd.needToSave = false;
 				// mDbHelper.createCoordsForTrip(tripid, ctd.coords);
 				mDbHelper.close();
 

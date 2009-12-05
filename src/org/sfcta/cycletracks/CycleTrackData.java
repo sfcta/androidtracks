@@ -22,7 +22,8 @@ public class CycleTrackData implements LocationListener {
 	boolean idle = true;
 	DbAdapter mDb;
 	long tripid;
-	
+	boolean needToSave = false;
+
 	// ---Singleton design pattern! Only one CTD should ever exist.
 	private CycleTrackData() {
 	}
@@ -34,6 +35,7 @@ public class CycleTrackData implements LocationListener {
 	public static CycleTrackData get() {
 		return CTDHolder.INSTANCE;
 	}
+
 	// ---End Singleton design pattern.
 
 	// If we're just starting to record, set initial conditions.
@@ -60,11 +62,12 @@ public class CycleTrackData implements LocationListener {
 			try {
 				mDb = new DbAdapter(activity);
 				mDb.open();
-			} catch (Exception e) {}
-			
+			} catch (Exception e) {
+			}
+
 			tripid = mDb.createTrip();
 		}
-		
+
 		lm = (LocationManager) activity
 				.getSystemService(Context.LOCATION_SERVICE);
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
@@ -78,22 +81,26 @@ public class CycleTrackData implements LocationListener {
 	void dropTrip() {
 		mDb.deleteAllCoordsForTrip(tripid);
 		mDb.deleteTrip(tripid);
+		needToSave = false;
 	}
-	
+
 	void addPointNow(Location loc, double currentTime) {
 		int lat = (int) (loc.getLatitude() * 1E6);
 		int lgt = (int) (loc.getLongitude() * 1E6);
-		
+
 		// Skip duplicates
 		if (latestlat == lat && latestlgt == lgt)
 			return;
 
+		needToSave = true;
 		CyclePoint pt = new CyclePoint(lat, lgt, currentTime);
 		coords.add(pt);
-		
-		// Only add point to database if we're live (i.e. not just showing a saved map)
-		if (!idle) mDb.addCoordToTrip(tripid, pt);
-		
+
+		// Only add point to database if we're live (i.e. not just showing a
+		// saved map)
+		if (!idle)
+			mDb.addCoordToTrip(tripid, pt);
+
 		OverlayItem opoint = new OverlayItem(pt, "", "");
 		gpspoints.addOverlay(opoint);
 
@@ -105,7 +112,7 @@ public class CycleTrackData implements LocationListener {
 
 	void addPointToSavedMap(int lat, int lgt, double currentTime) {
 		CyclePoint pt = new CyclePoint(lat, lgt, currentTime);
-		
+
 		OverlayItem opoint = new OverlayItem(pt, "", "");
 		gpspoints.addOverlay(opoint);
 	}
