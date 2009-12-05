@@ -21,8 +21,9 @@ public class RecordingActivity extends Activity {
 		setContentView(R.layout.recording);
 
 		// Start listening for GPS events
-		CycleTrackData.get().activity = this;
-		CycleTrackData.get().activateListener();
+		CycleTrackData ctd = CycleTrackData.get();
+		ctd.activity = this;
+		ctd.activateListener();
 		
 		// Create a notification saying we're recording
 		setNotification();
@@ -64,7 +65,10 @@ public class RecordingActivity extends Activity {
 			    	
 			    	// Go back to main screen
 					fi = new Intent(RecordingActivity.this, MainInput.class);
+					fi.putExtra("keep", true);
 					CycleTrackData.get().killListener();
+					CycleTrackData.get().dropTrip();
+					CycleTrackData.get().idle=true;
 				}
 				
 				// Either way, activate next task, and then kill this task

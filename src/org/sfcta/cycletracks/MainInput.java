@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainInput extends Activity {
 	ArrayList savedtrips = new ArrayList<HashMap>();
@@ -26,6 +27,25 @@ public class MainInput extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// Let's handle some launcher lifecycle issues:
+		// 1. If this activity floated to the top of another CycleTracks task,
+		//    just kill it. the existing task will reveal itself. (This handles
+		//    the user hitting home and relaunching later.
+		if (this.isChild()  && this.getIntent().getExtras()==null) {
+			Toast.makeText(getBaseContext(), "A-ha!",Toast.LENGTH_SHORT).show();
+			this.finish();
+		}
+
+		// 2. If we're recording right now, even if this is in a new task, jump
+		//    to the Recording activity.  (This handles user hitting back button
+		//    while recording)
+		if (CycleTrackData.get().idle == false) {
+			startActivity(new Intent(this, RecordingActivity.class));
+			this.finish();
+		}
+		
+		// Otherwise we're GTG; show the main screen. 
 		setContentView(R.layout.main);
 
 		// Set up the list view of saved trips

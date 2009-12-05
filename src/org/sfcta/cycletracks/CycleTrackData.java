@@ -105,7 +105,6 @@ public class CycleTrackData implements LocationListener {
 
 	void addPointToSavedMap(int lat, int lgt, double currentTime) {
 		CyclePoint pt = new CyclePoint(lat, lgt, currentTime);
-//		coords.add(pt);
 		
 		OverlayItem opoint = new OverlayItem(pt, "", "");
 		gpspoints.addOverlay(opoint);

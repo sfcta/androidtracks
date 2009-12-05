@@ -90,6 +90,8 @@ public class ShowMap extends MapActivity {
 	}
 
 	private class AddPointsToMapLayerTask extends AsyncTask <Long, Integer, Integer> {
+		int updates = 0;
+		
 		@Override
 		protected Integer doInBackground(Long... tripid) {
 			Integer pk = new Integer(5); // fakey!
@@ -98,7 +100,7 @@ public class ShowMap extends MapActivity {
 			int COL_LGT = coords.getColumnIndex("lgt");
 			int COL_TIME = coords.getColumnIndex("time");
 			CycleTrackData ctd = CycleTrackData.get();
-			
+
 			while (true) {
 				int lat = coords.getInt(COL_LAT);
 				int lgt = coords.getInt(COL_LGT);
@@ -117,15 +119,16 @@ public class ShowMap extends MapActivity {
 		
 		@Override
 		protected void onProgressUpdate(Integer... progress) {
-			mapView.invalidate(); 
+//			mapView.invalidate(); 
 		}
 		
 		@Override
 		protected void onPostExecute(Integer i) {
-			if (mapOverlays.isEmpty()) 
+			if (mapOverlays.isEmpty()) {
 				mapOverlays.add(CycleTrackData.get().gpspoints);
-			
+			}
 			mapView.invalidate();
 		}
+		
 	}
 }
