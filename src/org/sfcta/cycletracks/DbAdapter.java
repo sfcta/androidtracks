@@ -1,6 +1,5 @@
 package org.sfcta.cycletracks;
 
-import java.text.DateFormat;
 import java.util.Vector;
 
 import android.content.ContentValues;
@@ -24,7 +23,7 @@ import android.util.Log;
  * **This code borrows heavily from Google demo app "Notepad" in the Android SDK**
  */
 public class DbAdapter {
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 12;
 
     public static final String K_TRIP_ROWID = "_id";
     public static final String K_TRIP_PURP  = "purp";
@@ -43,6 +42,8 @@ public class DbAdapter {
     public static final String K_POINT_LGT   = "lgt";
     public static final String K_POINT_TIME  = "time";
     public static final String K_POINT_ACC   = "acc";
+    public static final String K_POINT_ALT   = "alt";
+    public static final String K_POINT_SPEED   = "speed";
 
     private static final String TAG = "DbAdapter";
     private DatabaseHelper mDbHelper;
@@ -60,7 +61,7 @@ public class DbAdapter {
     private static final String TABLE_CREATE_COORDS =
             "create table coords (_id integer primary key autoincrement, "
           			+ "trip integer, seq integer, lat integer, lgt integer, "
-          			+ "time double, acc integer);";
+          			+ "time double, acc float, alt double, speed float);";
 
     private static final String DATABASE_NAME = "data";
     private static final String DATA_TABLE_TRIPS = "trips";
@@ -140,7 +141,9 @@ public class DbAdapter {
     		rowValues.put(K_POINT_LAT, pt.getLatitudeE6());
     		rowValues.put(K_POINT_LGT, pt.getLongitudeE6());
     		rowValues.put(K_POINT_TIME, pt.time);
-    		//rowValues.put(K_POINT_ACC, 0); //TODO: Store accuracy!
+    		rowValues.put(K_POINT_ACC, pt.accuracy);
+    		rowValues.put(K_POINT_ALT, pt.altiude);
+    		rowValues.put(K_POINT_SPEED, pt.speed);
             
             long rtn = mDb.insert(DATA_TABLE_COORDS, null, rowValues);
             if (rtn<0) {
@@ -160,7 +163,9 @@ public class DbAdapter {
 		rowValues.put(K_POINT_LAT, pt.getLatitudeE6());
 		rowValues.put(K_POINT_LGT, pt.getLongitudeE6());
 		rowValues.put(K_POINT_TIME, pt.time);
-		//rowValues.put(K_POINT_ACC, 0); //TODO: Store accuracy!
+		rowValues.put(K_POINT_ACC, pt.accuracy);
+		rowValues.put(K_POINT_ALT, pt.altiude);
+		rowValues.put(K_POINT_SPEED, pt.speed);
             
         return mDb.insert(DATA_TABLE_COORDS, null, rowValues) > 0;
     }
@@ -171,7 +176,7 @@ public class DbAdapter {
     
     public Cursor fetchAllCoordsForTrip(long tripid) {
         Cursor mCursor =mDb.query(true, DATA_TABLE_COORDS, 
-        		new String[] {K_POINT_SEQ, K_POINT_LAT, K_POINT_LGT, K_POINT_TIME},
+        		new String[] {K_POINT_SEQ, K_POINT_LAT, K_POINT_LGT, K_POINT_TIME, K_POINT_ACC, K_POINT_ALT, K_POINT_SPEED},
         		K_POINT_TRIP + "=" + tripid, 
         		null, null, null, null, null);
         
