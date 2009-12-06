@@ -12,8 +12,7 @@
 		<LinearLayout android:id="@+id/LinearLayout02"
 			android:layout_height="wrap_content" android:layout_width="fill_parent">
 			<EditText android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:text="Age"
-				android:layout_marginLeft="10px" android:layout_weight="1" android:id="@+id/TextAge"></EditText>
+				android:layout_height="wrap_content" android:layout_marginLeft="10px" android:layout_weight="1" android:id="@+id/TextAge" android:hint="Age"></EditText>
 			<RadioGroup android:id="@+id/RadioGroup01"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
 				android:orientation="horizontal" android:layout_marginLeft="20px"
@@ -25,13 +24,11 @@
 					android:text="Female" android:layout_marginLeft="10px" android:id="@+id/ButtonFemale"></RadioButton>
 			</RadioGroup>
 		</LinearLayout>
-		<TextView android:id="@+id/TextView02" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:text="Cycling Frequency:"
-			android:layout_marginTop="10px" android:layout_marginLeft="10px"></TextView>
+		<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content"><TextView android:id="@+id/TextView02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cycling Frequency:" android:layout_marginTop="10px" android:layout_marginLeft="10px" android:layout_alignParentLeft="true"></TextView><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_marginTop="10px" android:layout_marginRight="10px" android:id="@+id/TextFreq"></TextView></RelativeLayout>
 		<SeekBar android:layout_height="wrap_content"
 			android:layout_width="fill_parent"
 			android:layout_marginLeft="10px" android:layout_marginRight="10px"
-			android:max="4" android:id="@+id/SeekCycleFreq"></SeekBar>
+			android:id="@+id/SeekCycleFreq" android:thumbOffset="5px" android:minHeight="30px" android:thumb="@drawable/icon48" android:max="399"></SeekBar>
 		<TextView android:id="@+id/TextView03" android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:text="ZIP codes:"
 			android:layout_marginLeft="10px" android:layout_marginTop="10px"></TextView>
@@ -39,12 +36,12 @@
 			android:layout_height="wrap_content"
 			android:orientation="horizontal" android:layout_width="fill_parent" android:layout_marginRight="10px">
 			<EditText android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:layout_marginLeft="10px" android:text="Home" android:layout_weight="1" android:id="@+id/TextZipHome"></EditText>
+				android:layout_height="wrap_content" android:layout_marginLeft="10px" android:layout_weight="1" android:id="@+id/TextZipHome" android:hint="Home"></EditText>
 			<EditText android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:layout_marginLeft="5px" android:layout_weight="1" android:text="Work" android:id="@+id/TextZipWork"></EditText>
+				android:layout_height="wrap_content" android:layout_marginLeft="5px" android:layout_weight="1" android:id="@+id/TextZipWork" android:hint="Work"></EditText>
 			<EditText android:layout_width="wrap_content"
 				android:layout_height="wrap_content" android:layout_marginLeft="5px"
-				android:text="School" android:layout_weight="1" android:id="@+id/TextZipSchool"></EditText>
+				android:layout_weight="1" android:id="@+id/TextZipSchool" android:hint="School"></EditText>
 		</LinearLayout>
 		<TextView android:id="@+id/TextView04" android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:layout_marginLeft="10px"
@@ -52,6 +49,8 @@
 			android:text="You can provide your e-mail address to receive news and updates:"></TextView>
 		<EditText android:layout_height="wrap_content"
 			android:layout_marginLeft="10px" android:layout_width="fill_parent"
-			android:layout_marginRight="10px" android:text="email address" android:id="@+id/TextEmail"></EditText>
-	</LinearLayout>
+			android:layout_marginRight="10px" android:id="@+id/TextEmail" android:hint="email address"></EditText>
+	
+
+</LinearLayout>
 </ScrollView>

@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 public class UserInfoActivity extends Activity {
     public final static int PREF_AGE = 1;
@@ -20,10 +21,32 @@ public class UserInfoActivity extends Activity {
     public final static int PREF_GENDER = 6;
     public final static int PREF_CYCLEFREQ = 7;
 
+    final String[] freqDesc = {"Less than once a month", "Several times a month", "Several times per week", "Daily"};
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.userprefs);
+
+        SeekBar sb = (SeekBar) findViewById(R.id.SeekCycleFreq);
+        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onStopTrackingTouch(SeekBar arg0) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar arg0) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
+                TextView tv = (TextView) findViewById(R.id.TextFreq);
+                tv.setText(freqDesc[arg1/100]);
+            }
+        });
 
         SharedPreferences settings = getSharedPreferences("PREFS", 0);
         Map <String, ?> prefs = settings.getAll();
