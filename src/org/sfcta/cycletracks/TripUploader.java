@@ -71,35 +71,17 @@ public class TripUploader {
 
     private JSONObject getUserJSON() throws JSONException {
         JSONObject user = new JSONObject();
-        SharedPreferences settings = this.mCtx.getSharedPreferences("PREFS", 0);
-        Map <String, ?> prefs = settings.getAll();
-        for (Entry <String, ?> p : prefs.entrySet()) {
-            int key = Integer.parseInt(p.getKey());
-            CharSequence value = (CharSequence) p.getValue();
+        Map<String, Integer> fieldMap = new HashMap<String, Integer>();
+        fieldMap.put("age", new Integer(UserInfoActivity.PREF_AGE));
+        fieldMap.put("email", new Integer(UserInfoActivity.PREF_EMAIL));
+        fieldMap.put("gender", new Integer(UserInfoActivity.PREF_GENDER));
+        fieldMap.put("homeZIP", new Integer(UserInfoActivity.PREF_ZIPHOME));
+        fieldMap.put("workZIP", new Integer(UserInfoActivity.PREF_ZIPWORK));
+        fieldMap.put("schoolZIP", new Integer(UserInfoActivity.PREF_ZIPSCHOOL));
 
-            switch (key) {
-            case UserInfoActivity.PREF_AGE:
-                user.put("age", value);
-                break;
-            case UserInfoActivity.PREF_ZIPHOME:
-                user.put("homeZIP", value);
-                break;
-            case UserInfoActivity.PREF_ZIPWORK:
-                user.put("workZIP", value);
-                break;
-            case UserInfoActivity.PREF_ZIPSCHOOL:
-                user.put("schoolZIP", value);
-                break;
-            case UserInfoActivity.PREF_EMAIL:
-                user.put("email", value);
-                break;
-            case UserInfoActivity.PREF_CYCLEFREQ:
-                user.put("cyclingFreq",value);
-                break;
-            case UserInfoActivity.PREF_GENDER:
-                user.put("gender", value);
-                break;
-            }
+        SharedPreferences settings = this.mCtx.getSharedPreferences("PREFS", 0);
+        for (Entry<String, Integer> entry : fieldMap.entrySet()) {
+               user.put(entry.getKey(), settings.getString(entry.getValue().toString(), null));
         }
         return user;
     }
