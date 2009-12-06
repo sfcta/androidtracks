@@ -83,6 +83,7 @@ public class TripUploader {
         for (Entry<String, Integer> entry : fieldMap.entrySet()) {
                user.put(entry.getKey(), settings.getString(entry.getValue().toString(), null));
         }
+        user.put("cyclingFreq", settings.getInt(""+UserInfoActivity.PREF_CYCLEFREQ, 0)/100);
         return user;
     }
 
