@@ -161,6 +161,7 @@ public class TripUploader {
         HttpClient client = new DefaultHttpClient();
         HttpPost postRequest = new HttpPost(
                 "http://bikedatabase.sfcta.org/post/");
+        postRequest.addHeader("Accept-Encoding", "gzip");
 
         HttpResponse response;
 
