@@ -32,6 +32,22 @@ public class TripUploader {
     Context mCtx;
     DbAdapter mDbHelper;
 
+    public static final String TRIP_COORDS_TIME = "rec";
+    public static final String TRIP_COORDS_LAT = "lat";
+    public static final String TRIP_COORDS_LON = "lon";
+    public static final String TRIP_COORDS_ALT = "alt";
+    public static final String TRIP_COORDS_SPEED = "spd";
+    public static final String TRIP_COORDS_HACCURACY = "hac";
+    public static final String TRIP_COORDS_VACCURACY = "vac";
+
+    public static final String USER_AGE = "age";
+    public static final String USER_EMAIL = "email";
+    public static final String USER_GENDER = "gender";
+    public static final String USER_ZIP_HOME = "homeZIP";
+    public static final String USER_ZIP_WORK = "workZIP";
+    public static final String USER_ZIP_SCHOOL = "schoolZIP";
+    public static final String USER_CYCLING_FREQUENCY = "cyclingFreq";
+
     public TripUploader(Context ctx) {
         this.mCtx = ctx;
         this.mDbHelper = new DbAdapter(this.mCtx);
@@ -41,13 +57,13 @@ public class TripUploader {
         mDbHelper.openReadOnly();
         Cursor tripCoordsCursor = mDbHelper.fetchAllCoordsForTrip(tripId);
         Map<String, String> fieldMap = new HashMap<String, String>();
-        fieldMap.put("rec", DbAdapter.K_POINT_TIME);
-        fieldMap.put("lat", DbAdapter.K_POINT_LAT);
-        fieldMap.put("lon", DbAdapter.K_POINT_LGT);
-        fieldMap.put("alt", DbAdapter.K_POINT_ALT);
-        fieldMap.put("spd", DbAdapter.K_POINT_SPEED);
-        fieldMap.put("hac", DbAdapter.K_POINT_ACC);
-        fieldMap.put("vac", DbAdapter.K_POINT_ACC);
+        fieldMap.put(TRIP_COORDS_TIME, DbAdapter.K_POINT_TIME);
+        fieldMap.put(TRIP_COORDS_LAT, DbAdapter.K_POINT_LAT);
+        fieldMap.put(TRIP_COORDS_LON, DbAdapter.K_POINT_LGT);
+        fieldMap.put(TRIP_COORDS_ALT, DbAdapter.K_POINT_ALT);
+        fieldMap.put(TRIP_COORDS_SPEED, DbAdapter.K_POINT_SPEED);
+        fieldMap.put(TRIP_COORDS_HACCURACY, DbAdapter.K_POINT_ACC);
+        fieldMap.put(TRIP_COORDS_VACCURACY, DbAdapter.K_POINT_ACC);
         JSONObject tripCoords = new JSONObject();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         while (!tripCoordsCursor.isAfterLast()) {
@@ -72,18 +88,18 @@ public class TripUploader {
     private JSONObject getUserJSON() throws JSONException {
         JSONObject user = new JSONObject();
         Map<String, Integer> fieldMap = new HashMap<String, Integer>();
-        fieldMap.put("age", new Integer(UserInfoActivity.PREF_AGE));
-        fieldMap.put("email", new Integer(UserInfoActivity.PREF_EMAIL));
-        fieldMap.put("gender", new Integer(UserInfoActivity.PREF_GENDER));
-        fieldMap.put("homeZIP", new Integer(UserInfoActivity.PREF_ZIPHOME));
-        fieldMap.put("workZIP", new Integer(UserInfoActivity.PREF_ZIPWORK));
-        fieldMap.put("schoolZIP", new Integer(UserInfoActivity.PREF_ZIPSCHOOL));
+        fieldMap.put(USER_AGE, new Integer(UserInfoActivity.PREF_AGE));
+        fieldMap.put(USER_EMAIL, new Integer(UserInfoActivity.PREF_EMAIL));
+        fieldMap.put(USER_GENDER, new Integer(UserInfoActivity.PREF_GENDER));
+        fieldMap.put(USER_ZIP_HOME, new Integer(UserInfoActivity.PREF_ZIPHOME));
+        fieldMap.put(USER_ZIP_WORK, new Integer(UserInfoActivity.PREF_ZIPWORK));
+        fieldMap.put(USER_ZIP_SCHOOL, new Integer(UserInfoActivity.PREF_ZIPSCHOOL));
 
         SharedPreferences settings = this.mCtx.getSharedPreferences("PREFS", 0);
         for (Entry<String, Integer> entry : fieldMap.entrySet()) {
                user.put(entry.getKey(), settings.getString(entry.getValue().toString(), null));
         }
-        user.put("cyclingFreq", Integer.parseInt(settings.getString(""+UserInfoActivity.PREF_CYCLEFREQ, "0"))/100);
+        user.put(USER_CYCLING_FREQUENCY, Integer.parseInt(settings.getString(""+UserInfoActivity.PREF_CYCLEFREQ, "0"))/100);
         return user;
     }
 
@@ -160,15 +176,12 @@ public class TripUploader {
         Log.v("PostData", nameValuePairs.toString());
 
         HttpClient client = new DefaultHttpClient();
-        HttpPost postRequest = new HttpPost("http://bikedatabase.sfcta.org/post/");
-//        HttpPost postRequest = new HttpPost("http://localhost/post/");
-
-        HttpResponse response;
+        final String postUrl = "http://bikedatabase.sfcta.org/post/";
+        HttpPost postRequest = new HttpPost(postUrl);
 
         try {
             postRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            Log.v("PostData", convertStreamToString(postRequest.getEntity().getContent()));
-            response = client.execute(postRequest);
+            HttpResponse response = client.execute(postRequest);
             String responseString = convertStreamToString(response.getEntity().getContent());
             Log.v("httpResponse", responseString);
             JSONObject responseData = new JSONObject(responseString);
