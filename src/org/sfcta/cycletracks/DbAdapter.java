@@ -24,7 +24,7 @@ import android.util.Log;
  * SDK**
  */
 public class DbAdapter {
-    private static final int DATABASE_VERSION = 13;
+    private static final int DATABASE_VERSION = 14;
 
     public static final String K_TRIP_ROWID = "_id";
     public static final String K_TRIP_PURP = "purp";
@@ -35,6 +35,7 @@ public class DbAdapter {
     public static final String K_TRIP_LATLO = "latlo";
     public static final String K_TRIP_LGTHI = "lgthi";
     public static final String K_TRIP_LGTLO = "lgtlo";
+    public static final String K_TRIP_UPLOADED = "uploaded";
 
     public static final String K_POINT_ROWID = "_id";
     public static final String K_POINT_TRIP = "trip";
@@ -56,7 +57,7 @@ public class DbAdapter {
      */
     private static final String TABLE_CREATE_TRIPS = "create table trips (_id integer primary key autoincrement, "
         + "purp text, start double, fancystart text, note text,"
-        + "lathi integer, latlo integer, lgthi integer, lgtlo integer);";
+        + "lathi integer, latlo integer, lgthi integer, lgtlo integer, uploaded boolean false);";
 
     private static final String TABLE_CREATE_COORDS = "create table coords (_id integer primary key autoincrement, "
         + "trip integer, seq integer, lat integer, lgt integer, "
@@ -274,6 +275,14 @@ public class DbAdapter {
         initialValues.put(K_TRIP_LATLO, latlow);
         initialValues.put(K_TRIP_LGTHI, lgthigh);
         initialValues.put(K_TRIP_LGTLO, lgtlow);
+
+        return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "="
+                + tripid, null) > 0;
+    }
+
+    public boolean updateTripMarkUploaded(long tripid) {
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(K_TRIP_UPLOADED, true);
 
         return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "="
                 + tripid, null) > 0;
