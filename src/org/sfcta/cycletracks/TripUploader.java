@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -24,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.provider.Settings.System;
 import android.util.Log;
@@ -69,14 +71,18 @@ public class TripUploader {
 
     private JSONObject getUserJSON() throws JSONException {
         JSONObject user = new JSONObject();
-        user.put("age", "Blah");
-        user.put("email", "Blah");
-        user.put("gender", "Blah");
-        user.put("homeZIP", "Blah");
-        user.put("workZIP", "Blah");
-        user.put("schoolZIP", "Blah");
-        user.put("cyclingFreq", 5);
+        Map<String, Integer> fieldMap = new HashMap<String, Integer>();
+        fieldMap.put("age", new Integer(UserInfoActivity.PREF_AGE));
+        fieldMap.put("email", new Integer(UserInfoActivity.PREF_EMAIL));
+        fieldMap.put("gender", new Integer(UserInfoActivity.PREF_GENDER));
+        fieldMap.put("homeZIP", new Integer(UserInfoActivity.PREF_ZIPHOME));
+        fieldMap.put("workZIP", new Integer(UserInfoActivity.PREF_ZIPWORK));
+        fieldMap.put("schoolZIP", new Integer(UserInfoActivity.PREF_ZIPSCHOOL));
 
+        SharedPreferences settings = this.mCtx.getSharedPreferences("PREFS", 0);
+        for (Entry<String, Integer> entry : fieldMap.entrySet()) {
+               user.put(entry.getKey(), settings.getString(entry.getValue().toString(), null));
+        }
         return user;
     }
 
