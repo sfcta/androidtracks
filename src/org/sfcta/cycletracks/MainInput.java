@@ -8,6 +8,7 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.os.Bundle;
@@ -51,6 +52,14 @@ public class MainInput extends Activity {
 
 		// Otherwise we're GTG; show the main screen.
 		setContentView(R.layout.main);
+
+		// Hide the user prefs btn if they already entered them
+		// (they can still get 'em thru the menu)
+        SharedPreferences settings = getSharedPreferences("PREFS", 0);
+        if (!settings.getAll().isEmpty()) {
+            Button btn = (Button) findViewById(R.id.ButtonPrefs);
+            btn.setVisibility(View.GONE);
+        }
 
 		// Set up the list view of saved trips
 		ListView listSavedTrips = (ListView) findViewById(R.id.ListSavedTrips);
