@@ -44,7 +44,7 @@ public class DbAdapter {
     public static final String K_POINT_TIME = "time";
     public static final String K_POINT_ACC = "acc";
     public static final String K_POINT_ALT = "alt";
-    public static final String K_POINT_SPEED = "spd";
+    public static final String K_POINT_SPEED = "speed";
 
     private static final String TAG = "DbAdapter";
     private DatabaseHelper mDbHelper;
