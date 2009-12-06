@@ -34,8 +34,7 @@ public class SaveTrip extends Activity {
 		final Button btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
 		btnDiscard.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Toast.makeText(getBaseContext(), "Trip discarded.",
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(getBaseContext(), "Trip discarded.",	Toast.LENGTH_SHORT).show();
 
 				CycleTrackData.get().dropTrip();
 				CycleTrackData.get().idle = true;
@@ -54,11 +53,9 @@ public class SaveTrip extends Activity {
 			public void onClick(View v) {
 				CycleTrackData ctd = CycleTrackData.get();
 
-				Toast.makeText(
-						getBaseContext(),
-						"Submitting trip with " + ctd.coords.size()
-								+ " points. Thank you!", Toast.LENGTH_SHORT)
-						.show();
+				Toast.makeText(getBaseContext(),
+				        "Submitting trip with " + ctd.coords.size()+" points. Thank you!",
+				        Toast.LENGTH_SHORT).show();
 
 				// Find user-entered info
 				Spinner purpose = (Spinner) findViewById(R.id.SpinnerPurp);
