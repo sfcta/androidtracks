@@ -1,6 +1,9 @@
 package org.sfcta.cycletracks;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,7 +20,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,14 +29,15 @@ import android.provider.Settings.System;
 import android.util.Log;
 
 public class TripUploader {
-    private final Context mCtx;
+    Context mCtx;
 
     public TripUploader(Context ctx) {
         this.mCtx = ctx;
     }
 
-    private JSONArray getCoordsJSON(long tripId) throws JSONException {
+    private JSONObject getCoordsJSON(long tripId) throws JSONException {
         DbAdapter mDbHelper = new DbAdapter(this.mCtx);
+        mDbHelper.open();
         Cursor tripCoordsCursor = mDbHelper.fetchAllCoordsForTrip(tripId);
         Map<String, String> fieldMap = new HashMap<String, String>();
         fieldMap.put("rec", DbAdapter.K_POINT_TIME);
@@ -44,9 +47,9 @@ public class TripUploader {
         fieldMap.put("spd", DbAdapter.K_POINT_SPEED);
         fieldMap.put("hac", DbAdapter.K_POINT_ACC);
         fieldMap.put("vac", DbAdapter.K_POINT_ACC);
-        JSONArray tripCoords = new JSONArray();
+        JSONObject tripCoords = new JSONObject();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        while (!tripCoordsCursor.isLast()) {
+        while (!tripCoordsCursor.isAfterLast()) {
             JSONObject coord = new JSONObject();
             for (Map.Entry<String, String> entry : fieldMap.entrySet()) {
                 int dbIndex = tripCoordsCursor.getColumnIndex(entry.getValue());
@@ -57,9 +60,10 @@ public class TripUploader {
                     coord.put(entry.getKey(), dbData);
                 }
             }
-            tripCoords.put(coord);
+            tripCoords.put(coord.getString("rec"), coord);
             tripCoordsCursor.moveToNext();
         }
+        mDbHelper.close();
         return tripCoords;
     }
 
@@ -71,7 +75,7 @@ public class TripUploader {
         user.put("homeZIP", "Blah");
         user.put("workZIP", "Blah");
         user.put("schoolZIP", "Blah");
-        user.put("cyclingFreq", "Blah");
+        user.put("cyclingFreq", 5);
 
         return user;
     }
@@ -79,6 +83,7 @@ public class TripUploader {
     private Vector<String> getTripData(long tripId) {
         Vector<String> tripData = new Vector<String>();
         DbAdapter mDbHelper = new DbAdapter(this.mCtx);
+        mDbHelper.open();
         Cursor tripCursor = mDbHelper.fetchTrip(tripId);
 
         String note = tripCursor.getString(tripCursor
@@ -87,6 +92,7 @@ public class TripUploader {
                 .getColumnIndex(DbAdapter.K_TRIP_PURP));
         Double startTime = tripCursor.getDouble(tripCursor
                 .getColumnIndex(DbAdapter.K_TRIP_START));
+        mDbHelper.close();
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         tripData.add(note);
@@ -102,7 +108,7 @@ public class TripUploader {
         String androidBase = "androidDeviceId-";
 
         if (androidId == null) { // This happens when running in the Emulator
-            final String emulatorId = "android-RunningAsEmulatorTestingDeleteMe";
+            final String emulatorId = "android-RunningAsTestingDeleteMe";
             return emulatorId;
         }
         String deviceId = androidBase.concat(androidId);
@@ -110,7 +116,7 @@ public class TripUploader {
     }
 
     private List<NameValuePair> getPostData(long tripId) throws JSONException {
-        JSONArray coords = getCoordsJSON(tripId);
+        JSONObject coords = getCoordsJSON(tripId);
         JSONObject user = getUserJSON();
         String deviceId = getDeviceId();
         Vector<String> tripData = getTripData(tripId);
@@ -135,18 +141,26 @@ public class TripUploader {
      * @return boolean Whether the post succeeded.
      * @throws JSONException
      */
-    public boolean uploadTrip(long tripId) throws JSONException {
-        List<NameValuePair> nameValuePairs = getPostData(tripId);
+    public boolean uploadTrip(long tripId) {
+        List<NameValuePair> nameValuePairs;
+        try {
+            nameValuePairs = getPostData(tripId);
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return false;
+        }
+        Log.v("PostData", nameValuePairs.toString());
 
         HttpClient client = new DefaultHttpClient();
         HttpPost postRequest = new HttpPost(
-                "http://bikedatabase.sfcta.org/test/post/");
+                "http://bikedatabase.sfcta.org/post/");
 
         HttpResponse response;
 
         try {
             postRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            Log.v("PostData", postRequest.toString());
+            Log.v("PostData", convertStreamToString(postRequest.getEntity().getContent()));
             response = client.execute(postRequest);
         } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block
@@ -161,7 +175,42 @@ public class TripUploader {
             e.printStackTrace();
             return false;
         }
-        Log.v("httpResponse", response.toString());
+        try {
+            Log.v("httpResponse", convertStreamToString(response.getEntity().getContent()));
+        } catch (IllegalStateException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return true;
+    }
+
+    private static String convertStreamToString(InputStream is) {
+        /*
+         * To convert the InputStream to String we use the BufferedReader.readLine()
+         * method. We iterate until the BufferedReader return null which means
+         * there's no more data to read. Each line will appended to a StringBuilder
+         * and returned as String.
+         */
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
     }
 }

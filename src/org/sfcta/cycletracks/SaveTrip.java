@@ -73,8 +73,9 @@ public class SaveTrip extends Activity {
 						ctd.lgthigh, ctd.lgtlow);
 
 				ctd.itsTimeToSave = false;
-				// mDbHelper.createCoordsForTrip(tripid, ctd.coords);
 				mDbHelper.close();
+				TripUploader uploader = new TripUploader(getBaseContext());
+                uploader.uploadTrip(ctd.tripid);
 
 				// Show the map!
 				startActivity(xi);

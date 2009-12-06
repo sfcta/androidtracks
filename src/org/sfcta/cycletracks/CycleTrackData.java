@@ -77,9 +77,11 @@ public class CycleTrackData implements LocationListener {
 	}
 
 	void killListener() {
-		if (lm != null)
+		if (lm != null) {
 	        Toast.makeText(activity.getBaseContext(), "Cancelling updates", Toast.LENGTH_SHORT).show();
 			lm.removeUpdates(this);
+		}
+		mDb.close();
 	}
 
 	void dropTrip() {
