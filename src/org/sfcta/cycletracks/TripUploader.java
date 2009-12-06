@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import java.util.Map.Entry;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -32,14 +30,15 @@ import android.util.Log;
 
 public class TripUploader {
     Context mCtx;
+    DbAdapter mDbHelper;
 
     public TripUploader(Context ctx) {
         this.mCtx = ctx;
+        this.mDbHelper = new DbAdapter(this.mCtx);
     }
 
     private JSONObject getCoordsJSON(long tripId) throws JSONException {
-        DbAdapter mDbHelper = new DbAdapter(this.mCtx);
-        mDbHelper.open();
+        mDbHelper.openReadOnly();
         Cursor tripCoordsCursor = mDbHelper.fetchAllCoordsForTrip(tripId);
         Map<String, String> fieldMap = new HashMap<String, String>();
         fieldMap.put("rec", DbAdapter.K_POINT_TIME);
@@ -65,6 +64,7 @@ public class TripUploader {
             tripCoords.put(coord.getString("rec"), coord);
             tripCoordsCursor.moveToNext();
         }
+        tripCoordsCursor.close();
         mDbHelper.close();
         return tripCoords;
     }
@@ -83,14 +83,13 @@ public class TripUploader {
         for (Entry<String, Integer> entry : fieldMap.entrySet()) {
                user.put(entry.getKey(), settings.getString(entry.getValue().toString(), null));
         }
-        user.put("cyclingFreq", settings.getInt(""+UserInfoActivity.PREF_CYCLEFREQ, 0)/100);
+        user.put("cyclingFreq", Integer.parseInt(settings.getString(""+UserInfoActivity.PREF_CYCLEFREQ, "0"))/100);
         return user;
     }
 
     private Vector<String> getTripData(long tripId) {
         Vector<String> tripData = new Vector<String>();
-        DbAdapter mDbHelper = new DbAdapter(this.mCtx);
-        mDbHelper.open();
+        mDbHelper.openReadOnly();
         Cursor tripCursor = mDbHelper.fetchTrip(tripId);
 
         String note = tripCursor.getString(tripCursor
@@ -99,6 +98,7 @@ public class TripUploader {
                 .getColumnIndex(DbAdapter.K_TRIP_PURP));
         Double startTime = tripCursor.getDouble(tripCursor
                 .getColumnIndex(DbAdapter.K_TRIP_START));
+        tripCursor.close();
         mDbHelper.close();
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -160,8 +160,8 @@ public class TripUploader {
         Log.v("PostData", nameValuePairs.toString());
 
         HttpClient client = new DefaultHttpClient();
-        HttpPost postRequest = new HttpPost(
-                "http://bikedatabase.sfcta.org/post/");
+        HttpPost postRequest = new HttpPost("http://bikedatabase.sfcta.org/post/");
+//        HttpPost postRequest = new HttpPost("http://localhost/post/");
 
         HttpResponse response;
 
@@ -169,27 +169,26 @@ public class TripUploader {
             postRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             Log.v("PostData", convertStreamToString(postRequest.getEntity().getContent()));
             response = client.execute(postRequest);
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
-        }
-        try {
-            Log.v("httpResponse", convertStreamToString(response.getEntity().getContent()));
+            String responseString = convertStreamToString(response.getEntity().getContent());
+            Log.v("httpResponse", responseString);
+            JSONObject responseData = new JSONObject(responseString);
+            if (responseData.getString("status").equals("success")) {
+                mDbHelper.open();
+                mDbHelper.updateTripMarkUploaded(tripId);
+                mDbHelper.close();
+            }
         } catch (IllegalStateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            return false;
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            return false;
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return false;
         }
         return true;
     }
