@@ -27,6 +27,7 @@ public class CycleTrackData implements LocationListener {
 	DbAdapter mDb;
 	long tripid;
 	boolean itsTimeToSave = false;
+	float curSpeed, maxSpeed;
 
 	// ---Singleton design pattern! Only one CTD should ever exist.
 	private CycleTrackData() {
@@ -54,6 +55,7 @@ public class CycleTrackData implements LocationListener {
 		Drawable drawable = activity.getResources().getDrawable(
 				R.drawable.point);
 		gpspoints = new ItemizedOverlayTrack(drawable);
+	    curSpeed = maxSpeed = distanceTraveled = 0.0f;
 	}
 
 	// Start getting updates
@@ -140,7 +142,7 @@ public class CycleTrackData implements LocationListener {
 			if (currentTime - latestUpdate > 999) {
 				addPointNow(loc, currentTime);
 				latestUpdate = currentTime;
-				updateDistance(loc);
+				updateTripStats(loc);
 				// Update the status page every time, if we can.
 	            //TODO: This should not be here; should be moved to a Listener somewhere
 				updateStatus();
@@ -148,21 +150,28 @@ public class CycleTrackData implements LocationListener {
 		}
 	}
 
-	private void updateDistance(Location newLocation) {
+	private void updateTripStats(Location newLocation) {
+	    final float spdConvert = 2.2369f;
 	    if (lastLocation != null) {
 	        Float segmentDistance = lastLocation.distanceTo(newLocation);
 	        distanceTraveled = distanceTraveled.floatValue() + segmentDistance.floatValue();
+	        curSpeed = newLocation.getSpeed() * spdConvert;
+	        maxSpeed = Math.max(maxSpeed, curSpeed);
 	    }
 	    lastLocation = newLocation;
 	}
 
 	private void updateStatus() {
-	    if (activity instanceof RecordingActivity) {
+	    if (activity instanceof RecordingActivity) { //TODO: check task status before doing this
             TextView stat = (TextView) activity.findViewById(R.id.TextRecordStats);
             TextView distance = (TextView) activity.findViewById(R.id.TextDistance);
+            TextView txtCurSpeed = (TextView) activity.findViewById(R.id.TextSpeed);
+            TextView txtMaxSpeed = (TextView) activity.findViewById(R.id.TextMaxSpeed);
             stat.setText(""+coords.size()+" data points received...");
             distance.setText(String.format("Meters travelled: %1d", distanceTraveled.intValue()));
-        }
+            txtCurSpeed.setText(String.format("Current speed: %1.1f", curSpeed));
+            txtMaxSpeed.setText(String.format("Maximum speed: %1.1f", maxSpeed));
+	    }
 	}
 
 	@Override
