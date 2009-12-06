@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -24,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.provider.Settings.System;
 import android.util.Log;
@@ -69,14 +71,36 @@ public class TripUploader {
 
     private JSONObject getUserJSON() throws JSONException {
         JSONObject user = new JSONObject();
-        user.put("age", "Blah");
-        user.put("email", "Blah");
-        user.put("gender", "Blah");
-        user.put("homeZIP", "Blah");
-        user.put("workZIP", "Blah");
-        user.put("schoolZIP", "Blah");
-        user.put("cyclingFreq", 5);
+        SharedPreferences settings = this.mCtx.getSharedPreferences("PREFS", 0);
+        Map <String, ?> prefs = settings.getAll();
+        for (Entry <String, ?> p : prefs.entrySet()) {
+            int key = Integer.parseInt(p.getKey());
+            CharSequence value = (CharSequence) p.getValue();
 
+            switch (key) {
+            case UserInfoActivity.PREF_AGE:
+                user.put("age", value);
+                break;
+            case UserInfoActivity.PREF_ZIPHOME:
+                user.put("homeZIP", value);
+                break;
+            case UserInfoActivity.PREF_ZIPWORK:
+                user.put("workZIP", value);
+                break;
+            case UserInfoActivity.PREF_ZIPSCHOOL:
+                user.put("schoolZIP", value);
+                break;
+            case UserInfoActivity.PREF_EMAIL:
+                user.put("email", value);
+                break;
+            case UserInfoActivity.PREF_CYCLEFREQ:
+                user.put("cyclingFreq",value);
+                break;
+            case UserInfoActivity.PREF_GENDER:
+                user.put("gender", value);
+                break;
+            }
+        }
         return user;
     }
 
