@@ -39,6 +39,7 @@ public class SaveTrip extends Activity {
                 startActivity(pi);
             }
         });
+
         SharedPreferences settings = getSharedPreferences("PREFS", 0);
         if (settings.getAll().size() >= 1) {
             prefsButton.setVisibility(View.GONE);

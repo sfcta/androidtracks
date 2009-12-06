@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.google.android.maps.OverlayItem;
 
 public class CycleTrackData implements LocationListener {
-	//Vector<CyclePoint> coords;
 	Activity activity = null;
 	LocationManager lm = null;
 	Location lastLocation;
@@ -26,6 +25,7 @@ public class CycleTrackData implements LocationListener {
 	long tripid;
 	boolean dirty = false;
 	boolean itsTimeToSave = false;
+	boolean isListening = false;
 	float curSpeed, maxSpeed;
 
 	// ---Singleton design pattern! Only one CTD should ever exist.
@@ -44,7 +44,6 @@ public class CycleTrackData implements LocationListener {
 
 	// If we're just starting to record, set initial conditions.
 	void initializeData() {
-		//coords = new Vector<CyclePoint>();
 		startTime = System.currentTimeMillis();
 		latestUpdate = latestlat = latestlgt = 0;
         curSpeed = maxSpeed = distanceTraveled = 0.0f;
@@ -63,7 +62,13 @@ public class CycleTrackData implements LocationListener {
 
 	// Start getting updates
 	void activateListener() {
-		if (idle) {
+	    if (isListening) {
+	        return;
+	    }
+
+        isListening = true;
+
+        if (idle) {
 			idle = false;
 			initializeData();
 
@@ -80,10 +85,10 @@ public class CycleTrackData implements LocationListener {
         Toast.makeText(activity.getBaseContext(), "Requesting updates", Toast.LENGTH_SHORT).show();
 		lm = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-
 	}
 
 	void killListener() {
+	    isListening = false;
 		if (lm != null) {
 	        Toast.makeText(activity.getBaseContext(), "Cancelling updates", Toast.LENGTH_SHORT).show();
 			lm.removeUpdates(this);
@@ -111,7 +116,6 @@ public class CycleTrackData implements LocationListener {
 
 		CyclePoint pt = new CyclePoint(lat, lgt, currentTime, accuracy,
 				altitude, speed);
-		//coords.add(pt);
 
 		// Only add point to database if we're live (i.e. not just showing a
 		// saved map)
@@ -121,9 +125,6 @@ public class CycleTrackData implements LocationListener {
             mDb.close();
             dirty = true;
 		}
-
-//		OverlayItem opoint = new OverlayItem(pt, "", "");
-//		gpspoints.addOverlay(opoint);
 
 		latlow = Math.min(latlow, lat);
 		lathigh = Math.max(lathigh, lat);
