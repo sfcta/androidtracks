@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -29,6 +30,19 @@ public class SaveTrip extends Activity {
 		ctd.itsTimeToSave = true;
 		ctd.activity = this;
 		ctd.killListener();
+
+        // User prefs btn
+        final Button prefsButton = (Button) findViewById(R.id.ButtonPrefs);
+        final Intent pi = new Intent(this, UserInfoActivity.class);
+        prefsButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(pi);
+            }
+        });
+        SharedPreferences settings = getSharedPreferences("PREFS", 0);
+        if (settings.getAll().size() >= 1) {
+            prefsButton.setVisibility(View.GONE);
+        }
 
 		// Discard btn
 		final Button btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
