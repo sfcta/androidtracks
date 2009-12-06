@@ -50,15 +50,13 @@ public class MainInput extends Activity {
 			this.finish();
 		}
 
-		// Otherwise we're GTG; show the main screen.
+		// Otherwise we're GTG; build the main screen.
 		setContentView(R.layout.main);
 
-		// Hide the user prefs btn if they already entered them
-		// (they can still get 'em thru the menu)
+		// Switch to user prefs screen if there are no prefs stored yet (first-run)
         SharedPreferences settings = getSharedPreferences("PREFS", 0);
-        if (!settings.getAll().isEmpty()) {
-            Button btn = (Button) findViewById(R.id.ButtonPrefs);
-//            btn.setVisibility(View.GONE);
+        if (settings.getAll().isEmpty()) {
+            startActivity(new Intent(this, UserInfoActivity.class));
         }
 
 		// Set up the list view of saved trips
@@ -73,15 +71,6 @@ public class MainInput extends Activity {
 						startActivity(i);
 					}
 				});
-
-        // User prefs
-        final Button prefsButton = (Button) findViewById(R.id.ButtonPrefs);
-        final Intent pi = new Intent(this, UserInfoActivity.class);
-        prefsButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                startActivity(pi);
-            }
-        });
 
 		// And set up the record button
 		final Button startButton = (Button) findViewById(R.id.ButtonStart);

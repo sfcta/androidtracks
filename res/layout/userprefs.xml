@@ -5,52 +5,46 @@
 	<LinearLayout android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:orientation="vertical">
 		<TextView android:id="@+id/TextView01" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:layout_marginLeft="10px"
-			android:layout_marginRight="5px"
+			android:layout_height="wrap_content" android:layout_marginRight="5px"
 			android:text="Add details about yourself here.  This info is anonymous, and will help us understand different people's biking preferences."
-			android:layout_marginBottom="10px"></TextView>
-		<LinearLayout android:id="@+id/LinearLayout02"
-			android:layout_height="wrap_content" android:layout_width="fill_parent">
-			<EditText android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:layout_marginLeft="10px" android:layout_weight="1" android:id="@+id/TextAge" android:hint="Age"></EditText>
-			<RadioGroup android:id="@+id/RadioGroup01"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:orientation="horizontal" android:layout_marginLeft="20px"
-				android:layout_weight="2">
-				<RadioButton android:layout_width="wrap_content"
-					android:layout_height="wrap_content" android:id="@+id/ButtonMale"
-					android:text="Male" android:layout_marginLeft="10px"></RadioButton>
-				<RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content"
-					android:text="Female" android:layout_marginLeft="10px" android:id="@+id/ButtonFemale"></RadioButton>
-			</RadioGroup>
-		</LinearLayout>
-		<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content"><TextView android:id="@+id/TextView02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cycling Frequency:" android:layout_marginTop="10px" android:layout_marginLeft="10px" android:layout_alignParentLeft="true"></TextView><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_marginTop="10px" android:layout_marginRight="10px" android:id="@+id/TextFreq"></TextView></RelativeLayout>
+			android:layout_marginBottom="10px" android:layout_marginLeft="12px" android:layout_marginTop="5px"></TextView>
+		<TextView android:id="@+id/TextView05" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:layout_marginLeft="15px" android:text="Age"></TextView><RelativeLayout android:id="@+id/RelativeLayout02" android:layout_height="wrap_content" android:layout_width="fill_parent"><EditText android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10px" android:layout_weight="1" android:id="@+id/TextAge" android:hint="Age" android:inputType="number" android:lines="1" android:layout_alignParentLeft="true"></EditText><RadioGroup android:id="@+id/RadioGroup01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginLeft="20px" android:layout_weight="2" android:layout_alignParentRight="true" android:layout_marginRight="10px">
+				<RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ButtonMale" android:text="Male" android:layout_marginLeft="10px" android:textStyle="bold" android:textSize="14px"></RadioButton>
+				<RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Female" android:layout_marginLeft="10px" android:id="@+id/ButtonFemale" android:textStyle="bold" android:textSize="14px"></RadioButton>
+			</RadioGroup></RelativeLayout>
+		<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content"><TextView android:id="@+id/TextView02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cycling Frequency:" android:layout_marginLeft="10px" android:layout_alignParentLeft="true" android:layout_marginTop="20px" android:textStyle="bold"></TextView><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_marginRight="10px" android:id="@+id/TextFreq" android:textStyle="bold" android:layout_marginTop="20px" android:text="Less than once a month"></TextView></RelativeLayout>
 		<SeekBar android:layout_height="wrap_content"
 			android:layout_width="fill_parent"
 			android:layout_marginLeft="10px" android:layout_marginRight="10px"
-			android:id="@+id/SeekCycleFreq" android:thumbOffset="5px" android:minHeight="30px" android:thumb="@drawable/icon48" android:max="399"></SeekBar>
-		<TextView android:id="@+id/TextView03" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:text="ZIP codes:"
-			android:layout_marginLeft="10px" android:layout_marginTop="10px"></TextView>
+			android:id="@+id/SeekCycleFreq" android:thumbOffset="5px" android:minHeight="30px" android:thumb="@drawable/icon48" android:max="399" android:layout_marginTop="2px" android:nextFocusDown="@+id/TextZipHome"></SeekBar>
+		
+		
 		<LinearLayout android:id="@+id/LinearLayout01"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal" android:layout_width="fill_parent" android:layout_marginRight="10px">
-			<EditText android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:layout_marginLeft="10px" android:layout_weight="1" android:id="@+id/TextZipHome" android:hint="Home"></EditText>
-			<EditText android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:layout_marginLeft="5px" android:layout_weight="1" android:id="@+id/TextZipWork" android:hint="Work"></EditText>
-			<EditText android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:layout_marginLeft="5px"
-				android:layout_weight="1" android:id="@+id/TextZipSchool" android:hint="School"></EditText>
+			android:orientation="horizontal" android:layout_width="fill_parent" android:layout_marginLeft="10px" android:layout_marginRight="10px" android:layout_marginTop="20px">
+            <LinearLayout android:id="@+id/ZipLayout1" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:layout_width="fill_parent">
+                <TextView android:id="@+id/TextView06" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5px" android:text="Home ZIP" android:textStyle="bold"></TextView>
+    			<EditText android:layout_width="fill_parent"
+	       			android:layout_height="wrap_content" android:id="@+id/TextZipHome" android:inputType="number" android:lines="1" android:nextFocusDown="@+id/TextZipWork" android:hint="Home"></EditText>
+			</LinearLayout>
+            <LinearLayout android:id="@+id/ZipLayout2" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:layout_width="fill_parent">
+                <TextView android:id="@+id/TextView07" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:text="Work ZIP" android:layout_marginLeft="7px"></TextView>
+                <EditText android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" android:id="@+id/TextZipWork" android:inputType="number" android:lines="1" android:nextFocusDown="@+id/TextZipSchool" android:hint="Work " android:layout_marginLeft="2px" android:layout_marginRight="2px"></EditText>
+            </LinearLayout>
+            <LinearLayout android:id="@+id/ZipLayout3" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:layout_width="fill_parent">
+                <TextView android:id="@+id/TextView08" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5px" android:textStyle="bold" android:text="School ZIP"></TextView>
+                <EditText android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" android:id="@+id/TextZipSchool" android:inputType="number" android:lines="1" android:nextFocusDown="@+id/TextEmail" android:hint="School"></EditText>
+            </LinearLayout>
 		</LinearLayout>
+		
 		<TextView android:id="@+id/TextView04" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:layout_marginLeft="10px"
-			android:layout_marginTop="10px"
-			android:text="You can provide your e-mail address to receive news and updates:"></TextView>
+			android:layout_height="wrap_content" android:layout_marginTop="20px" android:textStyle="bold" android:layout_marginRight="5px" android:layout_marginLeft="15px" android:text="Email address:  for news and updates !!"></TextView>
 		<EditText android:layout_height="wrap_content"
 			android:layout_marginLeft="10px" android:layout_width="fill_parent"
-			android:layout_marginRight="10px" android:id="@+id/TextEmail" android:hint="email address"></EditText>
-	
+			android:layout_marginRight="10px" android:id="@+id/TextEmail" android:hint="email address" android:lines="1" android:inputType="textEmailAddress"></EditText>
+
 
 </LinearLayout>
 </ScrollView>
