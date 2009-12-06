@@ -1,6 +1,7 @@
 package org.sfcta.cycletracks;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -11,34 +12,54 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 
 public class UserInfoActivity extends Activity {
-    public final static String PREF_AGE = "age";
-    public final static String PREF_ZIPHOME = "ziphome";
-    public final static String PREF_ZIPWORK = "zipwork";
-    public final static String PREF_ZIPSCHOOL = "zipschool";
-    public final static String PREF_EMAIL = "email";
-    public final static String PREF_GENDER = "gender";
-    public final static String PREF_CYCLEFREQ = "cyclefreq";
+    public final static int PREF_AGE = 1;
+    public final static int PREF_ZIPHOME = 2;
+    public final static int PREF_ZIPWORK = 3;
+    public final static int PREF_ZIPSCHOOL = 4;
+    public final static int PREF_EMAIL = 5;
+    public final static int PREF_GENDER = 6;
+    public final static int PREF_CYCLEFREQ = 7;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.userprefs);
 
         SharedPreferences settings = getSharedPreferences("PREFS", 0);
         Map <String, ?> prefs = settings.getAll();
-        ((EditText)findViewById(R.id.TextAge)).setText((CharSequence)prefs.get("age"));
-        ((EditText)findViewById(R.id.TextZipHome)).setText((CharSequence)prefs.get("ziphome"));
-        ((EditText)findViewById(R.id.TextZipWork)).setText((CharSequence)prefs.get("zipwork"));
-        ((EditText)findViewById(R.id.TextZipSchool)).setText((CharSequence)prefs.get("zipschool"));
-        ((EditText)findViewById(R.id.TextEmail)).setText((CharSequence)prefs.get("email"));
-        ((SeekBar) findViewById(R.id.SeekCycleFreq)).setProgress(Integer.parseInt((String) prefs.get("cyclefreq")));
+        for (Entry <String, ?> p : prefs.entrySet()) {
+            int key = Integer.parseInt(p.getKey());
+            CharSequence value = (CharSequence) p.getValue();
 
-        if (prefs.get("gender")=="M") {
-            ((RadioButton) findViewById(R.id.ButtonMale)).setChecked(true);
-        } else if (prefs.get("gender")=="F") {
-            ((RadioButton) findViewById(R.id.ButtonFemale)).setChecked(true);
+            switch (key) {
+            case PREF_AGE:
+                ((EditText)findViewById(R.id.TextAge)).setText(value);
+                break;
+            case PREF_ZIPHOME:
+                ((EditText)findViewById(R.id.TextZipHome)).setText(value);
+                break;
+            case PREF_ZIPWORK:
+                ((EditText)findViewById(R.id.TextZipWork)).setText(value);
+                break;
+            case PREF_ZIPSCHOOL:
+                ((EditText)findViewById(R.id.TextZipSchool)).setText(value);
+                break;
+            case PREF_EMAIL:
+                ((EditText)findViewById(R.id.TextEmail)).setText(value);
+                break;
+            case PREF_CYCLEFREQ:
+                ((SeekBar) findViewById(R.id.SeekCycleFreq)).setProgress(Integer.parseInt((String) value));
+                break;
+            case PREF_GENDER:
+                if (value.equals("M")) {
+                    ((RadioButton) findViewById(R.id.ButtonMale)).setChecked(true);
+                } else if (value.equals("F")) {
+                    ((RadioButton) findViewById(R.id.ButtonFemale)).setChecked(true);
+                }
+                break;
+            }
         }
 
-        setContentView(R.layout.userprefs);
     }
 
     @Override
@@ -48,15 +69,15 @@ public class UserInfoActivity extends Activity {
         SharedPreferences settings = getSharedPreferences("PREFS", 0);
         SharedPreferences.Editor editor = settings.edit();
 
-        editor.putString("age",((EditText)findViewById(R.id.TextAge)).getText().toString());
-        editor.putString("ziphome",((EditText)findViewById(R.id.TextZipHome)).getText().toString());
-        editor.putString("zipwork",((EditText)findViewById(R.id.TextZipWork)).getText().toString());
-        editor.putString("zipschool",((EditText)findViewById(R.id.TextZipSchool)).getText().toString());
-        editor.putString("email",((EditText)findViewById(R.id.TextEmail)).getText().toString());
-        editor.putString("cyclefreq",""+((SeekBar)findViewById(R.id.SeekCycleFreq)).getProgress());
+        editor.putString(""+PREF_AGE,((EditText)findViewById(R.id.TextAge)).getText().toString());
+        editor.putString(""+PREF_ZIPHOME,((EditText)findViewById(R.id.TextZipHome)).getText().toString());
+        editor.putString(""+PREF_ZIPWORK,((EditText)findViewById(R.id.TextZipWork)).getText().toString());
+        editor.putString(""+PREF_ZIPSCHOOL,((EditText)findViewById(R.id.TextZipSchool)).getText().toString());
+        editor.putString(""+PREF_EMAIL,((EditText)findViewById(R.id.TextEmail)).getText().toString());
+        editor.putString(""+PREF_CYCLEFREQ,""+((SeekBar)findViewById(R.id.SeekCycleFreq)).getProgress());
         RadioGroup rbg = (RadioGroup) findViewById(R.id.RadioGroup01);
-        if (rbg.getCheckedRadioButtonId() == R.id.ButtonMale) editor.putString("gender","M");
-        if (rbg.getCheckedRadioButtonId() == R.id.ButtonFemale) editor.putString("gender","F");
+        if (rbg.getCheckedRadioButtonId() == R.id.ButtonMale) editor.putString(""+PREF_GENDER,"M");
+        if (rbg.getCheckedRadioButtonId() == R.id.ButtonFemale) editor.putString(""+PREF_GENDER,"F");
 
         // Don't forget to commit your edits!!!
         editor.commit();
