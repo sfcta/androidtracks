@@ -22,7 +22,7 @@ public class CycleTrackData implements LocationListener {
 	boolean idle = true;
 	DbAdapter mDb;
 	long tripid;
-	boolean needToSave = false;
+	boolean itsTimeToSave = false;
 
 	// ---Singleton design pattern! Only one CTD should ever exist.
 	private CycleTrackData() {
@@ -81,7 +81,7 @@ public class CycleTrackData implements LocationListener {
 	void dropTrip() {
 		mDb.deleteAllCoordsForTrip(tripid);
 		mDb.deleteTrip(tripid);
-		needToSave = false;
+		itsTimeToSave = false;
 	}
 
 	void addPointNow(Location loc, double currentTime) {
@@ -95,7 +95,6 @@ public class CycleTrackData implements LocationListener {
 		if (latestlat == lat && latestlgt == lgt)
 			return;
 
-		needToSave = true;
 		CyclePoint pt = new CyclePoint(lat, lgt, currentTime, accuracy,
 				altiude, speed);
 		coords.add(pt);

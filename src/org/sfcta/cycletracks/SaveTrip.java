@@ -26,18 +26,22 @@ public class SaveTrip extends Activity {
 
 		// Turn of GPS updates
 		CycleTrackData ctd = CycleTrackData.get();
+		ctd.itsTimeToSave = true;
 		ctd.activity = this;
 		ctd.killListener();
 
 		// Discard btn
 		final Button btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
-		final Intent i = new Intent(this, MainInput.class);
 		btnDiscard.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Toast.makeText(getBaseContext(), "Trip discarded.",
 						Toast.LENGTH_SHORT).show();
 
 				CycleTrackData.get().dropTrip();
+				CycleTrackData.get().idle = true;
+
+				Intent i = new Intent(SaveTrip.this, MainInput.class);
+				i.putExtra("keepme", true);
 				startActivity(i);
 				SaveTrip.this.finish();
 			}
@@ -71,7 +75,7 @@ public class SaveTrip extends Activity {
 						.getEditableText().toString(), ctd.lathigh, ctd.latlow,
 						ctd.lgthigh, ctd.lgtlow);
 
-				ctd.needToSave = false;
+				ctd.itsTimeToSave = false;
 				// mDbHelper.createCoordsForTrip(tripid, ctd.coords);
 				mDbHelper.close();
 

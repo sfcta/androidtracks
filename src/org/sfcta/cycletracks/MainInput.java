@@ -20,7 +20,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class MainInput extends Activity {
-	ArrayList savedtrips = new ArrayList<HashMap>();
+	ArrayList<HashMap> savedtrips = new ArrayList<HashMap>();
 
 	/** Called when the activity is first created. */
 	@Override
@@ -28,19 +28,20 @@ public class MainInput extends Activity {
 		super.onCreate(savedInstanceState);
 
 		// Let's handle some launcher lifecycle issues:
+
 		// 1. If this activity floated to the top of another CycleTracks task,
-		// just kill it. the existing task will reveal itself.
-		// (This handles the user hitting home and relaunching later.
+		// just kill it. The existing task will reveal itself.
+		// (This handles the user hitting HOME and relaunching later.
 		if (this.isChild() && this.getIntent().getExtras() == null) {
 			this.finish();
 		}
 
 		// 2. If we're recording or saving right now, even if this is in a new
 		// task, jump to the existing activity.
-		// (This handles user hitting back button while recording)
+		// (This handles user hitting BACK button while recording)
 		CycleTrackData ctd = CycleTrackData.get();
 		if (!ctd.idle) {
-			if (ctd.needToSave) {
+			if (ctd.itsTimeToSave) {
 				startActivity(new Intent(this, SaveTrip.class));
 			} else {
 				startActivity(new Intent(this, RecordingActivity.class));
