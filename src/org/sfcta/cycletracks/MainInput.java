@@ -64,9 +64,10 @@ public class MainInput extends Activity {
 		populateList(listSavedTrips);
 		listSavedTrips
 				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-					public void onItemClick(AdapterView parent, View v,
-							int pos, long id) {
-						Intent i = new Intent(MainInput.this, ShowMap.class);
+					public void onItemClick(AdapterView parent, View v, int pos, long id) {
+                        CycleTrackData.get().initializeData();
+
+                        Intent i = new Intent(MainInput.this, ShowMap.class);
 						i.putExtra("showtrip", id);
 						startActivity(i);
 					}

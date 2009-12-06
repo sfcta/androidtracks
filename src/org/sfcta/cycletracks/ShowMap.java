@@ -1,13 +1,11 @@
 package org.sfcta.cycletracks;
 
-import java.text.DateFormat;
 import java.util.List;
 
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
@@ -38,33 +36,36 @@ public class ShowMap extends MapActivity {
 		// Set up the point layer
 		mapOverlays = mapView.getOverlays();
 		if (mapOverlays != null) mapOverlays.clear();
-		
+
 		drawable = getResources().getDrawable(R.drawable.point);
-		
+
 		// Check if we're building from database. If so, construct points layer!
-		Bundle cmds = getIntent().getExtras();
-		if (cmds != null && cmds.containsKey("showtrip")) {
-			ctd.initializeData();
+		// Note!: Every screen rotation calls this onCreate() method.
+        Bundle cmds = getIntent().getExtras();
 
-			long tripid = cmds.getLong("showtrip");
+        if (ctd.gpspoints.size()>0) {
+            mapOverlays.add(CycleTrackData.get().gpspoints);
+        } else if (cmds != null && cmds.containsKey("showtrip")) {
+            long tripid = cmds.getLong("showtrip");
 
-			// Query the database
-			mDbHelper = new DbAdapter(ShowMap.this);
-			mDbHelper.open();
-			
-			// Get lat/long extremes, etc, from trip record
-			Cursor tripdetails = mDbHelper.fetchTrip(tripid);
-			ctd.lathigh = tripdetails.getInt(tripdetails.getColumnIndex("lathi")); 
-			ctd.latlow =  tripdetails.getInt(tripdetails.getColumnIndex("latlo")); 
-			ctd.lgthigh = tripdetails.getInt(tripdetails.getColumnIndex("lgthi")); 
-			ctd.lgtlow =  tripdetails.getInt(tripdetails.getColumnIndex("lgtlo"));
-			tripdetails.close();
+            // Query the database
+            mDbHelper = new DbAdapter(ShowMap.this);
+            mDbHelper.open();
 
-			// Add the GPS points
-			Toast.makeText(getBaseContext(),"Loading track...", Toast.LENGTH_SHORT).show();
+            // Get lat/long extremes, etc, from trip record
+            Cursor tripdetails = mDbHelper.fetchTrip(tripid);
+            ctd.lathigh = tripdetails.getInt(tripdetails.getColumnIndex("lathi"));
+            ctd.latlow =  tripdetails.getInt(tripdetails.getColumnIndex("latlo"));
+            ctd.lgthigh = tripdetails.getInt(tripdetails.getColumnIndex("lgthi"));
+            ctd.lgtlow =  tripdetails.getInt(tripdetails.getColumnIndex("lgtlo"));
+            tripdetails.close();
+            mDbHelper.close();
 
-			// Now spawn a helper thread to add the points asynchronously! Whee!
-			new AddPointsToMapLayerTask().execute(new Long(tripid));			
+            // Add the GPS points
+            Toast.makeText(getBaseContext(),"Loading track...", Toast.LENGTH_SHORT).show();
+
+            // Now spawn a helper thread to add the points asynchronously! Whee!
+            new AddPointsToMapLayerTask().execute(new Long(tripid));
 		}
 
 		// Find map center and extent
@@ -74,10 +75,10 @@ public class ShowMap extends MapActivity {
 		MapController mc = mapView.getController();
 		mc.animateTo(center);
 		mc.zoomToSpan(ctd.lathigh - ctd.latlow, ctd.lgthigh - ctd.lgtlow);
-		
+
 		// Show the points if there's no background task.
 		if (cmds == null) mapOverlays.add(ctd.gpspoints);
-		
+
 		// This lets the gps listener know we're done collecting data; any
 		// future data can start a new (re-initialized) path.
 		ctd.idle = true;
@@ -91,37 +92,44 @@ public class ShowMap extends MapActivity {
 
 	private class AddPointsToMapLayerTask extends AsyncTask <Long, Integer, Integer> {
 		int updates = 0;
-		
+
 		@Override
 		protected Integer doInBackground(Long... tripid) {
-			Integer pk = new Integer(5); // fakey!
-			Cursor coords = mDbHelper.fetchAllCoordsForTrip(tripid[0].longValue());
-			int COL_LAT = coords.getColumnIndex("lat");
-			int COL_LGT = coords.getColumnIndex("lgt");
-			int COL_TIME = coords.getColumnIndex("time");
-			CycleTrackData ctd = CycleTrackData.get();
+            CycleTrackData ctd = CycleTrackData.get();
+            Integer pk = new Integer(5); // fakey!
 
-			while (true) {
-				int lat = coords.getInt(COL_LAT);
-				int lgt = coords.getInt(COL_LGT);
-				double time = coords.getDouble(COL_TIME);
-				
-				ctd.addPointToSavedMap(lat, lgt, time);
-				if (coords.isLast()) break;
-				
-				if (ctd.gpspoints.size() % 100 == 99) publishProgress(pk);
-				
-				coords.moveToNext();
-			}
-			coords.close();
+            // Only ping the database if we don't already have all the gpspoints.
+            if (ctd.gpspoints.size()==0) {
+                mDbHelper = new DbAdapter(ShowMap.this);
+                mDbHelper.open();
+	            Cursor coords = mDbHelper.fetchAllCoordsForTrip(tripid[0].longValue());
+	            int COL_LAT = coords.getColumnIndex("lat");
+	            int COL_LGT = coords.getColumnIndex("lgt");
+	            int COL_TIME = coords.getColumnIndex("time");
+
+	            while (true) {
+	                int lat = coords.getInt(COL_LAT);
+	                int lgt = coords.getInt(COL_LGT);
+	                double time = coords.getDouble(COL_TIME);
+
+	                ctd.addPointToSavedMap(lat, lgt, time);
+	                if (coords.isLast()) break;
+
+	                if (ctd.gpspoints.size() % 100 == 99) publishProgress(pk);
+
+	                coords.moveToNext();
+	            }
+	            coords.close();
+	            mDbHelper.close();
+            }
 			return pk;
 		}
-		
+
 		@Override
 		protected void onProgressUpdate(Integer... progress) {
-//			mapView.invalidate(); 
+//			mapView.invalidate();
 		}
-		
+
 		@Override
 		protected void onPostExecute(Integer i) {
 			if (mapOverlays.isEmpty()) {
@@ -129,6 +137,6 @@ public class ShowMap extends MapActivity {
 			}
 			mapView.invalidate();
 		}
-		
+
 	}
 }
