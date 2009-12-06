@@ -18,7 +18,8 @@ public class CycleTrackData implements LocationListener {
 	Vector<CyclePoint> coords;
 	Activity activity = null;
 	LocationManager lm = null;
-	double startTime, latestUpdate;
+	Location lastLocation;
+	double startTime, latestUpdate, distanceTraveled;
 	ItemizedOverlayTrack gpspoints;
 	int lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
 	boolean idle = true;
@@ -63,11 +64,11 @@ public class CycleTrackData implements LocationListener {
 			// Reset database
 			try {
 				mDb = new DbAdapter(activity);
-				mDb.open();
 			} catch (Exception e) {
 			}
-
+			mDb.open();
 			tripid = mDb.createTrip();
+			mDb.close();
 		}
 
         Toast.makeText(activity.getBaseContext(), "Requesting updates", Toast.LENGTH_SHORT).show();
@@ -81,12 +82,13 @@ public class CycleTrackData implements LocationListener {
 	        Toast.makeText(activity.getBaseContext(), "Cancelling updates", Toast.LENGTH_SHORT).show();
 			lm.removeUpdates(this);
 		}
-		mDb.close();
 	}
 
 	void dropTrip() {
+	    mDb.open();
 		mDb.deleteAllCoordsForTrip(tripid);
 		mDb.deleteTrip(tripid);
+		mDb.close();
 		itsTimeToSave = false;
 	}
 
@@ -108,7 +110,9 @@ public class CycleTrackData implements LocationListener {
 		// Only add point to database if we're live (i.e. not just showing a
 		// saved map)
 		if (!idle)
+		    mDb.open();
 			mDb.addCoordToTrip(tripid, pt);
+			mDb.close();
 
 		OverlayItem opoint = new OverlayItem(pt, "", "");
 		gpspoints.addOverlay(opoint);
@@ -135,15 +139,31 @@ public class CycleTrackData implements LocationListener {
 			if (currentTime - latestUpdate > 999) {
 				addPointNow(loc, currentTime);
 				latestUpdate = currentTime;
+				updateDistance(loc);
+
 
 				// Update the status page every time, if we can.
 	            //TODO: This should not be here; should be moved to a Listener somewhere
-	            if (activity instanceof RecordingActivity) {
-	                TextView stat = (TextView) activity.findViewById(R.id.TextRecordStats);
-	                stat.setText(""+coords.size()+" data points received...");
-	            }
+				updateStatus();
 			}
 		}
+	}
+
+	private void updateDistance(Location newLocation) {
+	    if (lastLocation != null) {
+	        Float segmentDistance = lastLocation.distanceTo(newLocation);
+	        distanceTraveled += segmentDistance;
+	    }
+	    lastLocation = newLocation;
+	}
+
+	private void updateStatus() {
+	    if (activity instanceof RecordingActivity) {
+            TextView stat = (TextView) activity.findViewById(R.id.TextRecordStats);
+            TextView distance = (TextView) activity.findViewById(R.id.TextDistance);
+            stat.setText(""+coords.size()+" data points received...");
+            distance.setText("Meters travelled: " + distanceTraveled);
+        }
 	}
 
 	@Override

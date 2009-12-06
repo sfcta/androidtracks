@@ -66,8 +66,8 @@ public class RecordingActivity extends Activity {
 			    	// Go back to main screen
 					fi = new Intent(RecordingActivity.this, MainInput.class);
 					fi.putExtra("keep", true);
-					CycleTrackData.get().dropTrip();
 					CycleTrackData.get().killListener();
+					CycleTrackData.get().dropTrip();
 					CycleTrackData.get().idle=true;
 				}
 

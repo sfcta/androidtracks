@@ -39,7 +39,7 @@ public class TripUploader {
 
     private JSONObject getCoordsJSON(long tripId) throws JSONException {
         DbAdapter mDbHelper = new DbAdapter(this.mCtx);
-        mDbHelper.open();
+        mDbHelper.openReadOnly();
         Cursor tripCoordsCursor = mDbHelper.fetchAllCoordsForTrip(tripId);
         Map<String, String> fieldMap = new HashMap<String, String>();
         fieldMap.put("rec", DbAdapter.K_POINT_TIME);
@@ -65,6 +65,7 @@ public class TripUploader {
             tripCoords.put(coord.getString("rec"), coord);
             tripCoordsCursor.moveToNext();
         }
+        tripCoordsCursor.close();
         mDbHelper.close();
         return tripCoords;
     }
@@ -90,7 +91,7 @@ public class TripUploader {
     private Vector<String> getTripData(long tripId) {
         Vector<String> tripData = new Vector<String>();
         DbAdapter mDbHelper = new DbAdapter(this.mCtx);
-        mDbHelper.open();
+        mDbHelper.openReadOnly();
         Cursor tripCursor = mDbHelper.fetchTrip(tripId);
 
         String note = tripCursor.getString(tripCursor
@@ -99,6 +100,7 @@ public class TripUploader {
                 .getColumnIndex(DbAdapter.K_TRIP_PURP));
         Double startTime = tripCursor.getDouble(tripCursor
                 .getColumnIndex(DbAdapter.K_TRIP_START));
+        tripCursor.close();
         mDbHelper.close();
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -160,7 +162,8 @@ public class TripUploader {
         Log.v("PostData", nameValuePairs.toString());
 
         HttpClient client = new DefaultHttpClient();
-        HttpPost postRequest = new HttpPost("http://bikedatabase.sfcta.org/post/");
+//        HttpPost postRequest = new HttpPost("http://bikedatabase.sfcta.org/post/");
+        HttpPost postRequest = new HttpPost("http://localhost/post/");
 
         HttpResponse response;
 

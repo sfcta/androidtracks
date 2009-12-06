@@ -118,6 +118,12 @@ public class DbAdapter {
         return this;
     }
 
+    public DbAdapter openReadOnly() throws SQLException {
+        mDbHelper = new DatabaseHelper(mCtx);
+        mDb = mDbHelper.getReadableDatabase();
+        return this;
+    }
+
     public void close() {
         mDbHelper.close();
     }
