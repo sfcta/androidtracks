@@ -9,6 +9,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.maps.OverlayItem;
 
@@ -68,13 +70,15 @@ public class CycleTrackData implements LocationListener {
 			tripid = mDb.createTrip();
 		}
 
-		lm = (LocationManager) activity
-				.getSystemService(Context.LOCATION_SERVICE);
+        Toast.makeText(activity.getBaseContext(), "Requesting updates", Toast.LENGTH_SHORT).show();
+		lm = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+
 	}
 
 	void killListener() {
 		if (lm != null)
+	        Toast.makeText(activity.getBaseContext(), "Cancelling updates", Toast.LENGTH_SHORT).show();
 			lm.removeUpdates(this);
 	}
 
@@ -88,7 +92,7 @@ public class CycleTrackData implements LocationListener {
 		int lat = (int) (loc.getLatitude() * 1E6);
 		int lgt = (int) (loc.getLongitude() * 1E6);
 		float accuracy = loc.getAccuracy();
-		double altiude = loc.getAltitude();
+		double altitude = loc.getAltitude();
 		float speed = loc.getSpeed();
 
 		// Skip duplicates
@@ -96,7 +100,7 @@ public class CycleTrackData implements LocationListener {
 			return;
 
 		CyclePoint pt = new CyclePoint(lat, lgt, currentTime, accuracy,
-				altiude, speed);
+				altitude, speed);
 		coords.add(pt);
 
 		// Only add point to database if we're live (i.e. not just showing a
@@ -129,6 +133,13 @@ public class CycleTrackData implements LocationListener {
 			if (currentTime - latestUpdate > 999) {
 				addPointNow(loc, currentTime);
 				latestUpdate = currentTime;
+
+				// Update the status page every time, if we can.
+	            //TODO: This should not be here; should be moved to a Listener somewhere
+	            if (activity instanceof RecordingActivity) {
+	                TextView stat = (TextView) activity.findViewById(R.id.TextRecordStats);
+	                stat.setText(""+coords.size()+" data points received...");
+	            }
 			}
 		}
 	}
