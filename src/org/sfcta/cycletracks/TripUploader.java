@@ -83,7 +83,7 @@ public class TripUploader {
         for (Entry<String, Integer> entry : fieldMap.entrySet()) {
                user.put(entry.getKey(), settings.getString(entry.getValue().toString(), null));
         }
-        user.put("cyclingFreq", settings.getInt(""+UserInfoActivity.PREF_CYCLEFREQ, 0)/100);
+        user.put("cyclingFreq", Integer.parseInt(settings.getString(""+UserInfoActivity.PREF_CYCLEFREQ, "0"))/100);
         return user;
     }
 
@@ -160,9 +160,7 @@ public class TripUploader {
         Log.v("PostData", nameValuePairs.toString());
 
         HttpClient client = new DefaultHttpClient();
-        HttpPost postRequest = new HttpPost(
-                "http://bikedatabase.sfcta.org/post/");
-        postRequest.addHeader("Accept-Encoding", "gzip");
+        HttpPost postRequest = new HttpPost("http://bikedatabase.sfcta.org/post/");
 
         HttpResponse response;
 
