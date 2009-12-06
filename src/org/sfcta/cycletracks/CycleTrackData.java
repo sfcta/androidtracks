@@ -19,7 +19,8 @@ public class CycleTrackData implements LocationListener {
 	Activity activity = null;
 	LocationManager lm = null;
 	Location lastLocation;
-	double startTime, latestUpdate, distanceTraveled;
+	double startTime, latestUpdate;
+	Float distanceTraveled = 0.0f;
 	ItemizedOverlayTrack gpspoints;
 	int lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
 	boolean idle = true;
@@ -140,8 +141,6 @@ public class CycleTrackData implements LocationListener {
 				addPointNow(loc, currentTime);
 				latestUpdate = currentTime;
 				updateDistance(loc);
-
-
 				// Update the status page every time, if we can.
 	            //TODO: This should not be here; should be moved to a Listener somewhere
 				updateStatus();
@@ -152,7 +151,7 @@ public class CycleTrackData implements LocationListener {
 	private void updateDistance(Location newLocation) {
 	    if (lastLocation != null) {
 	        Float segmentDistance = lastLocation.distanceTo(newLocation);
-	        distanceTraveled += segmentDistance;
+	        distanceTraveled = distanceTraveled.floatValue() + segmentDistance.floatValue();
 	    }
 	    lastLocation = newLocation;
 	}
@@ -162,7 +161,7 @@ public class CycleTrackData implements LocationListener {
             TextView stat = (TextView) activity.findViewById(R.id.TextRecordStats);
             TextView distance = (TextView) activity.findViewById(R.id.TextDistance);
             stat.setText(""+coords.size()+" data points received...");
-            distance.setText("Meters travelled: " + distanceTraveled);
+            distance.setText(String.format("Meters travelled: %1d", distanceTraveled.intValue()));
         }
 	}
 
