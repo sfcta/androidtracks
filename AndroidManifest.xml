@@ -16,6 +16,7 @@
 <activity android:name="SaveTrip" android:launchMode="singleTop"></activity>
 <uses-library android:name="com.google.android.maps"></uses-library>
 <activity android:name="ShowMap" android:launchMode="singleTop"></activity>
+<activity android:name="UserInfoActivity"></activity>
 </application>
     <uses-sdk android:minSdkVersion="3" />
 

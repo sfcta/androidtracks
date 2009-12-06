@@ -24,11 +24,11 @@ public class RecordingActivity extends Activity {
 		CycleTrackData ctd = CycleTrackData.get();
 		ctd.activity = this;
 		ctd.activateListener();
-		
+
 		// Create a notification saying we're recording
 		setNotification();
 
-		// Pause button 
+		// Pause button
 		final Button pauseButton = (Button) findViewById(R.id.ButtonPause);
 		pauseButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -54,15 +54,15 @@ public class RecordingActivity extends Activity {
 				// If we have points, go to the save-trip activity
 				if (CycleTrackData.get().coords.size()>0) {
 					fi = new Intent(RecordingActivity.this, SaveTrip.class);
-					
-				// Otherwise, cancel and go back to main screen 
+
+				// Otherwise, cancel and go back to main screen
 				} else {
 					Toast.makeText(getBaseContext(),"No GPS data acquired; nothing to submit.", Toast.LENGTH_SHORT).show();
 
 					// Remove the notification
 			    	NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 			    	mNotificationManager.cancelAll();
-			    	
+
 			    	// Go back to main screen
 					fi = new Intent(RecordingActivity.this, MainInput.class);
 					fi.putExtra("keep", true);
@@ -70,19 +70,19 @@ public class RecordingActivity extends Activity {
 					CycleTrackData.get().dropTrip();
 					CycleTrackData.get().idle=true;
 				}
-				
+
 				// Either way, activate next task, and then kill this task
 				startActivity(fi);
 				RecordingActivity.this.finish();
 			}
 		});
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 	}
-	
+
 	private void setNotification() {
 		// Create the notification icon - maybe this goes somewhere else?
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

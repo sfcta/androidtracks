@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/ScrollView01" android:layout_width="wrap_content"
+	android:layout_height="wrap_content">
+	<LinearLayout android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:orientation="vertical">
+		<TextView android:id="@+id/TextView01" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_marginLeft="10px"
+			android:layout_marginRight="5px"
+			android:text="Add details about yourself here.  This info is anonymous, and will help us understand different people's biking preferences."
+			android:layout_marginBottom="10px"></TextView>
+		<LinearLayout android:id="@+id/LinearLayout02"
+			android:layout_height="wrap_content" android:layout_width="fill_parent">
+			<EditText android:id="@+id/EditText01" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:text="Age"
+				android:layout_marginLeft="10px" android:layout_weight="1"></EditText>
+			<RadioGroup android:id="@+id/RadioGroup01"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:orientation="horizontal" android:layout_marginLeft="20px"
+				android:layout_weight="2">
+				<RadioButton android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:id="@+id/ButtonMale"
+					android:text="Male" android:layout_marginLeft="10px"></RadioButton>
+				<RadioButton android:id="@+id/RadioButton02"
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:text="Female" android:layout_marginLeft="10px"></RadioButton>
+			</RadioGroup>
+		</LinearLayout>
+		<TextView android:id="@+id/TextView02" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="Cycling Frequency:"
+			android:layout_marginTop="10px" android:layout_marginLeft="10px"></TextView>
+		<SeekBar android:id="@+id/SeekBar01" android:layout_height="wrap_content"
+			android:layout_width="fill_parent"
+			android:layout_marginLeft="10px" android:layout_marginRight="10px"
+			android:max="4"></SeekBar>
+		<TextView android:id="@+id/TextView03" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="ZIP codes:"
+			android:layout_marginLeft="10px" android:layout_marginTop="10px"></TextView>
+		<LinearLayout android:id="@+id/LinearLayout01"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal" android:layout_width="fill_parent" android:layout_marginRight="10px">
+			<EditText android:id="@+id/EditText02" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginLeft="10px" android:text="Home" android:layout_weight="1"></EditText>
+			<EditText android:id="@+id/EditText03" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginLeft="5px" android:layout_weight="1" android:text="Work"></EditText>
+			<EditText android:id="@+id/EditText04" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginLeft="5px"
+				android:text="School" android:layout_weight="1"></EditText>
+		</LinearLayout>
+		<TextView android:id="@+id/TextView04" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_marginLeft="10px"
+			android:layout_marginTop="10px"
+			android:text="You can provide your e-mail address to receive news and updates:"></TextView>
+		<EditText android:layout_height="wrap_content"
+			android:layout_marginLeft="10px" android:layout_width="fill_parent"
+			android:layout_marginRight="10px" android:text="email address"
+			android:id="@+id/EditText05"></EditText>
+	</LinearLayout>
+</ScrollView>

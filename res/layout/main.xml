@@ -7,7 +7,9 @@
 
 
 
-<Button android:layout_height="wrap_content" android:id="@+id/ButtonStart" android:text="@string/startNewTrip" android:textStyle="bold" android:layout_width="fill_parent" android:drawableLeft="@drawable/bike" android:layout_margin="8px" android:hapticFeedbackEnabled="true" android:textSize="24px"></Button><TextView android:layout_height="wrap_content" android:id="@+id/TextViewPreviousTrips" android:text="@string/previous_trips" android:layout_width="fill_parent" android:gravity="center"></TextView><ListView android:layout_height="wrap_content" android:id="@+id/ListSavedTrips" android:layout_width="fill_parent"></ListView>
+<LinearLayout android:id="@+id/LinearLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal"><Button android:layout_height="wrap_content" android:id="@+id/ButtonStart" android:text="@string/startNewTrip" android:textStyle="bold" android:layout_width="fill_parent" android:drawableLeft="@drawable/bike" android:layout_margin="8px" android:hapticFeedbackEnabled="true" android:textSize="24px"></Button><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ButtonPrefs" android:text="User Prefs..."></Button></LinearLayout><TextView android:layout_height="wrap_content" android:id="@+id/TextViewPreviousTrips" android:text="@string/previous_trips" android:layout_width="fill_parent" android:gravity="center"></TextView><ListView android:layout_height="wrap_content" android:id="@+id/ListSavedTrips" android:layout_width="fill_parent"></ListView>
+
+
 
 
 

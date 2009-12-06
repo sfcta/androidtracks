@@ -65,6 +65,15 @@ public class MainInput extends Activity {
 					}
 				});
 
+        // User prefs
+        final Button prefsButton = (Button) findViewById(R.id.ButtonPrefs);
+        final Intent pi = new Intent(this, UserInfoActivity.class);
+        prefsButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(pi);
+            }
+        });
+
 		// And set up the record button
 		final Button startButton = (Button) findViewById(R.id.ButtonStart);
 		final Intent i = new Intent(this, RecordingActivity.class);
