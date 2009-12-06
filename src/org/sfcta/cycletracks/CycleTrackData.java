@@ -1,7 +1,5 @@
 package org.sfcta.cycletracks;
 
-import java.util.Vector;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -15,17 +13,18 @@ import android.widget.Toast;
 import com.google.android.maps.OverlayItem;
 
 public class CycleTrackData implements LocationListener {
-	Vector<CyclePoint> coords;
+	//Vector<CyclePoint> coords;
 	Activity activity = null;
 	LocationManager lm = null;
 	Location lastLocation;
 	double startTime, latestUpdate;
 	Float distanceTraveled = 0.0f;
 	ItemizedOverlayTrack gpspoints;
-	int lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
+	int numpoints, lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
 	boolean idle = true;
 	DbAdapter mDb;
 	long tripid;
+	boolean dirty = false;
 	boolean itsTimeToSave = false;
 	float curSpeed, maxSpeed;
 
@@ -45,17 +44,21 @@ public class CycleTrackData implements LocationListener {
 
 	// If we're just starting to record, set initial conditions.
 	void initializeData() {
-		coords = new Vector<CyclePoint>();
+		//coords = new Vector<CyclePoint>();
 		startTime = System.currentTimeMillis();
 		latestUpdate = latestlat = latestlgt = 0;
-		lathigh = (int) (-100 * 1E6);
+        curSpeed = maxSpeed = distanceTraveled = 0.0f;
+        numpoints = 0;
+        itsTimeToSave = dirty = false;
+
+        lathigh = (int) (-100 * 1E6);
 		latlow = (int) (100 * 1E6);
 		lgtlow = (int) (360 * 1E6);
 		lgthigh = (int) (-360 * 1E6);
+
 		Drawable drawable = activity.getResources().getDrawable(
 				R.drawable.point);
 		gpspoints = new ItemizedOverlayTrack(drawable);
-	    curSpeed = maxSpeed = distanceTraveled = 0.0f;
 	}
 
 	// Start getting updates
@@ -108,17 +111,19 @@ public class CycleTrackData implements LocationListener {
 
 		CyclePoint pt = new CyclePoint(lat, lgt, currentTime, accuracy,
 				altitude, speed);
-		coords.add(pt);
+		//coords.add(pt);
 
 		// Only add point to database if we're live (i.e. not just showing a
 		// saved map)
-		if (!idle)
-		    mDb.open();
-			mDb.addCoordToTrip(tripid, pt);
-			mDb.close();
+		if (!idle) {
+            mDb.open();
+            mDb.addCoordToTrip(tripid, pt);
+            mDb.close();
+            dirty = true;
+		}
 
-		OverlayItem opoint = new OverlayItem(pt, "", "");
-		gpspoints.addOverlay(opoint);
+//		OverlayItem opoint = new OverlayItem(pt, "", "");
+//		gpspoints.addOverlay(opoint);
 
 		latlow = Math.min(latlow, lat);
 		lathigh = Math.max(lathigh, lat);
@@ -157,17 +162,19 @@ public class CycleTrackData implements LocationListener {
 	        distanceTraveled = distanceTraveled.floatValue() + segmentDistance.floatValue();
 	        curSpeed = newLocation.getSpeed() * spdConvert;
 	        maxSpeed = Math.max(maxSpeed, curSpeed);
+            numpoints++;
 	    }
 	    lastLocation = newLocation;
 	}
 
 	private void updateStatus() {
-	    if (activity instanceof RecordingActivity) { //TODO: check task status before doing this
+	    //TODO: check task status before doing this
+	    if (activity instanceof RecordingActivity) {
             TextView stat = (TextView) activity.findViewById(R.id.TextRecordStats);
-            TextView distance = (TextView) activity.findViewById(R.id.TextDistance);
+	        TextView distance = (TextView) activity.findViewById(R.id.TextDistance);
             TextView txtCurSpeed = (TextView) activity.findViewById(R.id.TextSpeed);
             TextView txtMaxSpeed = (TextView) activity.findViewById(R.id.TextMaxSpeed);
-            stat.setText(""+coords.size()+" data points received...");
+            stat.setText(""+CycleTrackData.get().numpoints+" data points received...");
             distance.setText(String.format("Meters travelled: %1d", distanceTraveled.intValue()));
             txtCurSpeed.setText(String.format("Current speed: %1.1f", curSpeed));
             txtMaxSpeed.setText(String.format("Maximum speed: %1.1f", maxSpeed));

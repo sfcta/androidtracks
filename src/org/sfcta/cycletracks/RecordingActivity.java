@@ -52,7 +52,7 @@ public class RecordingActivity extends Activity {
 		finishButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// If we have points, go to the save-trip activity
-				if (CycleTrackData.get().coords.size()>0) {
+				if (CycleTrackData.get().dirty) {
 					fi = new Intent(RecordingActivity.this, SaveTrip.class);
 
 				// Otherwise, cancel and go back to main screen

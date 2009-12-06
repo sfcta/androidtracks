@@ -68,7 +68,7 @@ public class SaveTrip extends Activity {
 				CycleTrackData ctd = CycleTrackData.get();
 
 				Toast.makeText(getBaseContext(),
-				        "Submitting trip with " + ctd.coords.size()+" points. Thank you!",
+				        "Submitting trip with "+ctd.numpoints+" points. Thanks for using CycleTracks!",
 				        Toast.LENGTH_SHORT).show();
 
 				// Find user-entered info
@@ -92,6 +92,7 @@ public class SaveTrip extends Activity {
                 uploader.uploadTrip(ctd.tripid);
 
 				// Show the map!
+                xi.putExtra("showtrip", ctd.tripid);
 				startActivity(xi);
 				SaveTrip.this.finish();
 			}
