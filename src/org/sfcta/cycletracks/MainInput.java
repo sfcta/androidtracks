@@ -58,7 +58,7 @@ public class MainInput extends Activity {
         SharedPreferences settings = getSharedPreferences("PREFS", 0);
         if (!settings.getAll().isEmpty()) {
             Button btn = (Button) findViewById(R.id.ButtonPrefs);
-            btn.setVisibility(View.GONE);
+//            btn.setVisibility(View.GONE);
         }
 
 		// Set up the list view of saved trips
