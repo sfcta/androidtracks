@@ -43,21 +43,25 @@ public class MainInput extends Activity {
 
 		// 1. If this activity floated to the top of another CycleTracks task,
 		// just kill it. The existing task will reveal itself.
-		// (This handles the user hitting HOME and relaunching later.
+		// (This handles the user who hit HOME and relaunched later.
 		if (this.isChild() && this.getIntent().getExtras() == null) {
 			this.finish();
 		}
 
 		// 2. If we're recording or saving right now, even if this is in a new
 		// task, jump to the existing activity.
-		// (This handles user hitting BACK button while recording)
-		CycleTrackData ctd = CycleTrackData.get();
-		if (!ctd.idle) {
-			if (ctd.itsTimeToSave) {
+		// (This handles user who hit  BACK button while recording)
+
+		//TODO: Open Service, check status:  if not idle, figure out what to do next!
+		RecordingService rs = RecordingService.get();
+		int state = rs.getState();
+		if (state > RecordingService.STATE_IDLE) {
+			if (state == RecordingService.STATE_FULL) {
 				startActivity(new Intent(this, SaveTrip.class));
 			} else {
 				startActivity(new Intent(this, RecordingActivity.class));
 			}
+
 			this.finish();
 		}
 
@@ -106,6 +110,7 @@ public class MainInput extends Activity {
 
 			lv.setAdapter(sca);
 			TextView counter = (TextView) findViewById(R.id.TextViewPreviousTrips);
+
 			int numtrips = allTrips.getCount();
 			switch (numtrips) {
 			case 0:
@@ -124,10 +129,6 @@ public class MainInput extends Activity {
 
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		    public void onItemClick(AdapterView parent, View v, int pos, long id) {
-		        CycleTrackData ctd = CycleTrackData.get();
-		        ctd.activity = MainInput.this;
-		        ctd.initializeData();
-
 		        Intent i = new Intent(MainInput.this, ShowMap.class);
 		        i.putExtra("showtrip", id);
 		        startActivity(i);

@@ -1,7 +1,5 @@
 package org.sfcta.cycletracks;
 
-import java.util.Vector;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -140,7 +138,7 @@ public class DbAdapter {
      * are all successfully created, return true; otherwise return false. TODO:
      * This method is really slow! :-(
      */
-    public boolean createCoordsForTrip(long tripid, Vector<CyclePoint> points) {
+/*    public boolean createCoordsForTrip(long tripid, Vector<CyclePoint> points) {
         boolean success = true;
         mDb.beginTransaction();
 
@@ -154,7 +152,7 @@ public class DbAdapter {
             rowValues.put(K_POINT_LGT, pt.getLongitudeE6());
             rowValues.put(K_POINT_TIME, pt.time);
             rowValues.put(K_POINT_ACC, pt.accuracy);
-            rowValues.put(K_POINT_ALT, pt.altiude);
+            rowValues.put(K_POINT_ALT, pt.altitude);
             rowValues.put(K_POINT_SPEED, pt.speed);
 
             long rtn = mDb.insert(DATA_TABLE_COORDS, null, rowValues);
@@ -166,6 +164,7 @@ public class DbAdapter {
         mDb.endTransaction();
         return success;
     }
+*/
 
     public boolean addCoordToTrip(long tripid, CyclePoint pt) {
         ContentValues rowValues = new ContentValues();
@@ -176,7 +175,7 @@ public class DbAdapter {
         rowValues.put(K_POINT_LGT, pt.getLongitudeE6());
         rowValues.put(K_POINT_TIME, pt.time);
         rowValues.put(K_POINT_ACC, pt.accuracy);
-        rowValues.put(K_POINT_ALT, pt.altiude);
+        rowValues.put(K_POINT_ALT, pt.altitude);
         rowValues.put(K_POINT_SPEED, pt.speed);
 
         return mDb.insert(DATA_TABLE_COORDS, null, rowValues) > 0;
@@ -187,15 +186,20 @@ public class DbAdapter {
     }
 
     public Cursor fetchAllCoordsForTrip(long tripid) {
-        Cursor mCursor = mDb.query(true, DATA_TABLE_COORDS, new String[] {
-                K_POINT_SEQ, K_POINT_LAT, K_POINT_LGT, K_POINT_TIME,
-                K_POINT_ACC, K_POINT_ALT, K_POINT_SPEED }, K_POINT_TRIP + "="
-                + tripid, null, null, null, null, null);
+    	try {
+            Cursor mCursor = mDb.query(true, DATA_TABLE_COORDS, new String[] {
+                    K_POINT_SEQ, K_POINT_LAT, K_POINT_LGT, K_POINT_TIME,
+                    K_POINT_ACC, K_POINT_ALT, K_POINT_SPEED }, K_POINT_TRIP + "="
+                    + tripid, null, null, null, null, null);
 
-        if (mCursor != null) {
-            mCursor.moveToFirst();
-        }
-        return mCursor;
+            if (mCursor != null) {
+                mCursor.moveToFirst();
+            }
+            return mCursor;
+    	} catch (Exception e) {
+    		Log.v("GOT!",e.toString());
+    		return null;
+    	}
     }
 
     // #### Trip table methods ####
@@ -240,7 +244,6 @@ public class DbAdapter {
      * @return Cursor over all trips
      */
     public Cursor fetchAllTrips() {
-        // TODO: These are not all strings! How does this work?
         return mDb.query(DATA_TABLE_TRIPS, new String[] { K_TRIP_ROWID,
                 K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART, K_TRIP_NOTE },
                 null, null, null, null, "-" + K_TRIP_START);

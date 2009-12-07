@@ -17,6 +17,7 @@
 <uses-library android:name="com.google.android.maps"></uses-library>
 <activity android:name="ShowMap" android:launchMode="singleTop"></activity>
 <activity android:name="UserInfoActivity"></activity>
+<service android:name="RecordingService"></service>
 </application>
     <uses-sdk android:minSdkVersion="3" />
 

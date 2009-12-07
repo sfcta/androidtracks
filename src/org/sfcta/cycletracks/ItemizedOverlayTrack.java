@@ -10,7 +10,7 @@ import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.OverlayItem;
 
 public class ItemizedOverlayTrack extends ItemizedOverlay<OverlayItem> {
-	private ArrayList<OverlayItem> overlays = new ArrayList<OverlayItem>();
+	private final ArrayList<OverlayItem> overlays = new ArrayList<OverlayItem>();
 
 	public ItemizedOverlayTrack(Drawable defaultMarker) {
 		super(boundCenter(defaultMarker));
@@ -28,7 +28,10 @@ public class ItemizedOverlayTrack extends ItemizedOverlay<OverlayItem> {
 
 	public void addOverlay(OverlayItem overlay) {
 		overlays.add(overlay);
+		// populate();
+	}
+
+	public void repop() {
 		populate();
 	}
-	
 }

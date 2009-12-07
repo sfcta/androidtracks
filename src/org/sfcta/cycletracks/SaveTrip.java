@@ -3,8 +3,6 @@ package org.sfcta.cycletracks;
 import java.text.DateFormat;
 
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,21 +13,10 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 public class SaveTrip extends Activity {
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.save);
-
-		// Remove the notification
-		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.cancelAll();
-
-		// Turn of GPS updates
-		CycleTrackData ctd = CycleTrackData.get();
-		ctd.itsTimeToSave = true;
-		ctd.activity = this;
-		ctd.killListener();
 
         // User prefs btn
         final Button prefsButton = (Button) findViewById(R.id.ButtonPrefs);
@@ -51,8 +38,7 @@ public class SaveTrip extends Activity {
 			public void onClick(View v) {
 				Toast.makeText(getBaseContext(), "Trip discarded.",	Toast.LENGTH_SHORT).show();
 
-				CycleTrackData.get().dropTrip();
-				CycleTrackData.get().idle = true;
+				RecordingService.get().cancelRecording();
 
 				Intent i = new Intent(SaveTrip.this, MainInput.class);
 				i.putExtra("keepme", true);
@@ -64,36 +50,36 @@ public class SaveTrip extends Activity {
 		// Submit btn
 		final Button btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
 		final Intent xi = new Intent(this, ShowMap.class);
+
 		btnSubmit.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				CycleTrackData ctd = CycleTrackData.get();
+				RecordingService rs = RecordingService.get();
 
 				Toast.makeText(getBaseContext(),
-				        "Submitting trip with "+ctd.numpoints+" points. Thanks for using CycleTracks!",
+				        "Submitting trip with "+rs.numpoints+" points. Thanks for using CycleTracks!",
 				        Toast.LENGTH_SHORT).show();
 
 				// Find user-entered info
 				Spinner purpose = (Spinner) findViewById(R.id.SpinnerPurp);
 				EditText notes = (EditText) findViewById(R.id.NotesField);
 
-				// Save the trip coords to the database. W00t!
+				TripData trip = RecordingService.get().getCurrentTrip();
+				String fancystarttime = DateFormat.getInstance().format(trip.startTime);
+
+				// Save the trip coords to the phone database. W00t!
 				DbAdapter mDbHelper = new DbAdapter(SaveTrip.this);
 				mDbHelper.open();
-				String fancystarttime = DateFormat.getInstance().format(
-						ctd.startTime);
-
-				mDbHelper.updateTrip(ctd.tripid, purpose.getSelectedItem()
-						.toString(), ctd.startTime, fancystarttime, notes
-						.getEditableText().toString(), ctd.lathigh, ctd.latlow,
-						ctd.lgthigh, ctd.lgtlow);
-
-				ctd.itsTimeToSave = false;
+				mDbHelper.updateTrip(trip.tripid, purpose.getSelectedItem().toString(),
+						trip.startTime, fancystarttime, notes.getEditableText().toString(),
+						trip.lathigh, trip.latlow, trip.lgthigh, trip.lgtlow);
 				mDbHelper.close();
+
+				// And upload to the cloud database, too!  W00t W00t!
 				TripUploader uploader = new TripUploader(getBaseContext());
-                uploader.uploadTrip(ctd.tripid);
+                uploader.uploadTrip(trip.tripid);
 
 				// Show the map!
-                xi.putExtra("showtrip", ctd.tripid);
+                xi.putExtra("showtrip", trip.tripid);
 				startActivity(xi);
 				SaveTrip.this.finish();
 			}
