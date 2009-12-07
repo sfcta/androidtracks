@@ -23,7 +23,7 @@ public class UserInfoActivity extends Activity {
     public final static int PREF_GENDER = 6;
     public final static int PREF_CYCLEFREQ = 7;
 
-    public final static int MENU_SAVE = 0;
+    private final static int MENU_SAVE = 0;
 
     final String[] freqDesc = {"Less than once a month", "Several times a month", "Several times per week", "Daily"};
 
