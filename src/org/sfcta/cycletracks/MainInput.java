@@ -88,6 +88,13 @@ public class MainInput extends Activity {
 		// Get list from the real phone database. W00t!
 		DbAdapter mDbHelper = new DbAdapter(MainInput.this);
 		mDbHelper.open();
+/*
+		// Clean up any bad trips & coords from crashes
+		int cleanedTrips = mDbHelper.cleanTables();
+		if (cleanedTrips > 0) {
+		    Toast.makeText(getBaseContext(), ""+cleanedTrips+" bad trips discarded.", Toast.LENGTH_SHORT).show();
+		}
+*/
 		try {
 			Cursor allTrips = mDbHelper.fetchAllTrips();
 

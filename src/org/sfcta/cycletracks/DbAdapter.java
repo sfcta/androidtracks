@@ -24,7 +24,7 @@ import android.util.Log;
  * SDK**
  */
 public class DbAdapter {
-    private static final int DATABASE_VERSION = 14;
+    private static final int DATABASE_VERSION = 15;
 
     public static final String K_TRIP_ROWID = "_id";
     public static final String K_TRIP_PURP = "purp";
@@ -35,17 +35,21 @@ public class DbAdapter {
     public static final String K_TRIP_LATLO = "latlo";
     public static final String K_TRIP_LGTHI = "lgthi";
     public static final String K_TRIP_LGTLO = "lgtlo";
-    public static final String K_TRIP_UPLOADED = "uploaded";
+    public static final String K_TRIP_STATUS = "status";
 
     public static final String K_POINT_ROWID = "_id";
-    public static final String K_POINT_TRIP = "trip";
     public static final String K_POINT_SEQ = "seq";
+    public static final String K_POINT_TRIP = "trip";
     public static final String K_POINT_LAT = "lat";
     public static final String K_POINT_LGT = "lgt";
     public static final String K_POINT_TIME = "time";
     public static final String K_POINT_ACC = "acc";
     public static final String K_POINT_ALT = "alt";
     public static final String K_POINT_SPEED = "speed";
+
+    public static int STATUS_INCOMPLETE = 0;
+    public static int STATUS_COMPLETE = 1;
+    public static int STATUS_SENT = 2;
 
     private static final String TAG = "DbAdapter";
     private DatabaseHelper mDbHelper;
@@ -57,7 +61,7 @@ public class DbAdapter {
      */
     private static final String TABLE_CREATE_TRIPS = "create table trips (_id integer primary key autoincrement, "
         + "purp text, start double, fancystart text, note text,"
-        + "lathi integer, latlo integer, lgthi integer, lgtlo integer, uploaded boolean false);";
+        + "lathi integer, latlo integer, lgthi integer, lgtlo integer, status integer default 0);";
 
     private static final String TABLE_CREATE_COORDS = "create table coords (_id integer primary key autoincrement, "
         + "trip integer, seq integer, lat integer, lgt integer, "
@@ -233,7 +237,7 @@ public class DbAdapter {
     /**
      * Return a Cursor over the list of all notes in the database
      *
-     * @return Cursor over all notes
+     * @return Cursor over all trips
      */
     public Cursor fetchAllTrips() {
         // TODO: These are not all strings! How does this work?
@@ -242,14 +246,30 @@ public class DbAdapter {
                 null, null, null, null, "-" + K_TRIP_START);
     }
 
+    public int cleanTables() {
+        Cursor c = mDb.query(DATA_TABLE_TRIPS, new String[]
+                { K_TRIP_ROWID, K_TRIP_ROWID, K_TRIP_STATUS },
+                K_TRIP_STATUS + "=" + STATUS_INCOMPLETE,
+                null, null, null, null);
+
+        if (c != null && c.getCount() >0) {
+            while (!c.isAfterLast()) {
+                int kcol = c.getColumnIndex(K_TRIP_ROWID);
+                long tripid = c.getInt(kcol);
+                deleteAllCoordsForTrip(tripid);
+                c.moveToNext();
+            }
+        }
+
+        return mDb.delete(DATA_TABLE_TRIPS, K_TRIP_STATUS + "=" + STATUS_INCOMPLETE, null);
+    }
+
     /**
      * Return a Cursor positioned at the trip that matches the given rowId
      *
-     * @param rowId
-     *            id of trip to retrieve
+     * @param rowId id of trip to retrieve
      * @return Cursor positioned to matching trip, if found
-     * @throws SQLException
-     *             if trip could not be found/retrieved
+     * @throws SQLException if trip could not be found/retrieved
      */
     public Cursor fetchTrip(long rowId) throws SQLException {
         Cursor mCursor = mDb.query(true, DATA_TABLE_TRIPS, new String[] {
@@ -275,6 +295,7 @@ public class DbAdapter {
         initialValues.put(K_TRIP_LATLO, latlow);
         initialValues.put(K_TRIP_LGTHI, lgthigh);
         initialValues.put(K_TRIP_LGTLO, lgtlow);
+        initialValues.put(K_TRIP_STATUS, STATUS_COMPLETE);
 
         return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "="
                 + tripid, null) > 0;
@@ -282,7 +303,7 @@ public class DbAdapter {
 
     public boolean updateTripMarkUploaded(long tripid) {
         ContentValues initialValues = new ContentValues();
-        initialValues.put(K_TRIP_UPLOADED, true);
+        initialValues.put(K_TRIP_STATUS, STATUS_SENT);
 
         return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "="
                 + tripid, null) > 0;
