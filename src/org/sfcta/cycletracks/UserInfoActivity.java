@@ -6,6 +6,8 @@ import java.util.Map.Entry;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -20,6 +22,8 @@ public class UserInfoActivity extends Activity {
     public final static int PREF_EMAIL = 5;
     public final static int PREF_GENDER = 6;
     public final static int PREF_CYCLEFREQ = 7;
+
+    public final static int MENU_SAVE = 0;
 
     final String[] freqDesc = {"Less than once a month", "Several times a month", "Several times per week", "Daily"};
 
@@ -87,7 +91,12 @@ public class UserInfoActivity extends Activity {
 
     @Override
     public void onDestroy() {
-        // Save user preferences. We need an Editor object to
+        savePreferences();
+        super.onDestroy();
+    }
+
+    private void savePreferences() {
+     // Save user preferences. We need an Editor object to
         // make changes. All objects are from android.context.Context
         SharedPreferences settings = getSharedPreferences("PREFS", 0);
         SharedPreferences.Editor editor = settings.edit();
@@ -104,6 +113,24 @@ public class UserInfoActivity extends Activity {
 
         // Don't forget to commit your edits!!!
         editor.commit();
-        super.onDestroy();
+    }
+
+    /* Creates the menu items */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, MENU_SAVE, 0, "Save").setIcon(android.R.drawable.ic_menu_save);
+        return true;
+    }
+
+    /* Handles item selections */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case MENU_SAVE:
+            savePreferences();
+            this.finish();
+            return true;
+        }
+        return false;
     }
 }
