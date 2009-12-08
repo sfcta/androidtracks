@@ -69,10 +69,11 @@ public class MainInput extends Activity {
 					}
 					MainInput.this.finish();
 				}
+				MainInput.this.unbindService(this); // race?  this says we no longer care
 			}
 		};
-		// This should block until the onServiceConnected (above) completes.
-		// Thus, we can check the recording status before continuing on.  Weird!
+		// This needs to block until the onServiceConnected (above) completes.
+		// Thus, we can check the recording status before continuing on.
 		bindService(rService, sc, Context.BIND_AUTO_CREATE);
 
 		// Ok we're finally GTG; build the main screen.

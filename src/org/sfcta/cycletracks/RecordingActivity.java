@@ -25,8 +25,7 @@ public class RecordingActivity extends Activity {
 		Intent rService = new Intent(this, RecordingService.class);
 		startService(rService);
 		ServiceConnection sc = new ServiceConnection() {
-			public void onServiceDisconnected(ComponentName name) {
-			}
+			public void onServiceDisconnected(ComponentName name) {}
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
 				if (rs.getState() == RecordingService.STATE_IDLE) {
