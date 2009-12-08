@@ -166,7 +166,7 @@ public class TripUploader {
     public void uploadTrip(long tripId) {
         CharSequence progTitle = mCtx.getText(R.string.uploadProgressTitle);
         CharSequence progMessage = mCtx.getText(R.string.uploadProgressMessage);
-        ProgressDialog pd = ProgressDialog.show(this.mCtx, progTitle, progMessage, true, true);
+        ProgressDialog pd = ProgressDialog.show(this.mCtx, progTitle, progMessage, true, false);
         UploadThread uploadThread = new UploadThread(pd, tripId);
         uploadThread.start();
     }
