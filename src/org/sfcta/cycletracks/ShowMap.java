@@ -17,8 +17,6 @@ public class ShowMap extends MapActivity {
 	private MapView mapView;
 	List<Overlay> mapOverlays;
 	Drawable drawable;
-	DbAdapter mDbHelper;
-	AddPointsToMapLayerTask maptask;
 	ItemizedOverlayTrack gpspoints;
 
 	@Override
@@ -48,7 +46,7 @@ public class ShowMap extends MapActivity {
 			mc.zoomToSpan(trip.lathigh - trip.latlow, trip.lgthigh - trip.lgtlow);
 
 			if (gpspoints == null) {
-				maptask = new AddPointsToMapLayerTask();
+				AddPointsToMapLayerTask maptask = new AddPointsToMapLayerTask();
 				maptask.execute(trip);
 			} else {
 				mapOverlays.add(gpspoints);

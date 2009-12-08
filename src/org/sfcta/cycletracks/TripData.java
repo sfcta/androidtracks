@@ -8,17 +8,18 @@ import android.location.Location;
 import com.google.android.maps.OverlayItem;
 
 public class TripData {
+	long tripid;
 	double startTime = 0;
 	Float distanceTraveled = 0.0f;
-	private ItemizedOverlayTrack gpspoints;
 	int numpoints, lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
-	DbAdapter mDb;
-	long tripid;
 	boolean dirty = false;
-	float curSpeed, maxSpeed;
-	Context context;
-	RecordingActivity recordActivity = null;
+
+	private ItemizedOverlayTrack gpspoints;
 	Location lastLocation;
+	float curSpeed, maxSpeed;
+
+	DbAdapter mDb;
+	RecordingActivity recordActivity = null;
 
 	public static TripData createTrip(Context c) {
 		TripData t = new TripData(c.getApplicationContext(), 0);
@@ -34,7 +35,7 @@ public class TripData {
 	}
 
 	public TripData (Context ctx, long tripid) {
-		this.context = ctx.getApplicationContext();
+		Context context = ctx.getApplicationContext();
 		this.tripid = tripid;
 		mDb = new DbAdapter(context);
 	}

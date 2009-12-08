@@ -1,7 +1,5 @@
 package org.sfcta.cycletracks;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +27,6 @@ import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class MainInput extends Activity {
-	ArrayList<HashMap> savedtrips = new ArrayList<HashMap>();
     private final static int MENU_USER_INFO = 0;
     private final static int MENU_RESEND_FAILED_UPLOADS = 1;
 
@@ -139,7 +136,7 @@ public class MainInput extends Activity {
 		mDbHelper.close();
 
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-		    public void onItemClick(AdapterView parent, View v, int pos, long id) {
+		    public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
 		        Intent i = new Intent(MainInput.this, ShowMap.class);
 		        i.putExtra("showtrip", id);
 		        startActivity(i);
