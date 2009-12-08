@@ -18,10 +18,12 @@ public class TripData {
 	float curSpeed, maxSpeed;
 	Context context;
 	RecordingActivity recordActivity = null;
+	Location lastLocation;
 
 	public static TripData createTrip(Context c) {
 		TripData t = new TripData(c.getApplicationContext(), 0);
 		t.createTripInDatabase(c);
+        t.initializeData();
 		return t;
 	}
 
@@ -35,7 +37,6 @@ public class TripData {
 		this.context = ctx.getApplicationContext();
 		this.tripid = tripid;
 		mDb = new DbAdapter(context);
-		initializeData();
 	}
 
 	void initializeData() {
@@ -49,6 +50,8 @@ public class TripData {
 		latlow = (int) (100 * 1E6);
 		lgtlow = (int) (360 * 1E6);
 		lgthigh = (int) (-360 * 1E6);
+
+		updateTrip();
 	}
 
     // Get lat/long extremes, etc, from trip record
@@ -57,7 +60,7 @@ public class TripData {
 	    mDb.openReadOnly();
 
 	    Cursor tripdetails = mDb.fetchTrip(tripid);
-	    startTime = tripdetails.getInt(tripdetails.getColumnIndex("start"));
+	    startTime = tripdetails.getDouble(tripdetails.getColumnIndex("start"));
 	    lathigh = tripdetails.getInt(tripdetails.getColumnIndex("lathi"));
 	    latlow =  tripdetails.getInt(tripdetails.getColumnIndex("latlo"));
 	    lgthigh = tripdetails.getInt(tripdetails.getColumnIndex("lgthi"));
@@ -130,6 +133,19 @@ public class TripData {
 		gpspoints.addOverlay(opoint);
 	}
 
+    private void updateTripStats(Location newLocation) {
+        final float spdConvert = 2.2369f;
+        if (lastLocation != null) {
+            Float segmentDistance = lastLocation.distanceTo(newLocation);
+            distanceTraveled = distanceTraveled.floatValue() + segmentDistance.floatValue();
+            curSpeed = newLocation.getSpeed() * spdConvert;
+            maxSpeed = Math.max(maxSpeed, curSpeed);
+            numpoints++;
+            updateTrip();
+        }
+        lastLocation = newLocation;
+    }
+
 	void addPointNow(Location loc, double currentTime) {
 		int lat = (int) (loc.getLatitude() * 1E6);
 		int lgt = (int) (loc.getLongitude() * 1E6);
@@ -144,10 +160,6 @@ public class TripData {
 		CyclePoint pt = new CyclePoint(lat, lgt, currentTime, accuracy,
 				altitude, speed);
 
-        mDb.open();
-        mDb.addCoordToTrip(tripid, pt);
-        mDb.close();
-
         dirty = true;
         numpoints++;
 
@@ -159,11 +171,24 @@ public class TripData {
 		latestlat = lat;
 		latestlgt = lgt;
 
+		updateTripStats(loc);
+
+        mDb.open();
+        mDb.addCoordToTrip(tripid, pt);
+        mDb.updateTrip(tripid, "", startTime, "", "",
+                lathigh, latlow, lgthigh, lgtlow);
+        mDb.close();
+
+
 		if (recordActivity != null) {
 			try {
 				recordActivity.updateStatus();
 			} catch (Exception e) {}
 		}
+	}
+
+	public void updateTrip() {
+	    updateTrip("","","");
 	}
 
 	public void updateTrip(String purpose, String fancy, String notes) {

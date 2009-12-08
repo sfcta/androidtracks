@@ -16,7 +16,6 @@ import android.os.IBinder;
 public class RecordingService extends Service implements LocationListener {
 	RecordingActivity recordActivity;
 	LocationManager lm = null;
-	Location lastLocation;
 
 	double latestUpdate;
 
@@ -117,12 +116,12 @@ public class RecordingService extends Service implements LocationListener {
 			if (currentTime - latestUpdate > 999) {
 				trip.addPointNow(loc, currentTime);
 				latestUpdate = currentTime;
-				updateTripStats(loc);
-
+/*
 				// Update the status page every time, if we can.
 				if (recordActivity != null) {
 					recordActivity.updateStatus();
 				}
+*/
 			}
 		}
 	}
@@ -139,18 +138,6 @@ public class RecordingService extends Service implements LocationListener {
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 	}
 	// END LocationListener implementation:
-
-	private void updateTripStats(Location newLocation) {
-	    final float spdConvert = 2.2369f;
-	    if (lastLocation != null) {
-	        Float segmentDistance = lastLocation.distanceTo(newLocation);
-	        trip.distanceTraveled = trip.distanceTraveled.floatValue() + segmentDistance.floatValue();
-	        trip.curSpeed = newLocation.getSpeed() * spdConvert;
-	        trip.maxSpeed = Math.max(trip.maxSpeed, trip.curSpeed);
-            trip.numpoints++;
-	    }
-	    lastLocation = newLocation;
-	}
 
 	private void setNotification() {
 		// Create the notification icon - maybe this goes somewhere else?
