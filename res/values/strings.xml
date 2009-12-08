@@ -18,4 +18,6 @@
 </string-array>
 <string name="enterTripInfo">And add any comments about your trip here</string>
 <string name="promptPurpose">Select the main purpose of this trip</string>
+<string name="uploadProgressTitle">Sending...</string>
+<string name="uploadProgressMessage">Sending your trip.\n\nThanks for using CycleTracks!</string>
 </resources>

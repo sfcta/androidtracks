@@ -164,7 +164,9 @@ public class TripUploader {
      * @param tripId
      */
     public void uploadTrip(long tripId) {
-        ProgressDialog pd = ProgressDialog.show(this.mCtx, "Sending...", "Sending your trip, thanks for using CycleTracks.", true, true);
+        CharSequence progTitle = mCtx.getText(R.string.uploadProgressTitle);
+        CharSequence progMessage = mCtx.getText(R.string.uploadProgressMessage);
+        ProgressDialog pd = ProgressDialog.show(this.mCtx, progTitle, progMessage, true, true);
         UploadThread uploadThread = new UploadThread(pd, tripId);
         uploadThread.start();
     }
