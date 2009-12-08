@@ -1,8 +1,12 @@
 package org.sfcta.cycletracks;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,14 +21,23 @@ public class RecordingActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.recording);
 
-		RecordingService rs = RecordingService.get();
-
 		// If service is idle, start recording!
-		if (rs.getState() == RecordingService.STATE_IDLE) {
-			trip = TripData.createTrip(this);
-			rs.startRecording(trip);
-			rs.registerUpdates(this);
-		}
+		Intent rService = new Intent(this, RecordingService.class);
+		startService(rService);
+		ServiceConnection sc = new ServiceConnection() {
+			public void onServiceDisconnected(ComponentName name) {}
+			public void onServiceConnected(ComponentName name, IBinder service) {
+				IRecordService rs = (IRecordService) service;
+				if (rs.getState() == RecordingService.STATE_IDLE) {
+					trip = TripData.createTrip(RecordingActivity.this);
+					rs.startRecording(trip);
+//TODO:					rs.registerUpdates(RecordingActivity.this);
+				}
+			}
+		};
+		// This should block until the onServiceConnected (above) completes.
+		bindService(rService, sc, Context.BIND_AUTO_CREATE);
+
 /*
 		// Pause button
 		final Button pauseButton = (Button) findViewById(R.id.ButtonPause);
@@ -52,16 +65,17 @@ public class RecordingActivity extends Activity {
 			public void onClick(View v) {
 				// If we have points, go to the save-trip activity
 				if (trip.dirty) {
-					fi.putExtra("trip", trip.tripid);
-					fi = new Intent(RecordingActivity.this, SaveTrip.class);
+					// Save trip so far (points and extent, but no purpose or notes)
+					trip.updateTrip("","","");
 
+					fi = new Intent(RecordingActivity.this, SaveTrip.class);
+					fi.putExtra("trip", trip.tripid);
+				}
 				// Otherwise, cancel and go back to main screen
-				} else {
+				else {
 					Toast.makeText(getBaseContext(),"No GPS data acquired; nothing to submit.", Toast.LENGTH_SHORT).show();
 
-					// Cancel the recording
-					RecordingService.get().cancelRecording();
-					//TODO: don't need this anymore:  TripData.get().dropTrip();
+					cancelRecording();
 
 			    	// Go back to main screen
 					fi = new Intent(RecordingActivity.this, MainInput.class);
@@ -86,5 +100,18 @@ public class RecordingActivity extends Activity {
         distance.setText(String.format("Meters travelled: %1d", trip.distanceTraveled.intValue()));
         txtCurSpeed.setText(String.format("Current speed: %1.1f", trip.curSpeed));
         txtMaxSpeed.setText(String.format("Maximum speed: %1.1f", trip.maxSpeed));
+	}
+
+	void cancelRecording() {
+		Intent rService = new Intent(this, RecordingActivity.class);
+		ServiceConnection sc = new ServiceConnection() {
+			public void onServiceDisconnected(ComponentName name) {}
+			public void onServiceConnected(ComponentName name, IBinder service) {
+				IRecordService rs = (IRecordService) service;
+				rs.cancelRecording();
+			}
+		};
+		// This should block until the onServiceConnected (above) completes.
+		bindService(rService, sc, Context.BIND_AUTO_CREATE);
 	}
 }

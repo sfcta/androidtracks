@@ -3,9 +3,13 @@ package org.sfcta.cycletracks;
 import java.text.DateFormat;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,7 +42,7 @@ public class SaveTrip extends Activity {
 			public void onClick(View v) {
 				Toast.makeText(getBaseContext(), "Trip discarded.",	Toast.LENGTH_SHORT).show();
 
-				RecordingService.get().cancelRecording();
+				cancelRecording();
 
 				Intent i = new Intent(SaveTrip.this, MainInput.class);
 				i.putExtra("keepme", true);
@@ -53,17 +57,19 @@ public class SaveTrip extends Activity {
 
 		btnSubmit.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				RecordingService rs = RecordingService.get();
+				// Figure out which trip we're looking at
+		        Bundle cmds = getIntent().getExtras();
+	            long tripid = cmds.getLong("trip");
+				TripData trip = TripData.fetchTrip(SaveTrip.this, tripid);
 
 				Toast.makeText(getBaseContext(),
-				        "Submitting trip with "+rs.numpoints+" points. Thanks for using CycleTracks!",
+				        "Submitting trip with "+trip.numpoints+" points. Thanks for using CycleTracks!",
 				        Toast.LENGTH_SHORT).show();
 
 				// Find user-entered info
 				Spinner purpose = (Spinner) findViewById(R.id.SpinnerPurp);
 				EditText notes = (EditText) findViewById(R.id.NotesField);
 
-				TripData trip = RecordingService.get().getCurrentTrip();
 				String fancystarttime = DateFormat.getInstance().format(trip.startTime);
 
 				// Save the trip coords to the phone database. W00t!
@@ -84,5 +90,18 @@ public class SaveTrip extends Activity {
 				SaveTrip.this.finish();
 			}
 		});
+	}
+
+	void cancelRecording() {
+		Intent rService = new Intent(this, SaveTrip.class);
+		ServiceConnection sc = new ServiceConnection() {
+			public void onServiceDisconnected(ComponentName name) {}
+			public void onServiceConnected(ComponentName name, IBinder service) {
+				IRecordService rs = (IRecordService) service;
+				rs.cancelRecording();
+			}
+		};
+		// This should block until the onServiceConnected (above) completes.
+		bindService(rService, sc, Context.BIND_AUTO_CREATE);
 	}
 }

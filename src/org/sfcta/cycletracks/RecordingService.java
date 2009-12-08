@@ -9,9 +9,9 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.widget.Toast;
 
 public class RecordingService extends Service implements LocationListener {
 	RecordingActivity recordActivity;
@@ -30,24 +30,37 @@ public class RecordingService extends Service implements LocationListener {
 	public static int STATE_FULL = 3;
 
 	int state = STATE_IDLE;
+	private final MyServiceBinder myServiceBinder = new MyServiceBinder();
 
+	// ---SERVICE methods - required! -----------------
 	@Override
 	public IBinder onBind(Intent arg0) {
-		return null;
+		return myServiceBinder;
 	}
 
-	// ---Singleton design pattern! Only one CTD should ever exist.
-	private RecordingService() {
+	@Override
+	public void onCreate() {
+		super.onCreate();
 	}
 
-	private static class CTDHolder {
-		private static final RecordingService INSTANCE = new RecordingService();
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
 	}
 
-	public static RecordingService get() {
-		return CTDHolder.INSTANCE;
+	public class MyServiceBinder extends Binder implements IRecordService {
+		public int getState() {
+			return state;
+		}
+		public void startRecording(TripData trip) {
+			RecordingService.this.startRecording(trip);
+		}
+		public void cancelRecording() {
+			RecordingService.this.cancelRecording();
+		}
 	}
-	// ---End Singleton design pattern.
+
+	// ---end SERVICE methods -------------------------
 
 	// Start "business logic":
 
@@ -59,14 +72,14 @@ public class RecordingService extends Service implements LocationListener {
 		setNotification();
 
 		// Start listening for GPS updates!
-        Toast.makeText(this, "Requesting updates", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Requesting updates", Toast.LENGTH_SHORT).show();
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 	}
 
 	public void finishRecording() {
 		if (lm != null) {
-	        Toast.makeText(this.getBaseContext(), "Stopped listening", Toast.LENGTH_SHORT).show();
+	        // Toast.makeText(this.getBaseContext(), "Stopped listening", Toast.LENGTH_SHORT).show();
 			lm.removeUpdates(this);
 		}
 		clearNotifications();
@@ -79,7 +92,7 @@ public class RecordingService extends Service implements LocationListener {
 		}
 
 		if (lm != null) {
-	        Toast.makeText(this.getBaseContext(), "Cancelling updates", Toast.LENGTH_SHORT).show();
+	        // Toast.makeText(this.getBaseContext(), "Cancelling updates", Toast.LENGTH_SHORT).show();
 			lm.removeUpdates(this);
 		}
 		clearNotifications();
@@ -88,10 +101,6 @@ public class RecordingService extends Service implements LocationListener {
 
 	public void registerUpdates(RecordingActivity r) {
 		this.recordActivity = r;
-	}
-
-	public int getState() {
-		return state;
 	}
 
 	public TripData getCurrentTrip() {

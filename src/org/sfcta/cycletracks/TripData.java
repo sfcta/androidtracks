@@ -151,4 +151,12 @@ public class TripData {
 		latestlat = lat;
 		latestlgt = lgt;
 	}
+
+	public void updateTrip(String purpose, String fancy, String notes) {
+		// Save the trip details to the phone database. W00t!
+		mDb.open();
+		mDb.updateTrip(tripid, purpose,	startTime, fancy, notes,
+				lathigh, latlow, lgthigh, lgtlow);
+		mDb.close();
+	}
 }

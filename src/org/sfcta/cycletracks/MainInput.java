@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,20 +55,27 @@ public class MainInput extends Activity {
 		// task, jump to the existing activity.
 		// (This handles user who hit  BACK button while recording)
 
-		//TODO: Open Service, check status:  if not idle, figure out what to do next!
-		RecordingService rs = RecordingService.get();
-		int state = rs.getState();
-		if (state > RecordingService.STATE_IDLE) {
-			if (state == RecordingService.STATE_FULL) {
-				startActivity(new Intent(this, SaveTrip.class));
-			} else {
-				startActivity(new Intent(this, RecordingActivity.class));
+		Intent rService = new Intent(this, RecordingService.class);
+		ServiceConnection sc = new ServiceConnection() {
+			public void onServiceDisconnected(ComponentName name) {}
+			public void onServiceConnected(ComponentName name, IBinder service) {
+				IRecordService rs = (IRecordService) service;
+				int state = rs.getState();
+				if (state > RecordingService.STATE_IDLE) {
+					if (state == RecordingService.STATE_FULL) {
+						startActivity(new Intent(MainInput.this, SaveTrip.class));
+					} else {
+						startActivity(new Intent(MainInput.this, RecordingActivity.class));
+					}
+					MainInput.this.finish();
+				}
 			}
+		};
+		// This should block until the onServiceConnected (above) completes.
+		// Thus, we can check the recording status before continuing on.  Weird!
+		bindService(rService, sc, Context.BIND_AUTO_CREATE);
 
-			this.finish();
-		}
-
-		// Otherwise we're GTG; build the main screen.
+		// Ok we're finally GTG; build the main screen.
 		setContentView(R.layout.main);
 
 		// Switch to user prefs screen if there are no prefs stored yet (first-run)
