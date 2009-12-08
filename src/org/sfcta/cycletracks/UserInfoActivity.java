@@ -87,7 +87,6 @@ public class UserInfoActivity extends Activity {
                 break;
             }
         }
-
     }
 
     @Override
@@ -97,7 +96,7 @@ public class UserInfoActivity extends Activity {
     }
 
     private void savePreferences() {
-     // Save user preferences. We need an Editor object to
+        // Save user preferences. We need an Editor object to
         // make changes. All objects are from android.context.Context
         SharedPreferences settings = getSharedPreferences("PREFS", 0);
         SharedPreferences.Editor editor = settings.edit();

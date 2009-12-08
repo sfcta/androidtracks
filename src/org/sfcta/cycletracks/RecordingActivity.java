@@ -25,17 +25,17 @@ public class RecordingActivity extends Activity {
 		Intent rService = new Intent(this, RecordingService.class);
 		startService(rService);
 		ServiceConnection sc = new ServiceConnection() {
-			public void onServiceDisconnected(ComponentName name) {}
+			public void onServiceDisconnected(ComponentName name) {
+			}
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
 				if (rs.getState() == RecordingService.STATE_IDLE) {
 					trip = TripData.createTrip(RecordingActivity.this);
 					rs.startRecording(trip);
-//TODO:					rs.registerUpdates(RecordingActivity.this);
+					trip.registerUpdates(RecordingActivity.this);
 				}
 			}
 		};
-		// This should block until the onServiceConnected (above) completes.
 		bindService(rService, sc, Context.BIND_AUTO_CREATE);
 
 /*
@@ -65,7 +65,6 @@ public class RecordingActivity extends Activity {
 			public void onClick(View v) {
 				// If we have points, go to the save-trip activity
 				if (trip.dirty) {
-					Toast.makeText(getBaseContext(),"Got points, need to save now!", Toast.LENGTH_SHORT).show();
 					// Save trip so far (points and extent, but no purpose or notes)
 					fi = new Intent(RecordingActivity.this, SaveTrip.class);
 					fi.putExtra("trip", trip.tripid);

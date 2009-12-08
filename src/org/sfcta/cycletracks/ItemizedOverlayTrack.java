@@ -28,10 +28,9 @@ public class ItemizedOverlayTrack extends ItemizedOverlay<OverlayItem> {
 
 	public void addOverlay(OverlayItem overlay) {
 		overlays.add(overlay);
-		// populate();
 	}
 
-	public void repop() {
+	public void repopulate() {
 		populate();
 	}
 }

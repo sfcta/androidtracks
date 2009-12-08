@@ -12,14 +12,12 @@ import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.widget.Toast;
 
 public class RecordingService extends Service implements LocationListener {
 	RecordingActivity recordActivity;
 	LocationManager lm = null;
 	Location lastLocation;
 
-	int numpoints;
 	double latestUpdate;
 
 	DbAdapter mDb;
@@ -74,18 +72,15 @@ public class RecordingService extends Service implements LocationListener {
 	public void startRecording(TripData trip) {
 		this.state = STATE_RECORDING;
 		this.trip = trip;
-		this.numpoints = 0;
 
 		setNotification();
 
 		// Start listening for GPS updates!
-        Toast.makeText(this, "Requesting updates", Toast.LENGTH_SHORT).show();
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 	}
 
 	public void finishRecording() {
-        Toast.makeText(this.getBaseContext(), "Stopped listening", Toast.LENGTH_SHORT).show();
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		lm.removeUpdates(this);
 
@@ -99,7 +94,6 @@ public class RecordingService extends Service implements LocationListener {
 		}
 
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Toast.makeText(this.getBaseContext(), "Cancelling updates", Toast.LENGTH_SHORT).show();
 		lm.removeUpdates(this);
 
 		clearNotifications();
@@ -123,7 +117,6 @@ public class RecordingService extends Service implements LocationListener {
 			if (currentTime - latestUpdate > 999) {
 				trip.addPointNow(loc, currentTime);
 				latestUpdate = currentTime;
-				numpoints++;
 				updateTripStats(loc);
 
 				// Update the status page every time, if we can.
@@ -154,7 +147,7 @@ public class RecordingService extends Service implements LocationListener {
 	        trip.distanceTraveled = trip.distanceTraveled.floatValue() + segmentDistance.floatValue();
 	        trip.curSpeed = newLocation.getSpeed() * spdConvert;
 	        trip.maxSpeed = Math.max(trip.maxSpeed, trip.curSpeed);
-            numpoints++;
+            trip.numpoints++;
 	    }
 	    lastLocation = newLocation;
 	}

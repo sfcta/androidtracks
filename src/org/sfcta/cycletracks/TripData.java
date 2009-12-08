@@ -17,6 +17,7 @@ public class TripData {
 	boolean dirty = false;
 	float curSpeed, maxSpeed;
 	Context context;
+	RecordingActivity recordActivity = null;
 
 	public static TripData createTrip(Context c) {
 		TripData t = new TripData(c.getApplicationContext(), 0);
@@ -79,6 +80,10 @@ public class TripData {
 		mDb.close();
 	}
 
+	void registerUpdates(RecordingActivity ra) {
+		this.recordActivity = ra;
+	}
+
 	public ItemizedOverlayTrack getPoints(Drawable d) {
 		// If already built, don't build again!
 		if (gpspoints != null && gpspoints.size()>0) {
@@ -95,6 +100,8 @@ public class TripData {
             int COL_LAT = points.getColumnIndex("lat");
             int COL_LGT = points.getColumnIndex("lgt");
             int COL_TIME = points.getColumnIndex("time");
+            numpoints = points.getCount();
+
 			while (!points.isAfterLast()) {
                 int lat = points.getInt(COL_LAT);
                 int lgt = points.getInt(COL_LGT);
@@ -111,7 +118,7 @@ public class TripData {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		gpspoints.repop();
+		gpspoints.repopulate();
 
 		return gpspoints;
 	}
@@ -142,6 +149,7 @@ public class TripData {
         mDb.close();
 
         dirty = true;
+        numpoints++;
 
 		latlow = Math.min(latlow, lat);
 		lathigh = Math.max(lathigh, lat);
@@ -150,6 +158,12 @@ public class TripData {
 
 		latestlat = lat;
 		latestlgt = lgt;
+
+		if (recordActivity != null) {
+			try {
+				recordActivity.updateStatus();
+			} catch (Exception e) {}
+		}
 	}
 
 	public void updateTrip(String purpose, String fancy, String notes) {
