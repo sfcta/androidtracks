@@ -17,10 +17,14 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 public class SaveTrip extends Activity {
+	long tripid;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.save);
+
+		finishRecording();
 
         // User prefs btn
         final Button prefsButton = (Button) findViewById(R.id.ButtonPrefs);
@@ -53,13 +57,18 @@ public class SaveTrip extends Activity {
 
 		// Submit btn
 		final Button btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
+		btnSubmit.setEnabled(false);
+	}
+
+	// submit btn is only activated after the service.finishedRecording() is completed.
+	void activateSubmitButton() {
+		final Button btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
 		final Intent xi = new Intent(this, ShowMap.class);
+		btnSubmit.setEnabled(true);
 
 		btnSubmit.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				// Figure out which trip we're looking at
-		        Bundle cmds = getIntent().getExtras();
-	            long tripid = cmds.getLong("trip");
+
 				TripData trip = TripData.fetchTrip(SaveTrip.this, tripid);
 				trip.populateDetails();
 
@@ -77,6 +86,10 @@ public class SaveTrip extends Activity {
 
 				resetService();
 
+				// Maybe this is where we should start a new activity for MainInput
+				Intent i = new Intent(getApplicationContext(), MainInput.class);
+				startActivity(i);
+
 				// Show the map!
                 xi.putExtra("showtrip", trip.tripid);
                 xi.putExtra("uploadTrip", true);
@@ -84,6 +97,7 @@ public class SaveTrip extends Activity {
 				SaveTrip.this.finish();
 			}
 		});
+
 	}
 
 	void cancelRecording() {
@@ -107,6 +121,21 @@ public class SaveTrip extends Activity {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
 				rs.reset();
+				unbindService(this);
+			}
+		};
+		// This should block until the onServiceConnected (above) completes.
+		bindService(rService, sc, Context.BIND_AUTO_CREATE);
+	}
+
+	void finishRecording() {
+		Intent rService = new Intent(this, RecordingService.class);
+		ServiceConnection sc = new ServiceConnection() {
+			public void onServiceDisconnected(ComponentName name) {}
+			public void onServiceConnected(ComponentName name, IBinder service) {
+				IRecordService rs = (IRecordService) service;
+				tripid = rs.finishRecording();
+				SaveTrip.this.activateSubmitButton();
 				unbindService(this);
 			}
 		};

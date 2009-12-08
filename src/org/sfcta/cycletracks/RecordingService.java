@@ -56,8 +56,15 @@ public class RecordingService extends Service implements LocationListener {
 		public void cancelRecording() {
 			RecordingService.this.cancelRecording();
 		}
-		public void finishRecording() {
-			RecordingService.this.finishRecording();
+		public long finishRecording() {
+			return RecordingService.this.finishRecording();
+		}
+		public long continueCurrentTrip() {
+			if (RecordingService.this.trip != null) {
+
+				return RecordingService.this.trip.tripid;
+			}
+			return -1;
 		}
 		public void reset() {
 			RecordingService.this.state = STATE_IDLE;
@@ -67,6 +74,12 @@ public class RecordingService extends Service implements LocationListener {
 	// ---end SERVICE methods -------------------------
 
 	// Start "business logic":
+
+	public void continueRecording() {
+		// Start listening for GPS updates!
+		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+	}
 
 	public void startRecording(TripData trip) {
 		this.state = STATE_RECORDING;
@@ -79,12 +92,14 @@ public class RecordingService extends Service implements LocationListener {
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 	}
 
-	public void finishRecording() {
+	public long finishRecording() {
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		lm.removeUpdates(this);
 
 		clearNotifications();
 		this.state = STATE_FULL;
+
+		return trip.tripid;
 	}
 
 	public void cancelRecording() {
@@ -140,14 +155,12 @@ public class RecordingService extends Service implements LocationListener {
 	// END LocationListener implementation:
 
 	private void setNotification() {
-		// Create the notification icon - maybe this goes somewhere else?
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		int icon = R.drawable.icon25;
 		CharSequence tickerText = "Recording...";
 		long when = System.currentTimeMillis();
 		Notification notification = new Notification(icon, tickerText, when);
-		notification.flags = notification.flags
-				| Notification.FLAG_ONGOING_EVENT;
+		notification.flags = notification.flags | Notification.FLAG_ONGOING_EVENT;
 		Context context = getApplicationContext();
 		CharSequence contentTitle = "CycleTracks - Recording";
 		CharSequence contentText = "Tap to finish your trip";

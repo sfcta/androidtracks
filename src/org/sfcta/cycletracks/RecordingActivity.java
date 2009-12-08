@@ -31,8 +31,13 @@ public class RecordingActivity extends Activity {
 				if (rs.getState() == RecordingService.STATE_IDLE) {
 					trip = TripData.createTrip(RecordingActivity.this);
 					rs.startRecording(trip);
-					trip.registerUpdates(RecordingActivity.this);
+				} else {
+					long id = rs.continueCurrentTrip();
+					trip = TripData.fetchTrip(RecordingActivity.this, id);
+					trip.dirty=true;
 				}
+				trip.registerUpdates(RecordingActivity.this);
+				updateStatus();
 				unbindService(this);
 			}
 		};
@@ -60,17 +65,13 @@ public class RecordingActivity extends Activity {
 */
 		// Finish button
 		final Button finishButton = (Button) findViewById(R.id.ButtonFinished);
-
 		finishButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// If we have points, go to the save-trip activity
 				if (trip.dirty) {
 					// Save trip so far (points and extent, but no purpose or notes)
 					fi = new Intent(RecordingActivity.this, SaveTrip.class);
-					fi.putExtra("trip", trip.tripid);
-
 					trip.updateTrip("","","");
-					finishRecording();
 				}
 				// Otherwise, cancel and go back to main screen
 				else {
@@ -118,20 +119,6 @@ public class RecordingActivity extends Activity {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
 				rs.cancelRecording();
-				unbindService(this);
-			}
-		};
-		// This should block until the onServiceConnected (above) completes.
-		bindService(rService, sc, Context.BIND_AUTO_CREATE);
-	}
-
-	void finishRecording() {
-		Intent rService = new Intent(this, RecordingService.class);
-		ServiceConnection sc = new ServiceConnection() {
-			public void onServiceDisconnected(ComponentName name) {}
-			public void onServiceConnected(ComponentName name, IBinder service) {
-				IRecordService rs = (IRecordService) service;
-				rs.finishRecording();
 				unbindService(this);
 			}
 		};

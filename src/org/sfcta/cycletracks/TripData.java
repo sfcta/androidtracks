@@ -68,6 +68,10 @@ public class TripData {
 	    lgtlow =  tripdetails.getInt(tripdetails.getColumnIndex("lgtlo"));
 	    tripdetails.close();
 
+		Cursor points = mDb.fetchAllCoordsForTrip(tripid);
+		numpoints = points.getCount();
+		points.close();
+
 	    mDb.close();
 	}
 
@@ -187,7 +191,6 @@ public class TripData {
         mDb.updateTrip(tripid, "", startTime, "", "",
                 lathigh, latlow, lgthigh, lgtlow);
         mDb.close();
-
 
 		if (recordActivity != null) {
 			try {

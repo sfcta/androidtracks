@@ -66,14 +66,7 @@ public class ShowMap extends MapActivity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-/*
-		if (maptask != null && maptask.getStatus()==AsyncTask.Status.RUNNING) {
-			try {
-				maptask.cancel(true);
-				trip.mDb.close();
-			} catch (Exception e) {}
-		}
-*/
+
 	}
 
 	@Override

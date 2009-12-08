@@ -11,9 +11,9 @@
             </intent-filter>
         </activity>
 
-    <activity android:label="@string/recording_title" android:name="RecordingActivity" android:launchMode="singleTop"></activity>
+    <activity android:label="@string/recording_title" android:name="RecordingActivity" android:launchMode="singleInstance"></activity>
 
-<activity android:name="SaveTrip" android:launchMode="singleTop"></activity>
+<activity android:name="SaveTrip" android:launchMode="singleInstance"></activity>
 <uses-library android:name="com.google.android.maps"></uses-library>
 <activity android:name="ShowMap" android:launchMode="singleTop"></activity>
 <activity android:name="UserInfoActivity"></activity>

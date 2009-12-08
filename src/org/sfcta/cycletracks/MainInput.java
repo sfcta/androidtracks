@@ -100,7 +100,7 @@ public class MainInput extends Activity {
 	void populateList(ListView lv) {
 		// Get list from the real phone database. W00t!
 		DbAdapter mDbHelper = new DbAdapter(MainInput.this);
-		mDbHelper.open();
+		mDbHelper.openReadOnly();
 /*
 		// Clean up any bad trips & coords from crashes
 		int cleanedTrips = mDbHelper.cleanTables();
