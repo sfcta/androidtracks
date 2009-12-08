@@ -51,6 +51,12 @@ public class ShowMap extends MapActivity {
 
 			mapOverlays.add(gpspoints);
 
+			if (cmds.getBoolean("uploadTrip", false)) {
+			    // And upload to the cloud database, too!  W00t W00t!
+                TripUploader uploader = new TripUploader(ShowMap.this);
+                uploader.uploadTrip(trip.tripid);
+			}
+
 		} catch (Exception e) {
 			Log.e("GOT!",e.toString());
 		}

@@ -171,8 +171,8 @@ public class MainInput extends Activity {
 	}
 
 	private void retryTripUpload(long tripId) {
-	    TripUploader uploader = new TripUploader(getBaseContext());
-        uploader.uploadTrip(tripId);
+	    TripUploader uploader = new TripUploader(MainInput.this);
+	    uploader.uploadTrip(tripId);
 	}
 
 	private void deleteTrip(long tripId) {
