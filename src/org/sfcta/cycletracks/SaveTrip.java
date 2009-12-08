@@ -61,6 +61,7 @@ public class SaveTrip extends Activity {
 		        Bundle cmds = getIntent().getExtras();
 	            long tripid = cmds.getLong("trip");
 				TripData trip = TripData.fetchTrip(SaveTrip.this, tripid);
+				trip.populateDetails();
 
 				Toast.makeText(getBaseContext(),
 				        "Submitting trip with "+trip.numpoints+" points. Thanks for using CycleTracks!",

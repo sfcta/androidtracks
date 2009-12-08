@@ -224,7 +224,7 @@ public class DbAdapter {
     }
 
     public long createTrip() {
-        return createTrip("", 0, "", "");
+        return createTrip("", System.currentTimeMillis(), "", "");
     }
 
     /**
