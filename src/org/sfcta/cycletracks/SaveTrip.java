@@ -63,10 +63,6 @@ public class SaveTrip extends Activity {
 				TripData trip = TripData.fetchTrip(SaveTrip.this, tripid);
 				trip.populateDetails();
 
-				Toast.makeText(getBaseContext(),
-				        "Submitting trip with "+trip.numpoints+" points. Thanks for using CycleTracks!",
-				        Toast.LENGTH_SHORT).show();
-
 				// Find user-entered info
 				Spinner purpose = (Spinner) findViewById(R.id.SpinnerPurp);
 				EditText notes = (EditText) findViewById(R.id.NotesField);

@@ -97,9 +97,17 @@ public class RecordingActivity extends Activity {
         TextView txtMaxSpeed = (TextView) findViewById(R.id.TextMaxSpeed);
 
         stat.setText(""+trip.numpoints+" data points received...");
-        distance.setText(String.format("Meters travelled: %1d", trip.distanceTraveled.intValue()));
         txtCurSpeed.setText(String.format("Current speed: %1.1f", trip.curSpeed));
         txtMaxSpeed.setText(String.format("Maximum speed: %1.1f", trip.maxSpeed));
+
+        // Distance funky!
+        int dist = trip.distanceTraveled.intValue();
+        if (dist < 3000) {
+            distance.setText(String.format("Distance travelled: %1d meters", dist));
+        } else {
+        	float miles = 0.0006212f * dist;
+            distance.setText(String.format("Distance travelled: %1.1f miles", miles));
+        }
 	}
 
 	void cancelRecording() {

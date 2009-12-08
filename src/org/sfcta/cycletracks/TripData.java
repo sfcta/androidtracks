@@ -137,14 +137,22 @@ public class TripData {
     private void updateTripStats(Location newLocation) {
         final float spdConvert = 2.2369f;
         if (lastLocation != null) {
-            Float segmentDistance = lastLocation.distanceTo(newLocation);
-            distanceTraveled = distanceTraveled.floatValue() + segmentDistance.floatValue();
-            curSpeed = newLocation.getSpeed() * spdConvert;
-            maxSpeed = Math.max(maxSpeed, curSpeed);
+        	// Some stats should only be updated if accuracy is decent
+        	if (newLocation.getAccuracy()< 75) {
+                float segmentDistance = lastLocation.distanceTo(newLocation);
+                distanceTraveled = distanceTraveled.floatValue() + segmentDistance;
+                curSpeed = newLocation.getSpeed() * spdConvert;
+                // And, speed calcs are sometimes awful, too
+                if (curSpeed < 60.0f) {
+                	maxSpeed = Math.max(maxSpeed, curSpeed);
+                }
+                lastLocation = newLocation;
+        	}
+
+            // Save the point no matter what, even with bad accuracy
             numpoints++;
             updateTrip();
         }
-        lastLocation = newLocation;
     }
 
 	void addPointNow(Location loc, double currentTime) {
