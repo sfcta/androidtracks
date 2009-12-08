@@ -3,6 +3,7 @@ package org.sfcta.cycletracks;
 import java.util.List;
 
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -17,6 +18,8 @@ public class ShowMap extends MapActivity {
 	List<Overlay> mapOverlays;
 	Drawable drawable;
 	DbAdapter mDbHelper;
+	AddPointsToMapLayerTask maptask;
+	ItemizedOverlayTrack gpspoints;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -37,7 +40,6 @@ public class ShowMap extends MapActivity {
 
             TripData trip = TripData.fetchTrip(this, tripid);
 
-			// Find map center and extent
 			int latcenter = (trip.lathigh + trip.latlow) / 2;
 			int lgtcenter = (trip.lgthigh + trip.lgtlow) / 2;
 			GeoPoint center = new GeoPoint(latcenter, lgtcenter);
@@ -45,11 +47,12 @@ public class ShowMap extends MapActivity {
 			mc.animateTo(center);
 			mc.zoomToSpan(trip.lathigh - trip.latlow, trip.lgthigh - trip.lgtlow);
 
-			// *** Fetch the gps points from the TripData
-			drawable = getResources().getDrawable(R.drawable.point);
-            ItemizedOverlayTrack gpspoints = trip.getPoints(drawable);
-
-			mapOverlays.add(gpspoints);
+			if (gpspoints == null) {
+				maptask = new AddPointsToMapLayerTask();
+				maptask.execute(trip);
+			} else {
+				mapOverlays.add(gpspoints);
+			}
 
 			if (cmds.getBoolean("uploadTrip", false)) {
 			    // And upload to the cloud database, too!  W00t W00t!
@@ -63,8 +66,41 @@ public class ShowMap extends MapActivity {
 	}
 
 	@Override
+	public void onDestroy() {
+		super.onDestroy();
+/*
+		if (maptask != null && maptask.getStatus()==AsyncTask.Status.RUNNING) {
+			try {
+				maptask.cancel(true);
+				trip.mDb.close();
+			} catch (Exception e) {}
+		}
+*/
+	}
+
+	@Override
 	protected boolean isRouteDisplayed() {
 		// Auto-generated method stub
 		return false;
 	}
+
+
+	private class AddPointsToMapLayerTask extends AsyncTask <TripData, Integer, ItemizedOverlayTrack> {
+		@Override
+		protected ItemizedOverlayTrack doInBackground(TripData... trips) {
+	        TripData trip = trips[0]; // always get just the first trip
+
+			drawable = getResources().getDrawable(R.drawable.point);
+            ShowMap.this.gpspoints = trip.getPoints(drawable);
+
+			return ShowMap.this.gpspoints;
+		}
+
+		@Override
+		protected void onPostExecute(ItemizedOverlayTrack gpspoints) {
+			mapOverlays.add(ShowMap.this.gpspoints);
+			mapView.invalidate();
+		}
+	}
 }
+
