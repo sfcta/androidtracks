@@ -22,6 +22,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -161,49 +162,60 @@ public class TripUploader {
 
     /**
      * @param tripId
-     * @return boolean Whether the post succeeded.
-     * @throws JSONException
      */
-    public boolean uploadTrip(long tripId) {
-        List<NameValuePair> nameValuePairs;
-        try {
-            nameValuePairs = getPostData(tripId);
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
+    public void uploadTrip(long tripId) {
+        ProgressDialog pd = ProgressDialog.show(this.mCtx, "Sending...", "Sending your trip, thanks for using CycleTracks.", true, true);
+        UploadThread uploadThread = new UploadThread(pd, tripId);
+        uploadThread.start();
+    }
+
+    private class UploadThread extends Thread {
+        long tripId;
+        ProgressDialog pd;
+
+        UploadThread(ProgressDialog pd, long tripId){
+            this.tripId = tripId;
+            this.pd = pd;
         }
-        Log.v("PostData", nameValuePairs.toString());
-
-        HttpClient client = new DefaultHttpClient();
-        final String postUrl = "http://bikedatabase.sfcta.org/post/";
-        HttpPost postRequest = new HttpPost(postUrl);
-
-        try {
-            postRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            HttpResponse response = client.execute(postRequest);
-            String responseString = convertStreamToString(response.getEntity().getContent());
-            Log.v("httpResponse", responseString);
-            JSONObject responseData = new JSONObject(responseString);
-            if (responseData.getString("status").equals("success")) {
-                mDbHelper.open();
-                mDbHelper.updateTripMarkUploaded(tripId);
-                mDbHelper.close();
+        @Override
+        public void run() {
+            List<NameValuePair> nameValuePairs;
+            try {
+                nameValuePairs = getPostData(tripId);
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return;
             }
-        } catch (IllegalStateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
+            Log.v("PostData", nameValuePairs.toString());
+
+            HttpClient client = new DefaultHttpClient();
+            final String postUrl = "http://bikedatabase.sfcta.org/post/";
+            HttpPost postRequest = new HttpPost(postUrl);
+
+            try {
+                postRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                HttpResponse response = client.execute(postRequest);
+                String responseString = convertStreamToString(response.getEntity().getContent());
+                Log.v("httpResponse", responseString);
+                JSONObject responseData = new JSONObject(responseString);
+                if (responseData.getString("status").equals("success")) {
+                    mDbHelper.open();
+                    mDbHelper.updateTripMarkUploaded(tripId);
+                    mDbHelper.close();
+                }
+            } catch (IllegalStateException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            pd.dismiss();
         }
-        return true;
     }
 
     private static String convertStreamToString(InputStream is) {

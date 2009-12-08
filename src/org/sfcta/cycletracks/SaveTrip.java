@@ -80,12 +80,9 @@ public class SaveTrip extends Activity {
 
 				resetService();
 
-				// And upload to the cloud database, too!  W00t W00t!
-				TripUploader uploader = new TripUploader(getBaseContext());
-                uploader.uploadTrip(trip.tripid);
-
 				// Show the map!
                 xi.putExtra("showtrip", trip.tripid);
+                xi.putExtra("uploadTrip", true);
 				startActivity(xi);
 				SaveTrip.this.finish();
 			}
