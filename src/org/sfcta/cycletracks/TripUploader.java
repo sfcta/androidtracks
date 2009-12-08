@@ -143,7 +143,7 @@ public class TripUploader {
         JSONObject user = getUserJSON();
         String deviceId = getDeviceId();
         Vector<String> tripData = getTripData(tripId);
-        String note = tripData.get(0);
+        String notes = tripData.get(0);
         String purpose = tripData.get(1);
         String startTime = tripData.get(2);
 
@@ -151,7 +151,7 @@ public class TripUploader {
         nameValuePairs.add(new BasicNameValuePair("coords", coords.toString()));
         nameValuePairs.add(new BasicNameValuePair("user", user.toString()));
         nameValuePairs.add(new BasicNameValuePair("device", deviceId));
-        nameValuePairs.add(new BasicNameValuePair("note", note));
+        nameValuePairs.add(new BasicNameValuePair("notes", notes));
         nameValuePairs.add(new BasicNameValuePair("purpose", purpose));
         nameValuePairs.add(new BasicNameValuePair("start", startTime));
         nameValuePairs.add(new BasicNameValuePair("version", "2"));
