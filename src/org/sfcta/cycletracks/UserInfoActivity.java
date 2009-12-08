@@ -13,6 +13,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class UserInfoActivity extends Activity {
     public final static int PREF_AGE = 1;
@@ -113,6 +114,7 @@ public class UserInfoActivity extends Activity {
 
         // Don't forget to commit your edits!!!
         editor.commit();
+		Toast.makeText(getBaseContext(),"User preferences saved.", Toast.LENGTH_SHORT).show();
     }
 
     /* Creates the menu items */

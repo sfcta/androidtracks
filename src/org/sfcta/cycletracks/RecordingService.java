@@ -12,6 +12,7 @@ import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.widget.Toast;
 
 public class RecordingService extends Service implements LocationListener {
 	RecordingActivity recordActivity;
@@ -58,6 +59,12 @@ public class RecordingService extends Service implements LocationListener {
 		public void cancelRecording() {
 			RecordingService.this.cancelRecording();
 		}
+		public void finishRecording() {
+			RecordingService.this.finishRecording();
+		}
+		public void reset() {
+			RecordingService.this.state = STATE_IDLE;
+		}
 	}
 
 	// ---end SERVICE methods -------------------------
@@ -72,16 +79,16 @@ public class RecordingService extends Service implements LocationListener {
 		setNotification();
 
 		// Start listening for GPS updates!
-        //Toast.makeText(this, "Requesting updates", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Requesting updates", Toast.LENGTH_SHORT).show();
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 	}
 
 	public void finishRecording() {
-		if (lm != null) {
-	        // Toast.makeText(this.getBaseContext(), "Stopped listening", Toast.LENGTH_SHORT).show();
-			lm.removeUpdates(this);
-		}
+        Toast.makeText(this.getBaseContext(), "Stopped listening", Toast.LENGTH_SHORT).show();
+		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		lm.removeUpdates(this);
+
 		clearNotifications();
 		this.state = STATE_FULL;
 	}
@@ -91,10 +98,10 @@ public class RecordingService extends Service implements LocationListener {
 			trip.dropTrip();
 		}
 
-		if (lm != null) {
-	        // Toast.makeText(this.getBaseContext(), "Cancelling updates", Toast.LENGTH_SHORT).show();
-			lm.removeUpdates(this);
-		}
+		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Toast.makeText(this.getBaseContext(), "Cancelling updates", Toast.LENGTH_SHORT).show();
+		lm.removeUpdates(this);
+
 		clearNotifications();
 		this.state = STATE_IDLE;
 	}

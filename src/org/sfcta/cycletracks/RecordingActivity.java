@@ -65,11 +65,13 @@ public class RecordingActivity extends Activity {
 			public void onClick(View v) {
 				// If we have points, go to the save-trip activity
 				if (trip.dirty) {
+					Toast.makeText(getBaseContext(),"Got points, need to save now!", Toast.LENGTH_SHORT).show();
 					// Save trip so far (points and extent, but no purpose or notes)
-					trip.updateTrip("","","");
-
 					fi = new Intent(RecordingActivity.this, SaveTrip.class);
 					fi.putExtra("trip", trip.tripid);
+
+					trip.updateTrip("","","");
+					finishRecording();
 				}
 				// Otherwise, cancel and go back to main screen
 				else {
@@ -103,12 +105,25 @@ public class RecordingActivity extends Activity {
 	}
 
 	void cancelRecording() {
-		Intent rService = new Intent(this, RecordingActivity.class);
+		Intent rService = new Intent(this, RecordingService.class);
 		ServiceConnection sc = new ServiceConnection() {
 			public void onServiceDisconnected(ComponentName name) {}
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
 				rs.cancelRecording();
+			}
+		};
+		// This should block until the onServiceConnected (above) completes.
+		bindService(rService, sc, Context.BIND_AUTO_CREATE);
+	}
+
+	void finishRecording() {
+		Intent rService = new Intent(this, RecordingService.class);
+		ServiceConnection sc = new ServiceConnection() {
+			public void onServiceDisconnected(ComponentName name) {}
+			public void onServiceConnected(ComponentName name, IBinder service) {
+				IRecordService rs = (IRecordService) service;
+				rs.finishRecording();
 			}
 		};
 		// This should block until the onServiceConnected (above) completes.

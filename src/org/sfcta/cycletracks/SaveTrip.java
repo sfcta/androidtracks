@@ -72,13 +72,13 @@ public class SaveTrip extends Activity {
 
 				String fancystarttime = DateFormat.getInstance().format(trip.startTime);
 
-				// Save the trip coords to the phone database. W00t!
-				DbAdapter mDbHelper = new DbAdapter(SaveTrip.this);
-				mDbHelper.open();
-				mDbHelper.updateTrip(trip.tripid, purpose.getSelectedItem().toString(),
-						trip.startTime, fancystarttime, notes.getEditableText().toString(),
-						trip.lathigh, trip.latlow, trip.lgthigh, trip.lgtlow);
-				mDbHelper.close();
+				// Save the trip details to the phone database. W00t!
+				trip.updateTrip(
+						purpose.getSelectedItem().toString(),
+						fancystarttime,
+						notes.getEditableText().toString());
+
+				resetService();
 
 				// And upload to the cloud database, too!  W00t W00t!
 				TripUploader uploader = new TripUploader(getBaseContext());
@@ -93,12 +93,25 @@ public class SaveTrip extends Activity {
 	}
 
 	void cancelRecording() {
-		Intent rService = new Intent(this, SaveTrip.class);
+		Intent rService = new Intent(this, RecordingService.class);
 		ServiceConnection sc = new ServiceConnection() {
 			public void onServiceDisconnected(ComponentName name) {}
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
 				rs.cancelRecording();
+			}
+		};
+		// This should block until the onServiceConnected (above) completes.
+		bindService(rService, sc, Context.BIND_AUTO_CREATE);
+	}
+
+	void resetService() {
+		Intent rService = new Intent(this, RecordingService.class);
+		ServiceConnection sc = new ServiceConnection() {
+			public void onServiceDisconnected(ComponentName name) {}
+			public void onServiceConnected(ComponentName name, IBinder service) {
+				IRecordService rs = (IRecordService) service;
+				rs.reset();
 			}
 		};
 		// This should block until the onServiceConnected (above) completes.
