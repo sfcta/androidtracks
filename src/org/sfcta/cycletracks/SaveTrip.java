@@ -93,6 +93,7 @@ public class SaveTrip extends Activity {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
 				rs.cancelRecording();
+				unbindService(this);
 			}
 		};
 		// This should block until the onServiceConnected (above) completes.
@@ -106,6 +107,7 @@ public class SaveTrip extends Activity {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
 				rs.reset();
+				unbindService(this);
 			}
 		};
 		// This should block until the onServiceConnected (above) completes.

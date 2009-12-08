@@ -33,6 +33,7 @@ public class RecordingActivity extends Activity {
 					rs.startRecording(trip);
 					trip.registerUpdates(RecordingActivity.this);
 				}
+				unbindService(this);
 			}
 		};
 		bindService(rService, sc, Context.BIND_AUTO_CREATE);
@@ -117,6 +118,7 @@ public class RecordingActivity extends Activity {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
 				rs.cancelRecording();
+				unbindService(this);
 			}
 		};
 		// This should block until the onServiceConnected (above) completes.
@@ -130,6 +132,7 @@ public class RecordingActivity extends Activity {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
 				rs.finishRecording();
+				unbindService(this);
 			}
 		};
 		// This should block until the onServiceConnected (above) completes.
