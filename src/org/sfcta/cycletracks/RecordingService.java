@@ -17,9 +17,13 @@ public class RecordingService extends Service implements LocationListener {
 	RecordingActivity recordActivity;
 	LocationManager lm = null;
 
-	double latestUpdate;
-
 	DbAdapter mDb;
+
+	// Aspects of the currently recording trip
+	double latestUpdate;
+	Location lastLocation;
+	float distanceTraveled;
+	float curSpeed, maxSpeed;
 	TripData trip;
 
 	public static int STATE_IDLE = 0;
@@ -59,9 +63,8 @@ public class RecordingService extends Service implements LocationListener {
 		public long finishRecording() {
 			return RecordingService.this.finishRecording();
 		}
-		public long continueCurrentTrip() {
+		public long getCurrentTrip() {
 			if (RecordingService.this.trip != null) {
-
 				return RecordingService.this.trip.tripid;
 			}
 			return -1;
@@ -69,21 +72,22 @@ public class RecordingService extends Service implements LocationListener {
 		public void reset() {
 			RecordingService.this.state = STATE_IDLE;
 		}
+		public void setListener(RecordingActivity ra) {
+			RecordingService.this.recordActivity = ra;
+			notifyListeners();
+		}
 	}
 
 	// ---end SERVICE methods -------------------------
 
 	// Start "business logic":
 
-	public void continueRecording() {
-		// Start listening for GPS updates!
-		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-	}
-
 	public void startRecording(TripData trip) {
 		this.state = STATE_RECORDING;
 		this.trip = trip;
+
+	    curSpeed = maxSpeed = distanceTraveled = 0.0f;
+	    lastLocation = null;
 
 		setNotification();
 
@@ -129,14 +133,13 @@ public class RecordingService extends Service implements LocationListener {
 			// Only save one beep per second.
 			double currentTime = System.currentTimeMillis();
 			if (currentTime - latestUpdate > 999) {
-				trip.addPointNow(loc, currentTime);
+
 				latestUpdate = currentTime;
-/*
+				trip.addPointNow(loc, currentTime);
+				updateTripStats(loc);
+
 				// Update the status page every time, if we can.
-				if (recordActivity != null) {
-					recordActivity.updateStatus();
-				}
-*/
+				notifyListeners();
 			}
 		}
 	}
@@ -177,4 +180,30 @@ public class RecordingService extends Service implements LocationListener {
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.cancelAll();
 	}
+
+    private void updateTripStats(Location newLocation) {
+        final float spdConvert = 2.2369f;
+
+    	// Stats should only be updated if accuracy is decent
+    	if (newLocation.getAccuracy()< 20) {
+            // Speed data is sometimes awful, too:
+            curSpeed = newLocation.getSpeed() * spdConvert;
+            if (curSpeed < 60.0f) {
+            	maxSpeed = Math.max(maxSpeed, curSpeed);
+            }
+            if (lastLocation != null) {
+                float segmentDistance = lastLocation.distanceTo(newLocation);
+                distanceTraveled = distanceTraveled + segmentDistance;
+            }
+
+            lastLocation = newLocation;
+    	}
+    }
+
+    void notifyListeners() {
+    	if (recordActivity != null) {
+    		recordActivity.updateStatus(
+    				trip.numpoints, distanceTraveled, curSpeed, maxSpeed);
+    	}
+    }
 }

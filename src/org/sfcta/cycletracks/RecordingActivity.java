@@ -32,12 +32,11 @@ public class RecordingActivity extends Activity {
 					trip = TripData.createTrip(RecordingActivity.this);
 					rs.startRecording(trip);
 				} else {
-					long id = rs.continueCurrentTrip();
+					long id = rs.getCurrentTrip();
 					trip = TripData.fetchTrip(RecordingActivity.this, id);
 					trip.dirty=true;
 				}
-				trip.registerUpdates(RecordingActivity.this);
-				updateStatus();
+				rs.setListener(RecordingActivity.this);
 				unbindService(this);
 			}
 		};
@@ -91,25 +90,20 @@ public class RecordingActivity extends Activity {
 		});
 	}
 
-	public void updateStatus() {
+	public void updateStatus(int points, float distance, float spdCurrent, float spdMax) {
 	    //TODO: check task status before doing this
-        TextView stat = (TextView) findViewById(R.id.TextRecordStats);
-        TextView distance = (TextView) findViewById(R.id.TextDistance);
+        TextView txtStat = (TextView) findViewById(R.id.TextRecordStats);
+        TextView txtDistance = (TextView) findViewById(R.id.TextDistance);
         TextView txtCurSpeed = (TextView) findViewById(R.id.TextSpeed);
         TextView txtMaxSpeed = (TextView) findViewById(R.id.TextMaxSpeed);
 
-        stat.setText(""+trip.numpoints+" data points received...");
-        txtCurSpeed.setText(String.format("Current speed: %1.1f", trip.curSpeed));
-        txtMaxSpeed.setText(String.format("Maximum speed: %1.1f", trip.maxSpeed));
+        txtStat.setText(""+points+" data points received...");
+        txtCurSpeed.setText(String.format("Current speed: %1.1f", spdCurrent));
+        txtMaxSpeed.setText(String.format("Maximum speed: %1.1f", spdMax));
 
         // Distance funky!
-        int dist = trip.distanceTraveled.intValue();
-        if (dist < 3000) {
-            distance.setText(String.format("Distance travelled: %1d meters", dist));
-        } else {
-        	float miles = 0.0006212f * dist;
-            distance.setText(String.format("Distance travelled: %1.1f miles", miles));
-        }
+    	float miles = 0.0006212f * distance;
+    	txtDistance.setText(String.format("Distance travelled: %1.1f miles", miles));
 	}
 
 	void cancelRecording() {

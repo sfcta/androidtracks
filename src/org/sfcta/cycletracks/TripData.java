@@ -10,16 +10,12 @@ import com.google.android.maps.OverlayItem;
 public class TripData {
 	long tripid;
 	double startTime = 0;
-	Float distanceTraveled = 0.0f;
 	int numpoints, lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
 	boolean dirty = false;
 
 	private ItemizedOverlayTrack gpspoints;
-	Location lastLocation;
-	float curSpeed, maxSpeed;
 
 	DbAdapter mDb;
-	RecordingActivity recordActivity = null;
 
 	public static TripData createTrip(Context c) {
 		TripData t = new TripData(c.getApplicationContext(), 0);
@@ -42,7 +38,6 @@ public class TripData {
 
 	void initializeData() {
 		startTime = System.currentTimeMillis();
-        curSpeed = maxSpeed = distanceTraveled = 0.0f;
         numpoints = 0;
         dirty = false;
         latestlat = 0; latestlgt = 0;
@@ -86,10 +81,6 @@ public class TripData {
 		mDb.deleteAllCoordsForTrip(tripid);
 		mDb.deleteTrip(tripid);
 		mDb.close();
-	}
-
-	void registerUpdates(RecordingActivity ra) {
-		this.recordActivity = ra;
 	}
 
 	public ItemizedOverlayTrack getPoints(Drawable d) {
@@ -138,27 +129,6 @@ public class TripData {
 		gpspoints.addOverlay(opoint);
 	}
 
-    private void updateTripStats(Location newLocation) {
-        final float spdConvert = 2.2369f;
-        if (lastLocation != null) {
-        	// Some stats should only be updated if accuracy is decent
-        	if (newLocation.getAccuracy()< 75) {
-                float segmentDistance = lastLocation.distanceTo(newLocation);
-                distanceTraveled = distanceTraveled.floatValue() + segmentDistance;
-                curSpeed = newLocation.getSpeed() * spdConvert;
-                // And, speed calcs are sometimes awful, too
-                if (curSpeed < 60.0f) {
-                	maxSpeed = Math.max(maxSpeed, curSpeed);
-                }
-                lastLocation = newLocation;
-        	}
-
-            // Save the point no matter what, even with bad accuracy
-            numpoints++;
-            updateTrip();
-        }
-    }
-
 	void addPointNow(Location loc, double currentTime) {
 		int lat = (int) (loc.getLatitude() * 1E6);
 		int lgt = (int) (loc.getLongitude() * 1E6);
@@ -184,19 +154,11 @@ public class TripData {
 		latestlat = lat;
 		latestlgt = lgt;
 
-		updateTripStats(loc);
-
         mDb.open();
         mDb.addCoordToTrip(tripid, pt);
         mDb.updateTrip(tripid, "", startTime, "", "",
                 lathigh, latlow, lgthigh, lgtlow);
         mDb.close();
-
-		if (recordActivity != null) {
-			try {
-				recordActivity.updateStatus();
-			} catch (Exception e) {}
-		}
 	}
 
 	public void updateTrip() {
