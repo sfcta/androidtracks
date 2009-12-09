@@ -111,9 +111,10 @@ public class MainInput extends Activity {
 			Cursor allTrips = mDb.fetchAllTrips();
 
 			SimpleCursorAdapter sca = new SimpleCursorAdapter(this,
-					R.layout.twolinelist, allTrips, new String[] { "purp",
-							"note", "fancystart" }, new int[] {
-							R.id.TextView01, R.id.TextView02, R.id.TextView03 });
+					R.layout.twolinelist, allTrips,
+						new String[] { "purp", "fancystart", "fancyinfo"},
+						new int[] {R.id.TextView01, R.id.TextView03, R.id.TextInfo}
+			);
 
 			lv.setAdapter(sca);
 			TextView counter = (TextView) findViewById(R.id.TextViewPreviousTrips);

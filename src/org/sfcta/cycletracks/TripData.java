@@ -10,9 +10,11 @@ import com.google.android.maps.OverlayItem;
 public class TripData {
 	long tripid;
 	double startTime = 0;
+	double endTime = 0;
 	int numpoints, lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
 	boolean dirty = false;
 	int status;
+	float distance;
 
 	private ItemizedOverlayTrack gpspoints;
 
@@ -43,9 +45,11 @@ public class TripData {
 
 	void initializeData() {
 		startTime = System.currentTimeMillis();
+		endTime = System.currentTimeMillis();
         numpoints = 0;
         dirty = false;
         latestlat = 0; latestlgt = 0;
+        distance = 0;
 
         lathigh = (int) (-100 * 1E6);
 		latlow = (int) (100 * 1E6);
@@ -67,6 +71,8 @@ public class TripData {
 	    lgthigh = tripdetails.getInt(tripdetails.getColumnIndex("lgthi"));
 	    lgtlow =  tripdetails.getInt(tripdetails.getColumnIndex("lgtlo"));
 	    status =  tripdetails.getInt(tripdetails.getColumnIndex("status"));
+	    endTime = tripdetails.getDouble(tripdetails.getColumnIndex("endtime"));
+	    distance = tripdetails.getFloat(tripdetails.getColumnIndex("distance"));
 	    tripdetails.close();
 
 		Cursor points = mDb.fetchAllCoordsForTrip(tripid);
@@ -135,22 +141,25 @@ public class TripData {
 		gpspoints.addOverlay(opoint);
 	}
 
-	void addPointNow(Location loc, double currentTime) {
+	void addPointNow(Location loc, double currentTime, float dst) {
 		int lat = (int) (loc.getLatitude() * 1E6);
 		int lgt = (int) (loc.getLongitude() * 1E6);
-		float accuracy = loc.getAccuracy();
-		double altitude = loc.getAltitude();
-		float speed = loc.getSpeed();
 
 		// Skip duplicates
 		if (latestlat == lat && latestlgt == lgt)
 			return;
+
+		float accuracy = loc.getAccuracy();
+		double altitude = loc.getAltitude();
+		float speed = loc.getSpeed();
 
 		CyclePoint pt = new CyclePoint(lat, lgt, currentTime, accuracy,
 				altitude, speed);
 
         dirty = true;
         numpoints++;
+        endTime = currentTime;
+        distance = dst;
 
 		latlow = Math.min(latlow, lat);
 		lathigh = Math.max(lathigh, lat);
@@ -162,13 +171,9 @@ public class TripData {
 
         mDb.open();
         mDb.addCoordToTrip(tripid, pt);
-        mDb.updateTrip(tripid, "", startTime, "", "",
-                lathigh, latlow, lgthigh, lgtlow);
+        mDb.updateTrip(tripid, "", startTime, "", "", "",
+                lathigh, latlow, lgthigh, lgtlow, distance);
         mDb.close();
-	}
-
-	public void updateTrip() {
-	    updateTrip("","","");
 	}
 
 	public boolean updateTripStatus(int tripStatus) {
@@ -187,12 +192,12 @@ public class TripData {
 		return rtn;
 	}
 
-
-	public void updateTrip(String purpose, String fancy, String notes) {
+	public void updateTrip() { updateTrip("","","",""); }
+	public void updateTrip(String purpose, String fancyStart, String fancyInfo, String notes) {
 		// Save the trip details to the phone database. W00t!
 		mDb.open();
-		mDb.updateTrip(tripid, purpose,	startTime, fancy, notes,
-				lathigh, latlow, lgthigh, lgtlow);
+		mDb.updateTrip(tripid, purpose,	startTime, fancyStart, fancyInfo, notes,
+				lathigh, latlow, lgthigh, lgtlow, distance);
 		mDb.close();
 	}
 }

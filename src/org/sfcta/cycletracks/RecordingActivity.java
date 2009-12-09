@@ -1,5 +1,8 @@
 package org.sfcta.cycletracks;
 
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -70,7 +73,7 @@ public class RecordingActivity extends Activity {
 				if (trip.dirty) {
 					// Save trip so far (points and extent, but no purpose or notes)
 					fi = new Intent(RecordingActivity.this, SaveTrip.class);
-					trip.updateTrip("","","");
+					trip.updateTrip("","","","");
 				}
 				// Otherwise, cancel and go back to main screen
 				else {
@@ -90,16 +93,22 @@ public class RecordingActivity extends Activity {
 		});
 	}
 
-	public void updateStatus(int points, float distance, float spdCurrent, float spdMax) {
+	public void updateStatus(int points, float distance, double duration, float spdCurrent, float spdMax) {
+        final SimpleDateFormat sdf = new SimpleDateFormat("H:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
 	    //TODO: check task status before doing this
         TextView txtStat = (TextView) findViewById(R.id.TextRecordStats);
         TextView txtDistance = (TextView) findViewById(R.id.TextDistance);
+        TextView txtDuration = (TextView) findViewById(R.id.TextDuration);
         TextView txtCurSpeed = (TextView) findViewById(R.id.TextSpeed);
         TextView txtMaxSpeed = (TextView) findViewById(R.id.TextMaxSpeed);
 
         txtStat.setText(""+points+" data points received...");
-        txtCurSpeed.setText(String.format("Current speed: %1.1f", spdCurrent));
-        txtMaxSpeed.setText(String.format("Maximum speed: %1.1f", spdMax));
+        txtCurSpeed.setText(String.format("Current speed: %1.1f mph", spdCurrent));
+        txtMaxSpeed.setText(String.format("Maximum speed: %1.1f mph", spdMax));
+
+        txtDuration.setText(String.format("Time Elapsed: %ss", sdf.format(duration)));
 
         // Distance funky!
     	float miles = 0.0006212f * distance;

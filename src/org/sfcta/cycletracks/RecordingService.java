@@ -135,8 +135,8 @@ public class RecordingService extends Service implements LocationListener {
 			if (currentTime - latestUpdate > 999) {
 
 				latestUpdate = currentTime;
-				trip.addPointNow(loc, currentTime);
 				updateTripStats(loc);
+				trip.addPointNow(loc, currentTime, distanceTraveled);
 
 				// Update the status page every time, if we can.
 				notifyListeners();
@@ -203,7 +203,8 @@ public class RecordingService extends Service implements LocationListener {
     void notifyListeners() {
     	if (recordActivity != null) {
     		recordActivity.updateStatus(
-    				trip.numpoints, distanceTraveled, curSpeed, maxSpeed);
+    				trip.numpoints, distanceTraveled, (trip.endTime - trip.startTime),
+    				curSpeed, maxSpeed);
     	}
     }
 }

@@ -2,7 +2,7 @@
 <resources>
     <string name="recording_title">CycleTracks - Recording...</string>
     
-    <string name="app_name">CycleTracks 11</string>
+    <string name="app_name">CycleTracks</string>
 <string name="previous_trips">Saved Trips:</string>
 <string name="startNewTrip">Start Trip!</string>
 <string name="pauseButtonLabel">Pause</string>

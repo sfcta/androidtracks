@@ -22,13 +22,16 @@ import android.util.Log;
  * SDK**
  */
 public class DbAdapter {
-    private static final int DATABASE_VERSION = 15;
+    private static final int DATABASE_VERSION = 20;
 
     public static final String K_TRIP_ROWID = "_id";
     public static final String K_TRIP_PURP = "purp";
     public static final String K_TRIP_START = "start";
+    public static final String K_TRIP_END = "endtime";
     public static final String K_TRIP_FANCYSTART = "fancystart";
+    public static final String K_TRIP_FANCYINFO = "fancyinfo";
     public static final String K_TRIP_NOTE = "note";
+    public static final String K_TRIP_DISTANCE = "distance";
     public static final String K_TRIP_LATHI = "lathi";
     public static final String K_TRIP_LATLO = "latlo";
     public static final String K_TRIP_LGTHI = "lgthi";
@@ -36,29 +39,27 @@ public class DbAdapter {
     public static final String K_TRIP_STATUS = "status";
 
     public static final String K_POINT_ROWID = "_id";
-    public static final String K_POINT_SEQ = "seq";
-    public static final String K_POINT_TRIP = "trip";
-    public static final String K_POINT_LAT = "lat";
-    public static final String K_POINT_LGT = "lgt";
-    public static final String K_POINT_TIME = "time";
-    public static final String K_POINT_ACC = "acc";
-    public static final String K_POINT_ALT = "alt";
+    public static final String K_POINT_TRIP  = "trip";
+    public static final String K_POINT_TIME  = "time";
+    public static final String K_POINT_LAT   = "lat";
+    public static final String K_POINT_LGT   = "lgt";
+    public static final String K_POINT_ACC   = "acc";
+    public static final String K_POINT_ALT   = "alt";
     public static final String K_POINT_SPEED = "speed";
 
     private static final String TAG = "DbAdapter";
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
-    private int seq = 1;
 
     /**
      * Database creation sql statement
      */
     private static final String TABLE_CREATE_TRIPS = "create table trips (_id integer primary key autoincrement, "
-        + "purp text, start double, fancystart text, note text,"
+        + "purp text, start double, endtime double, fancystart text, fancyinfo text, distance float, note text,"
         + "lathi integer, latlo integer, lgthi integer, lgtlo integer, status integer);";
 
     private static final String TABLE_CREATE_COORDS = "create table coords (_id integer primary key autoincrement, "
-        + "trip integer, seq integer, lat integer, lgt integer, "
+        + "trip integer, lat integer, lgt integer, "
         + "time double, acc float, alt double, speed float);";
 
     private static final String DATABASE_NAME = "data";
@@ -129,44 +130,12 @@ public class DbAdapter {
 
     // #### Coordinate table methods ####
 
-    /**
-     * Create a set of coords for a trip using the data provided. If the coords
-     * are all successfully created, return true; otherwise return false. TODO:
-     * This method is really slow! :-(
-     */
-/*    public boolean createCoordsForTrip(long tripid, Vector<CyclePoint> points) {
-        boolean success = true;
-        mDb.beginTransaction();
-
-        for (int i = 0; i < points.size(); i++) {
-            ContentValues rowValues = new ContentValues();
-            rowValues.put(K_POINT_TRIP, tripid);
-            rowValues.put(K_POINT_SEQ, i);
-
-            CyclePoint pt = points.elementAt(i);
-            rowValues.put(K_POINT_LAT, pt.getLatitudeE6());
-            rowValues.put(K_POINT_LGT, pt.getLongitudeE6());
-            rowValues.put(K_POINT_TIME, pt.time);
-            rowValues.put(K_POINT_ACC, pt.accuracy);
-            rowValues.put(K_POINT_ALT, pt.altitude);
-            rowValues.put(K_POINT_SPEED, pt.speed);
-
-            long rtn = mDb.insert(DATA_TABLE_COORDS, null, rowValues);
-            if (rtn < 0) {
-                success = false;
-                break;
-            }
-        }
-        mDb.endTransaction();
-        return success;
-    }
-*/
-
     public boolean addCoordToTrip(long tripid, CyclePoint pt) {
+    	boolean success = true;
+
+    	// Add the latest point
         ContentValues rowValues = new ContentValues();
         rowValues.put(K_POINT_TRIP, tripid);
-        rowValues.put(K_POINT_SEQ, seq++);
-
         rowValues.put(K_POINT_LAT, pt.getLatitudeE6());
         rowValues.put(K_POINT_LGT, pt.getLongitudeE6());
         rowValues.put(K_POINT_TIME, pt.time);
@@ -174,7 +143,15 @@ public class DbAdapter {
         rowValues.put(K_POINT_ALT, pt.altitude);
         rowValues.put(K_POINT_SPEED, pt.speed);
 
-        return mDb.insert(DATA_TABLE_COORDS, null, rowValues) > 0;
+        success = success && (mDb.insert(DATA_TABLE_COORDS, null, rowValues) > 0);
+
+        // And update the trip stats
+        rowValues = new ContentValues();
+        rowValues.put(K_TRIP_END, pt.time);
+
+        success = success && (mDb.update(DATA_TABLE_TRIPS, rowValues, K_TRIP_ROWID + "=" + tripid, null) > 0);
+
+        return success;
     }
 
     public boolean deleteAllCoordsForTrip(long tripid) {
@@ -184,7 +161,7 @@ public class DbAdapter {
     public Cursor fetchAllCoordsForTrip(long tripid) {
     	try {
             Cursor mCursor = mDb.query(true, DATA_TABLE_COORDS, new String[] {
-                    K_POINT_SEQ, K_POINT_LAT, K_POINT_LGT, K_POINT_TIME,
+                    K_POINT_LAT, K_POINT_LGT, K_POINT_TIME,
                     K_POINT_ACC, K_POINT_ALT, K_POINT_SPEED }, K_POINT_TRIP + "="
                     + tripid, null, null, null, null, null);
 
@@ -214,9 +191,6 @@ public class DbAdapter {
         initialValues.put(K_TRIP_NOTE, note);
         initialValues.put(K_TRIP_STATUS, TripData.STATUS_INCOMPLETE);
 
-        // Start numbering points for this trip from 1
-        seq = 1;
-
         return mDb.insert(DATA_TABLE_TRIPS, null, initialValues);
     }
 
@@ -242,7 +216,7 @@ public class DbAdapter {
      */
     public Cursor fetchAllTrips() {
         return mDb.query(DATA_TABLE_TRIPS, new String[] { K_TRIP_ROWID,
-                K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART, K_TRIP_NOTE },
+                K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART, K_TRIP_NOTE, K_TRIP_FANCYINFO },
                 null, null, null, null, "-" + K_TRIP_START);
     }
 
@@ -282,8 +256,11 @@ public class DbAdapter {
         Cursor mCursor = mDb.query(true, DATA_TABLE_TRIPS, new String[] {
                 K_TRIP_ROWID, K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART,
                 K_TRIP_NOTE, K_TRIP_LATHI, K_TRIP_LATLO, K_TRIP_LGTHI,
-                K_TRIP_LGTLO, K_TRIP_STATUS }, K_TRIP_ROWID + "=" + rowId, null, null, null,
-                null, null);
+                K_TRIP_LGTLO, K_TRIP_STATUS, K_TRIP_END, K_TRIP_FANCYINFO, K_TRIP_DISTANCE },
+
+                K_TRIP_ROWID + "=" + rowId,
+
+                null, null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
         }
@@ -291,8 +268,8 @@ public class DbAdapter {
     }
 
     public boolean updateTrip(long tripid, String purp, double starttime,
-            String fancystart, String note, int lathigh, int latlow,
-            int lgthigh, int lgtlow) {
+            String fancystart, String fancyinfo, String note, int lathigh, int latlow,
+            int lgthigh, int lgtlow, float distance) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(K_TRIP_PURP, purp);
         initialValues.put(K_TRIP_START, starttime);
@@ -302,6 +279,8 @@ public class DbAdapter {
         initialValues.put(K_TRIP_LATLO, latlow);
         initialValues.put(K_TRIP_LGTHI, lgthigh);
         initialValues.put(K_TRIP_LGTLO, lgtlow);
+        initialValues.put(K_TRIP_FANCYINFO, fancyinfo);
+        initialValues.put(K_TRIP_DISTANCE, distance);
 
         return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "="
                 + tripid, null) > 0;

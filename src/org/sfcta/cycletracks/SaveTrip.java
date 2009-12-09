@@ -1,6 +1,8 @@
 package org.sfcta.cycletracks;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -76,12 +78,21 @@ public class SaveTrip extends Activity {
 				Spinner purpose = (Spinner) findViewById(R.id.SpinnerPurp);
 				EditText notes = (EditText) findViewById(R.id.NotesField);
 
-				String fancystarttime = DateFormat.getInstance().format(trip.startTime);
+				String fancyStartTime = DateFormat.getInstance().format(trip.startTime);
+
+				// "3.5 miles in 26 minutes"
+				SimpleDateFormat sdf = new SimpleDateFormat("m");
+				sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+				String minutes = sdf.format(trip.endTime - trip.startTime);
+				String fancyEndInfo = String.format("%1.1f miles, %s minutes.  %s",
+						(0.0006212f * trip.distance),
+						minutes,
+						notes.getEditableText().toString());
 
 				// Save the trip details to the phone database. W00t!
 				trip.updateTrip(
 						purpose.getSelectedItem().toString(),
-						fancystarttime,
+						fancyStartTime, fancyEndInfo,
 						notes.getEditableText().toString());
 				trip.updateTripStatus(TripData.STATUS_COMPLETE);
 				resetService();
