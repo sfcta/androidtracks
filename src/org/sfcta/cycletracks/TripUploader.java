@@ -203,7 +203,7 @@ public class TripUploader {
                 JSONObject responseData = new JSONObject(responseString);
                 if (responseData.getString("status").equals("success")) {
                     mDbHelper.open();
-                    mDbHelper.updateTripMarkUploaded(tripId);
+                    mDbHelper.updateTripStatus(tripId, TripData.STATUS_SENT);
                     mDbHelper.close();
                 }
             } catch (IllegalStateException e) {

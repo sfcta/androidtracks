@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class MainInput extends Activity {
@@ -33,6 +34,7 @@ public class MainInput extends Activity {
     private final static int CONTEXT_RETRY = 0;
     private final static int CONTEXT_DELETE = 1;
 
+    DbAdapter mDb;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -99,17 +101,17 @@ public class MainInput extends Activity {
 
 	void populateList(ListView lv) {
 		// Get list from the real phone database. W00t!
-		DbAdapter mDbHelper = new DbAdapter(MainInput.this);
-		mDbHelper.openReadOnly();
-/*
+		DbAdapter mDb = new DbAdapter(MainInput.this);
+		mDb.open();
+
 		// Clean up any bad trips & coords from crashes
-		int cleanedTrips = mDbHelper.cleanTables();
+		int cleanedTrips = mDb.cleanTables();
 		if (cleanedTrips > 0) {
-		    Toast.makeText(getBaseContext(), ""+cleanedTrips+" bad trips discarded.", Toast.LENGTH_SHORT).show();
+		    Toast.makeText(getBaseContext(),""+cleanedTrips+" bad trips removed.", Toast.LENGTH_SHORT).show();
 		}
-*/
+
 		try {
-			Cursor allTrips = mDbHelper.fetchAllTrips();
+			Cursor allTrips = mDb.fetchAllTrips();
 
 			SimpleCursorAdapter sca = new SimpleCursorAdapter(this,
 					R.layout.twolinelist, allTrips, new String[] { "purp",
@@ -130,10 +132,11 @@ public class MainInput extends Activity {
 			default:
 				counter.setText("" + numtrips + " saved trips:");
 			}
+			// allTrips.close();
 		} catch (SQLException sqle) {
 			// Do nothing, for now!
 		}
-		mDbHelper.close();
+		mDb.close();
 
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		    public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {

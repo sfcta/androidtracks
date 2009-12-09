@@ -83,7 +83,7 @@ public class SaveTrip extends Activity {
 						purpose.getSelectedItem().toString(),
 						fancystarttime,
 						notes.getEditableText().toString());
-
+				trip.updateTripStatus(TripData.STATUS_COMPLETE);
 				resetService();
 
 				// Maybe this is where we should start a new activity for MainInput

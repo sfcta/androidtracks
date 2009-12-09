@@ -17,6 +17,10 @@ public class TripData {
 
 	DbAdapter mDb;
 
+    public static int STATUS_INCOMPLETE = 0;
+    public static int STATUS_COMPLETE = 1;
+    public static int STATUS_SENT = 2;
+
 	public static TripData createTrip(Context c) {
 		TripData t = new TripData(c.getApplicationContext(), 0);
 		t.createTripInDatabase(c);
@@ -163,6 +167,14 @@ public class TripData {
 
 	public void updateTrip() {
 	    updateTrip("","","");
+	}
+
+	public boolean updateTripStatus(int tripStatus) {
+		boolean rtn;
+		mDb.open();
+		rtn = mDb.updateTripStatus(tripid, tripStatus);
+		mDb.close();
+		return rtn;
 	}
 
 	public void updateTrip(String purpose, String fancy, String notes) {

@@ -45,10 +45,6 @@ public class DbAdapter {
     public static final String K_POINT_ALT = "alt";
     public static final String K_POINT_SPEED = "speed";
 
-    public static int STATUS_INCOMPLETE = 0;
-    public static int STATUS_COMPLETE = 1;
-    public static int STATUS_SENT = 2;
-
     private static final String TAG = "DbAdapter";
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
@@ -59,7 +55,7 @@ public class DbAdapter {
      */
     private static final String TABLE_CREATE_TRIPS = "create table trips (_id integer primary key autoincrement, "
         + "purp text, start double, fancystart text, note text,"
-        + "lathi integer, latlo integer, lgthi integer, lgtlo integer, status integer default 0);";
+        + "lathi integer, latlo integer, lgthi integer, lgtlo integer, status integer);";
 
     private static final String TABLE_CREATE_COORDS = "create table coords (_id integer primary key autoincrement, "
         + "trip integer, seq integer, lat integer, lgt integer, "
@@ -216,6 +212,7 @@ public class DbAdapter {
         initialValues.put(K_TRIP_START, starttime);
         initialValues.put(K_TRIP_FANCYSTART, fancystart);
         initialValues.put(K_TRIP_NOTE, note);
+        initialValues.put(K_TRIP_STATUS, TripData.STATUS_INCOMPLETE);
 
         // Start numbering points for this trip from 1
         seq = 1;
@@ -250,21 +247,28 @@ public class DbAdapter {
     }
 
     public int cleanTables() {
+    	int badTrips = 0;
+
         Cursor c = mDb.query(DATA_TABLE_TRIPS, new String[]
-                { K_TRIP_ROWID, K_TRIP_ROWID, K_TRIP_STATUS },
-                K_TRIP_STATUS + "=" + STATUS_INCOMPLETE,
+                { K_TRIP_ROWID, K_TRIP_STATUS },
+                K_TRIP_STATUS + "=" + TripData.STATUS_INCOMPLETE,
                 null, null, null, null);
 
-        if (c != null && c.getCount() >0) {
+        if (c != null && c.getCount()>0) {
+        	c.moveToFirst();
+        	badTrips = c.getCount();
+
             while (!c.isAfterLast()) {
-                int kcol = c.getColumnIndex(K_TRIP_ROWID);
-                long tripid = c.getInt(kcol);
+                long tripid = c.getInt(0);
                 deleteAllCoordsForTrip(tripid);
                 c.moveToNext();
             }
         }
-
-        return mDb.delete(DATA_TABLE_TRIPS, K_TRIP_STATUS + "=" + STATUS_INCOMPLETE, null);
+        c.close();
+        if (badTrips>0) {
+        	mDb.delete(DATA_TABLE_TRIPS, K_TRIP_STATUS + "=" + TripData.STATUS_INCOMPLETE, null);
+        }
+        return badTrips;
     }
 
     /**
@@ -298,15 +302,14 @@ public class DbAdapter {
         initialValues.put(K_TRIP_LATLO, latlow);
         initialValues.put(K_TRIP_LGTHI, lgthigh);
         initialValues.put(K_TRIP_LGTLO, lgtlow);
-        initialValues.put(K_TRIP_STATUS, STATUS_COMPLETE);
 
         return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "="
                 + tripid, null) > 0;
     }
 
-    public boolean updateTripMarkUploaded(long tripid) {
+    public boolean updateTripStatus(long tripid, int tripStatus) {
         ContentValues initialValues = new ContentValues();
-        initialValues.put(K_TRIP_STATUS, STATUS_SENT);
+        initialValues.put(K_TRIP_STATUS, tripStatus);
 
         return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "="
                 + tripid, null) > 0;
