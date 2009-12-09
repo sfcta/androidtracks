@@ -282,7 +282,7 @@ public class DbAdapter {
         Cursor mCursor = mDb.query(true, DATA_TABLE_TRIPS, new String[] {
                 K_TRIP_ROWID, K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART,
                 K_TRIP_NOTE, K_TRIP_LATHI, K_TRIP_LATLO, K_TRIP_LGTHI,
-                K_TRIP_LGTLO }, K_TRIP_ROWID + "=" + rowId, null, null, null,
+                K_TRIP_LGTLO, K_TRIP_STATUS }, K_TRIP_ROWID + "=" + rowId, null, null, null,
                 null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();

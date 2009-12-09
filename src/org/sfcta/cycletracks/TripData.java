@@ -12,6 +12,7 @@ public class TripData {
 	double startTime = 0;
 	int numpoints, lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
 	boolean dirty = false;
+	int status;
 
 	private ItemizedOverlayTrack gpspoints;
 
@@ -65,6 +66,7 @@ public class TripData {
 	    latlow =  tripdetails.getInt(tripdetails.getColumnIndex("latlo"));
 	    lgthigh = tripdetails.getInt(tripdetails.getColumnIndex("lgthi"));
 	    lgtlow =  tripdetails.getInt(tripdetails.getColumnIndex("lgtlo"));
+	    status =  tripdetails.getInt(tripdetails.getColumnIndex("status"));
 	    tripdetails.close();
 
 		Cursor points = mDb.fetchAllCoordsForTrip(tripid);
@@ -176,6 +178,15 @@ public class TripData {
 		mDb.close();
 		return rtn;
 	}
+
+	public boolean getStatus(int tripStatus) {
+		boolean rtn;
+		mDb.open();
+		rtn = mDb.updateTripStatus(tripid, tripStatus);
+		mDb.close();
+		return rtn;
+	}
+
 
 	public void updateTrip(String purpose, String fancy, String notes) {
 		// Save the trip details to the phone database. W00t!

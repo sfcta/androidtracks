@@ -53,6 +53,7 @@ public class MainInput extends Activity {
 		// 2. If we're recording or saving right now, even if this is in a new
 		// task, jump to the existing activity.
 		// (This handles user who hit  BACK button while recording)
+		setContentView(R.layout.main);
 
 		Intent rService = new Intent(this, RecordingService.class);
 		ServiceConnection sc = new ServiceConnection() {
@@ -67,6 +68,15 @@ public class MainInput extends Activity {
 						startActivity(new Intent(MainInput.this, RecordingActivity.class));
 					}
 					MainInput.this.finish();
+				} else {
+					// Idle. First run? Switch to user prefs screen if there are no prefs stored yet
+			        SharedPreferences settings = getSharedPreferences("PREFS", 0);
+			        if (settings.getAll().isEmpty()) {
+			            startActivity(new Intent(MainInput.this, UserInfoActivity.class));
+			        }
+					// Not first run - set up the list view of saved trips
+					ListView listSavedTrips = (ListView) findViewById(R.id.ListSavedTrips);
+					populateList(listSavedTrips);
 				}
 				MainInput.this.unbindService(this); // race?  this says we no longer care
 			}
@@ -74,19 +84,6 @@ public class MainInput extends Activity {
 		// This needs to block until the onServiceConnected (above) completes.
 		// Thus, we can check the recording status before continuing on.
 		bindService(rService, sc, Context.BIND_AUTO_CREATE);
-
-		// Ok we're finally GTG; build the main screen.
-		setContentView(R.layout.main);
-
-		// Switch to user prefs screen if there are no prefs stored yet (first-run)
-        SharedPreferences settings = getSharedPreferences("PREFS", 0);
-        if (settings.getAll().isEmpty()) {
-            startActivity(new Intent(this, UserInfoActivity.class));
-        }
-
-		// Set up the list view of saved trips
-		ListView listSavedTrips = (ListView) findViewById(R.id.ListSavedTrips);
-		populateList(listSavedTrips);
 
 		// And set up the record button
 		final Button startButton = (Button) findViewById(R.id.ButtonStart);

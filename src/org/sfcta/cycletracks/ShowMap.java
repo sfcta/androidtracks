@@ -52,7 +52,9 @@ public class ShowMap extends MapActivity {
 				mapOverlays.add(gpspoints);
 			}
 
-			if (cmds.getBoolean("uploadTrip", false)) {
+			if (trip.status < TripData.STATUS_SENT
+					&& cmds != null
+					&& cmds.getBoolean("uploadTrip", false)) {
 			    // And upload to the cloud database, too!  W00t W00t!
                 TripUploader uploader = new TripUploader(ShowMap.this);
                 uploader.uploadTrip(trip.tripid);
@@ -66,7 +68,6 @@ public class ShowMap extends MapActivity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-
 	}
 
 	@Override
@@ -74,7 +75,6 @@ public class ShowMap extends MapActivity {
 		// Auto-generated method stub
 		return false;
 	}
-
 
 	private class AddPointsToMapLayerTask extends AsyncTask <TripData, Integer, ItemizedOverlayTrack> {
 		@Override
