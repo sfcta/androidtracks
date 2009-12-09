@@ -55,29 +55,48 @@ public class TripUploader {
     }
 
     private JSONObject getCoordsJSON(long tripId) throws JSONException {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         mDbHelper.openReadOnly();
         Cursor tripCoordsCursor = mDbHelper.fetchAllCoordsForTrip(tripId);
-        Map<String, String> fieldMap = new HashMap<String, String>();
-        fieldMap.put(TRIP_COORDS_TIME, DbAdapter.K_POINT_TIME);
-        fieldMap.put(TRIP_COORDS_LAT, DbAdapter.K_POINT_LAT);
-        fieldMap.put(TRIP_COORDS_LON, DbAdapter.K_POINT_LGT);
-        fieldMap.put(TRIP_COORDS_ALT, DbAdapter.K_POINT_ALT);
-        fieldMap.put(TRIP_COORDS_SPEED, DbAdapter.K_POINT_SPEED);
-        fieldMap.put(TRIP_COORDS_HACCURACY, DbAdapter.K_POINT_ACC);
-        fieldMap.put(TRIP_COORDS_VACCURACY, DbAdapter.K_POINT_ACC);
+
+        // Build the map between JSON fieldname and phone db fieldname:
+        Map<String, Integer> fieldMap = new HashMap<String, Integer>();
+        fieldMap.put(TRIP_COORDS_TIME,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_TIME));
+        fieldMap.put(TRIP_COORDS_LAT,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_LAT));
+        fieldMap.put(TRIP_COORDS_LON,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_LGT));
+        fieldMap.put(TRIP_COORDS_ALT,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_ALT));
+        fieldMap.put(TRIP_COORDS_SPEED,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_SPEED));
+        fieldMap.put(TRIP_COORDS_HACCURACY,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_ACC));
+        fieldMap.put(TRIP_COORDS_VACCURACY,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_ACC));
+
+        // Build JSON objects for each coordinate:
         JSONObject tripCoords = new JSONObject();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         while (!tripCoordsCursor.isAfterLast()) {
             JSONObject coord = new JSONObject();
-            for (Map.Entry<String, String> entry : fieldMap.entrySet()) {
-                int dbIndex = tripCoordsCursor.getColumnIndex(entry.getValue());
-                Double dbData = tripCoordsCursor.getDouble(dbIndex);
-                if (entry.getValue() == DbAdapter.K_POINT_TIME) {
-                    coord.put(entry.getKey(), df.format(dbData));
-                } else {
-                    coord.put(entry.getKey(), dbData);
-                }
-            }
+
+            coord.put(TRIP_COORDS_TIME,
+            		df.format(tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_TIME))));
+            coord.put(TRIP_COORDS_LAT,
+            		tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_LAT)) / 1E6);
+            coord.put(TRIP_COORDS_LON,
+            		tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_LON)) / 1E6);
+            coord.put(TRIP_COORDS_ALT,
+            		tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_ALT)));
+            coord.put(TRIP_COORDS_SPEED,
+            		tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_SPEED)));
+            coord.put(TRIP_COORDS_HACCURACY,
+            		tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_HACCURACY)));
+            coord.put(TRIP_COORDS_VACCURACY,
+            		tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_VACCURACY)));
+
             tripCoords.put(coord.getString("rec"), coord);
             tripCoordsCursor.moveToNext();
         }
@@ -115,6 +134,8 @@ public class TripUploader {
                 .getColumnIndex(DbAdapter.K_TRIP_PURP));
         Double startTime = tripCursor.getDouble(tripCursor
                 .getColumnIndex(DbAdapter.K_TRIP_START));
+        Double endTime = tripCursor.getDouble(tripCursor
+                .getColumnIndex(DbAdapter.K_TRIP_END));
         tripCursor.close();
         mDbHelper.close();
 
@@ -122,6 +143,7 @@ public class TripUploader {
         tripData.add(note);
         tripData.add(purpose);
         tripData.add(df.format(startTime));
+        tripData.add(df.format(endTime));
 
         return tripData;
     }
@@ -147,6 +169,7 @@ public class TripUploader {
         String notes = tripData.get(0);
         String purpose = tripData.get(1);
         String startTime = tripData.get(2);
+        String endTime = tripData.get(3);
 
         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
         nameValuePairs.add(new BasicNameValuePair("coords", coords.toString()));
@@ -155,6 +178,7 @@ public class TripUploader {
         nameValuePairs.add(new BasicNameValuePair("notes", notes));
         nameValuePairs.add(new BasicNameValuePair("purpose", purpose));
         nameValuePairs.add(new BasicNameValuePair("start", startTime));
+        nameValuePairs.add(new BasicNameValuePair("end", endTime));
         nameValuePairs.add(new BasicNameValuePair("version", "2"));
 
         return nameValuePairs;

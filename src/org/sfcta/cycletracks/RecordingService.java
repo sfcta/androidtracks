@@ -162,16 +162,23 @@ public class RecordingService extends Service implements LocationListener {
 		int icon = R.drawable.icon25;
 		CharSequence tickerText = "Recording...";
 		long when = System.currentTimeMillis();
+
 		Notification notification = new Notification(icon, tickerText, when);
-		notification.flags = notification.flags | Notification.FLAG_ONGOING_EVENT;
+
+		// LED !!
+		notification.ledARGB = 0xffff00ff;
+		notification.ledOnMS = 300;
+		notification.ledOffMS = 1200;
+		notification.flags = notification.flags | Notification.FLAG_ONGOING_EVENT | Notification.FLAG_SHOW_LIGHTS;
+
 		Context context = getApplicationContext();
 		CharSequence contentTitle = "CycleTracks - Recording";
 		CharSequence contentText = "Tap to finish your trip";
+
 		Intent notificationIntent = new Intent(context, RecordingActivity.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
-				notificationIntent, 0);
-		notification.setLatestEventInfo(context, contentTitle, contentText,
-				contentIntent);
+		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+		notification.setLatestEventInfo(context, contentTitle, contentText,	contentIntent);
+
 		final int RECORDING_ID = 1;
 		mNotificationManager.notify(RECORDING_ID, notification);
 	}

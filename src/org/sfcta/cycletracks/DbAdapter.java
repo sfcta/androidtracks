@@ -54,12 +54,14 @@ public class DbAdapter {
     /**
      * Database creation sql statement
      */
-    private static final String TABLE_CREATE_TRIPS = "create table trips (_id integer primary key autoincrement, "
-        + "purp text, start double, endtime double, fancystart text, fancyinfo text, distance float, note text,"
+    private static final String TABLE_CREATE_TRIPS = "create table trips "
+    	+ "(_id integer primary key autoincrement, purp text, start double, endtime double, "
+    	+ "fancystart text, fancyinfo text, distance float, note text,"
         + "lathi integer, latlo integer, lgthi integer, lgtlo integer, status integer);";
 
-    private static final String TABLE_CREATE_COORDS = "create table coords (_id integer primary key autoincrement, "
-        + "trip integer, lat integer, lgt integer, "
+    private static final String TABLE_CREATE_COORDS = "create table coords "
+    	+ "(_id integer primary key autoincrement, "
+        + "trip integer, lat int, lgt int, "
         + "time double, acc float, alt double, speed float);";
 
     private static final String DATABASE_NAME = "data";
