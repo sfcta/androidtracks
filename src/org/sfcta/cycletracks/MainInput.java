@@ -52,16 +52,8 @@ public class MainInput extends Activity {
 
 		// Let's handle some launcher lifecycle issues:
 
-		// 1. If this activity floated to the top of another CycleTracks task,
-		// just kill it. The existing task will reveal itself.
-		// (This handles the user who hit HOME and relaunched later.
-		if (this.isChild() && this.getIntent().getExtras() == null) {
-			this.finish();
-		}
-
-		// 2. If we're recording or saving right now, even if this is in a new
-		// task, jump to the existing activity.
-		// (This handles user who hit  BACK button while recording)
+		// If we're recording or saving right now, jump to the existing activity.
+		// (This handles user who hit BACK button while recording)
 		setContentView(R.layout.main);
 
 		Intent rService = new Intent(this, RecordingService.class);
@@ -73,7 +65,7 @@ public class MainInput extends Activity {
 				if (state > RecordingService.STATE_IDLE) {
 					if (state == RecordingService.STATE_FULL) {
 						startActivity(new Intent(MainInput.this, SaveTrip.class));
-					} else {
+					} else {  // RECORDING OR PAUSED:
 						startActivity(new Intent(MainInput.this, RecordingActivity.class));
 					}
 					MainInput.this.finish();

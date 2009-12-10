@@ -60,8 +60,8 @@ public class TripData {
 
         lathigh = (int) (-100 * 1E6);
 		latlow = (int) (100 * 1E6);
-		lgtlow = (int) (360 * 1E6);
-		lgthigh = (int) (-360 * 1E6);
+		lgtlow = (int) (180 * 1E6);
+		lgthigh = (int) (-180 * 1E6);
 
 		updateTrip();
 	}
@@ -126,7 +126,6 @@ public class TripData {
                 double time = points.getDouble(COL_TIME);
 
                 addPointToSavedMap(lat, lgt, time);
-                // if (gpspoints.size() % 100 == 99) publishProgress(pk);
 
 				points.moveToNext();
 			}
