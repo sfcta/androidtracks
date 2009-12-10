@@ -104,7 +104,7 @@ public class MainInput extends Activity {
 		// Clean up any bad trips & coords from crashes
 		int cleanedTrips = mDb.cleanTables();
 		if (cleanedTrips > 0) {
-		    Toast.makeText(getBaseContext(),""+cleanedTrips+" bad trips removed.", Toast.LENGTH_SHORT).show();
+		    Toast.makeText(getBaseContext(),""+cleanedTrips+" bad trip(s) removed.", Toast.LENGTH_SHORT).show();
 		}
 
 		try {

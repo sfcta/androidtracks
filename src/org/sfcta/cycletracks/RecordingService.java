@@ -33,10 +33,10 @@ public class RecordingService extends Service implements LocationListener {
 	float curSpeed, maxSpeed;
 	TripData trip;
 
-	public static int STATE_IDLE = 0;
-	public static int STATE_RECORDING = 1;
-	public static int STATE_PAUSED = 2;  //TODO: may not need this one.
-	public static int STATE_FULL = 3;
+	public final static int STATE_IDLE = 0;
+	public final static int STATE_RECORDING = 1;
+	public final static int STATE_PAUSED = 2;  //TODO: may not need this one.
+	public final static int STATE_FULL = 3;
 
 	int state = STATE_IDLE;
 	private final MyServiceBinder myServiceBinder = new MyServiceBinder();
@@ -68,6 +68,12 @@ public class RecordingService extends Service implements LocationListener {
 		}
 		public void cancelRecording() {
 			RecordingService.this.cancelRecording();
+		}
+		public void pauseRecording() {
+			RecordingService.this.pauseRecording();
+		}
+		public void resumeRecording() {
+			RecordingService.this.resumeRecording();
 		}
 		public long finishRecording() {
 			return RecordingService.this.finishRecording();
@@ -110,12 +116,24 @@ public class RecordingService extends Service implements LocationListener {
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 	}
 
+	public void pauseRecording() {
+		this.state = STATE_PAUSED;
+		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		lm.removeUpdates(this);
+	}
+
+	public void resumeRecording() {
+		this.state = STATE_RECORDING;
+		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+	}
+
 	public long finishRecording() {
+		this.state = STATE_FULL;
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		lm.removeUpdates(this);
 
 		clearNotifications();
-		this.state = STATE_FULL;
 
 		return trip.tripid;
 	}
@@ -193,7 +211,7 @@ public class RecordingService extends Service implements LocationListener {
 				Notification.FLAG_SHOW_LIGHTS;
 		notification.ledARGB = 0xffff00ff;
 		notification.ledOnMS = 300;
-		notification.ledOffMS = 1200;
+		notification.ledOffMS = 3000;
 
 		Context context = getApplicationContext();
 		CharSequence contentTitle = "CycleTracks - Recording";
@@ -216,15 +234,19 @@ public class RecordingService extends Service implements LocationListener {
 
 		notification.ledARGB = 0xffff00ff;
 		notification.ledOnMS = 300;
-		notification.ledOffMS = 1200;
-		notification.flags = notification.flags | Notification.FLAG_ONGOING_EVENT | Notification.FLAG_SHOW_LIGHTS;
-		String z = this.getResources().getString(R.raw.bikebell);
+		notification.ledOffMS = 3000;
+		notification.flags = notification.flags |
+				Notification.FLAG_ONGOING_EVENT |
+				Notification.FLAG_SHOW_LIGHTS |
+				Notification.FLAG_INSISTENT |
+				Notification.FLAG_NO_CLEAR;
 
-		Context context = getApplicationContext();
+		Context context = this;
 		CharSequence contentTitle = "CycleTracks - Recording";
 		CharSequence contentText = "Tap to finish your trip";
 
 		Intent notificationIntent = new Intent(context, RecordingActivity.class);
+//		notificationIntent.putExtra("blinky", true);
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(context, contentTitle, contentText,	contentIntent);
 

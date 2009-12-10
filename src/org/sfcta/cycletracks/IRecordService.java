@@ -6,6 +6,8 @@ public interface IRecordService {
 	public void cancelRecording();
 	public long finishRecording(); // returns trip-id
 	public long getCurrentTrip();  // returns trip-id
+	public void pauseRecording();
+	public void resumeRecording();
 	public void reset();
 	public void setListener(RecordingActivity ra);
 }

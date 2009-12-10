@@ -18,25 +18,52 @@ import android.widget.Toast;
 public class RecordingActivity extends Activity {
 	Intent fi;
 	TripData trip;
+	boolean isRecording = false;
+	Button pauseButton;
+	Button finishButton;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.recording);
 
-		// If service is idle, start recording!
+		setContentView(R.layout.recording);
+		pauseButton = (Button) findViewById(R.id.ButtonPause);
+		finishButton = (Button) findViewById(R.id.ButtonFinished);
+
+		// Query the RecordingService to figure out what to do.
 		Intent rService = new Intent(this, RecordingService.class);
 		startService(rService);
 		ServiceConnection sc = new ServiceConnection() {
 			public void onServiceDisconnected(ComponentName name) {}
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
-				if (rs.getState() == RecordingService.STATE_IDLE) {
-					trip = TripData.createTrip(RecordingActivity.this);
-					rs.startRecording(trip);
-				} else {
-					long id = rs.getCurrentTrip();
-					trip = TripData.fetchTrip(RecordingActivity.this, id);
+
+				switch (rs.getState()) {
+					case RecordingService.STATE_IDLE:
+						trip = TripData.createTrip(RecordingActivity.this);
+						rs.startRecording(trip);
+						isRecording = true;
+						RecordingActivity.this.pauseButton.setEnabled(true);
+						RecordingActivity.this.setTitle("CycleTracks - Recording...");
+						break;
+					case RecordingService.STATE_RECORDING:
+						long id = rs.getCurrentTrip();
+						trip = TripData.fetchTrip(RecordingActivity.this, id);
+						isRecording = true;
+						RecordingActivity.this.pauseButton.setEnabled(true);
+						RecordingActivity.this.setTitle("CycleTracks - Recording...");
+						break;
+					case RecordingService.STATE_PAUSED:
+						long tid = rs.getCurrentTrip();
+						isRecording = false;
+						trip = TripData.fetchTrip(RecordingActivity.this, tid);
+						RecordingActivity.this.pauseButton.setEnabled(true);
+						RecordingActivity.this.pauseButton.setText("Resume");
+						RecordingActivity.this.setTitle("CycleTracks - Paused...");
+						break;
+					case RecordingService.STATE_FULL:
+						// Should never get here, right?
+						break;
 				}
 				rs.setListener(RecordingActivity.this);
 				unbindService(this);
@@ -44,32 +71,29 @@ public class RecordingActivity extends Activity {
 		};
 		bindService(rService, sc, Context.BIND_AUTO_CREATE);
 
-/*
 		// Pause button
-		final Button pauseButton = (Button) findViewById(R.id.ButtonPause);
+		pauseButton.setEnabled(false);
 		pauseButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				isRecording = !isRecording;
 				if (isRecording) {
-					// TripData.get().killListener();
-					pauseButton.setText("Resume");
-					RecordingActivity.this.setTitle("CycleTracks - Paused...");
-					Toast.makeText(getBaseContext(),"Recording paused; GPS now offline", Toast.LENGTH_LONG).show();
-				} else {
-					// TripData.get().activateListener();
 					pauseButton.setText("Pause");
 					RecordingActivity.this.setTitle("CycleTracks - Recording...");
 					Toast.makeText(getBaseContext(),"GPS restarted. It may take a moment to resync.", Toast.LENGTH_LONG).show();
+				} else {
+					pauseButton.setText("Resume");
+					RecordingActivity.this.setTitle("CycleTracks - Paused...");
+					Toast.makeText(getBaseContext(),"Recording paused; GPS now offline", Toast.LENGTH_LONG).show();
 				}
-				isRecording = !isRecording;
+				RecordingActivity.this.setListener();
 			}
 		});
-*/
+
 		// Finish button
-		final Button finishButton = (Button) findViewById(R.id.ButtonFinished);
 		finishButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// If we have points, go to the save-trip activity
-				if (trip.dirty) {
+				if (trip.numpoints > 0) {
 					// Save trip so far (points and extent, but no purpose or notes)
 					fi = new Intent(RecordingActivity.this, SaveTrip.class);
 					trip.updateTrip("","","","");
@@ -112,6 +136,24 @@ public class RecordingActivity extends Activity {
         // Distance funky!
     	float miles = 0.0006212f * distance;
     	txtDistance.setText(String.format("Distance traveled: %1.1f miles", miles));
+	}
+
+	void setListener() {
+		Intent rService = new Intent(this, RecordingService.class);
+		ServiceConnection sc = new ServiceConnection() {
+			public void onServiceDisconnected(ComponentName name) {}
+			public void onServiceConnected(ComponentName name, IBinder service) {
+				IRecordService rs = (IRecordService) service;
+				if (RecordingActivity.this.isRecording) {
+					rs.resumeRecording();
+				} else {
+					rs.pauseRecording();
+				}
+				unbindService(this);
+			}
+		};
+		// This should block until the onServiceConnected (above) completes.
+		bindService(rService, sc, Context.BIND_AUTO_CREATE);
 	}
 
 	void cancelRecording() {

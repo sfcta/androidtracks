@@ -12,7 +12,6 @@ public class TripData {
 	double startTime = 0;
 	double endTime = 0;
 	int numpoints, lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
-	boolean dirty = false;
 	int status;
 	float distance;
 
@@ -47,7 +46,6 @@ public class TripData {
 		startTime = System.currentTimeMillis();
 		endTime = System.currentTimeMillis();
         numpoints = 0;
-        dirty = false;
         latestlat = 0; latestlgt = 0;
         distance = 0;
 
@@ -156,7 +154,6 @@ public class TripData {
 		CyclePoint pt = new CyclePoint(lat, lgt, currentTime, accuracy,
 				altitude, speed);
 
-        dirty = true;
         numpoints++;
         endTime = currentTime;
         distance = dst;

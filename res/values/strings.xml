@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="recording_title">CycleTracks - Recording...</string>
+    <string name="recording_title">CycleTracks</string>
     
     <string name="app_name">CycleTracks</string>
 <string name="previous_trips">Saved Trips:</string>
