@@ -226,9 +226,23 @@ public class DbAdapter {
      * @return Cursor over all trips
      */
     public Cursor fetchAllTrips() {
-        return mDb.query(DATA_TABLE_TRIPS, new String[] { K_TRIP_ROWID,
+        Cursor c = mDb.query(DATA_TABLE_TRIPS, new String[] { K_TRIP_ROWID,
                 K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART, K_TRIP_NOTE, K_TRIP_FANCYINFO },
                 null, null, null, null, "-" + K_TRIP_START);
+        if (c != null && c.getCount()>0) {
+        	c.moveToFirst();
+        }
+        return c;
+    }
+
+    public Cursor fetchUnsentTrips() {
+        Cursor c = mDb.query(DATA_TABLE_TRIPS, new String[] { K_TRIP_ROWID },
+                K_TRIP_STATUS + "=" + TripData.STATUS_COMPLETE,
+                null, null, null, null);
+        if (c != null && c.getCount()>0) {
+        	c.moveToFirst();
+        }
+        return c;
     }
 
     public int cleanTables() {

@@ -40,7 +40,7 @@ import android.util.Log;
 
 public class TripUploader {
     Context mCtx;
-    DbAdapter mDbHelper;
+    DbAdapter mDb;
 
     public static final String TRIP_COORDS_TIME = "rec";
     public static final String TRIP_COORDS_LAT = "lat";
@@ -60,14 +60,14 @@ public class TripUploader {
 
     public TripUploader(Context ctx) {
         this.mCtx = ctx;
-        this.mDbHelper = new DbAdapter(this.mCtx);
+        this.mDb = new DbAdapter(this.mCtx);
     }
 
     private JSONObject getCoordsJSON(long tripId) throws JSONException {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        mDbHelper.openReadOnly();
-        Cursor tripCoordsCursor = mDbHelper.fetchAllCoordsForTrip(tripId);
+        mDb.openReadOnly();
+        Cursor tripCoordsCursor = mDb.fetchAllCoordsForTrip(tripId);
 
         // Build the map between JSON fieldname and phone db fieldname:
         Map<String, Integer> fieldMap = new HashMap<String, Integer>();
@@ -110,7 +110,7 @@ public class TripUploader {
             tripCoordsCursor.moveToNext();
         }
         tripCoordsCursor.close();
-        mDbHelper.close();
+        mDb.close();
         return tripCoords;
     }
 
@@ -134,8 +134,8 @@ public class TripUploader {
 
     private Vector<String> getTripData(long tripId) {
         Vector<String> tripData = new Vector<String>();
-        mDbHelper.openReadOnly();
-        Cursor tripCursor = mDbHelper.fetchTrip(tripId);
+        mDb.openReadOnly();
+        Cursor tripCursor = mDb.fetchTrip(tripId);
 
         String note = tripCursor.getString(tripCursor
                 .getColumnIndex(DbAdapter.K_TRIP_NOTE));
@@ -146,7 +146,7 @@ public class TripUploader {
         Double endTime = tripCursor.getDouble(tripCursor
                 .getColumnIndex(DbAdapter.K_TRIP_END));
         tripCursor.close();
-        mDbHelper.close();
+        mDb.close();
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         tripData.add(note);
@@ -194,7 +194,7 @@ public class TripUploader {
     }
 
     /**
-     * @param tripId
+     * @param tripId The first trip to upload. Other unsent trips will be sent afterwards.
      */
     public void uploadTrip(long tripId) {
         CharSequence progTitle = mCtx.getText(R.string.uploadProgressTitle);
@@ -212,11 +212,39 @@ public class TripUploader {
             this.tripId = tripId;
             this.pd = pd;
         }
+
         @Override
         public void run() {
+        	// First, send the trip user asked for:
+        	uploadOneTrip(tripId);
+
+        	// Then, automatically try and send previously-completed trips
+        	// that were not sent successfully.
+            Vector <Long> unsentTrips = new Vector <Long>();
+
+            mDb.openReadOnly();
+            Cursor cur = mDb.fetchUnsentTrips();
+            if (cur != null && cur.getCount()>0) {
+            	//pd.setMessage("Sent. You have previously unsent trips; submitting those now.");
+                while (!cur.isAfterLast()) {
+                	unsentTrips.add(new Long(cur.getLong(0)));
+                	cur.moveToNext();
+                }
+                cur.close();
+            }
+            mDb.close();
+
+            for (Long trip: unsentTrips) {
+                uploadOneTrip(trip);
+            }
+
+            pd.dismiss();
+        }
+
+        void uploadOneTrip(long currentTripId) {
             List<NameValuePair> nameValuePairs;
             try {
-                nameValuePairs = getPostData(tripId);
+                nameValuePairs = getPostData(currentTripId);
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -235,9 +263,9 @@ public class TripUploader {
                 Log.v("httpResponse", responseString);
                 JSONObject responseData = new JSONObject(responseString);
                 if (responseData.getString("status").equals("success")) {
-                    mDbHelper.open();
-                    mDbHelper.updateTripStatus(tripId, TripData.STATUS_SENT);
-                    mDbHelper.close();
+                    mDb.open();
+                    mDb.updateTripStatus(currentTripId, TripData.STATUS_SENT);
+                    mDb.close();
                 }
             } catch (IllegalStateException e) {
                 // TODO Auto-generated catch block
@@ -249,7 +277,6 @@ public class TripUploader {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            pd.dismiss();
         }
     }
 

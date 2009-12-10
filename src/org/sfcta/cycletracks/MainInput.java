@@ -20,6 +20,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.ContextMenu;
@@ -38,7 +39,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class MainInput extends Activity {
     private final static int MENU_USER_INFO = 0;
-    private final static int MENU_RESEND_FAILED_UPLOADS = 1;
+    private final static int MENU_HELP = 1;
 
     private final static int CONTEXT_RETRY = 0;
     private final static int CONTEXT_DELETE = 1;
@@ -189,8 +190,8 @@ public class MainInput extends Activity {
 	 /* Creates the menu items */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, MENU_RESEND_FAILED_UPLOADS, 0, "Retry Failed Uploads").setIcon(android.R.drawable.ic_menu_send);
-        menu.add(0, MENU_USER_INFO, 0, "Edit User Info").setIcon(android.R.drawable.ic_menu_info_details);
+        menu.add(0, MENU_HELP, 0, "Help and FAQ").setIcon(android.R.drawable.ic_menu_help);
+        menu.add(0, MENU_USER_INFO, 0, "Edit User Info").setIcon(android.R.drawable.ic_menu_edit);
         return true;
     }
 
@@ -201,7 +202,10 @@ public class MainInput extends Activity {
         case MENU_USER_INFO:
             startActivity(new Intent(this, UserInfoActivity.class));
             return true;
-        case MENU_RESEND_FAILED_UPLOADS:
+        case MENU_HELP:
+        	Intent myIntent = new Intent(Intent.ACTION_VIEW,
+        			Uri.parse("http://www.sfcta.org/cycletracks-androidhelp.html"));
+   			startActivity(myIntent);
             return true;
         }
         return false;

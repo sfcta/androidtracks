@@ -106,11 +106,11 @@ public class SaveTrip extends Activity {
 				trip.updateTripStatus(TripData.STATUS_COMPLETE);
 				resetService();
 
-				// Maybe this is where we should start a new activity for MainInput
+				// Now need to create the MainInput Activity so BACK btn works properly
 				Intent i = new Intent(getApplicationContext(), MainInput.class);
 				startActivity(i);
 
-				// Show the map!
+				// And, show the map!
                 xi.putExtra("showtrip", trip.tripid);
                 xi.putExtra("uploadTrip", true);
 				startActivity(xi);
