@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -16,8 +18,13 @@ import android.os.IBinder;
 public class RecordingService extends Service implements LocationListener {
 	RecordingActivity recordActivity;
 	LocationManager lm = null;
-
 	DbAdapter mDb;
+
+	// Bike bell variables
+	static int BELL_FIRST_INTERVAL = 15;
+	static int BELL_NEXT_INTERVAL = 5;
+	SoundPool soundpool;
+	int bikebell, intervalToNextRing, previousRing;
 
 	// Aspects of the currently recording trip
 	double latestUpdate;
@@ -43,6 +50,8 @@ public class RecordingService extends Service implements LocationListener {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+	    soundpool = new SoundPool(1,AudioManager.STREAM_NOTIFICATION,0);
+	    bikebell = soundpool.load(this.getApplicationContext(), R.raw.bikebell,1);
 	}
 
 	@Override
@@ -89,7 +98,14 @@ public class RecordingService extends Service implements LocationListener {
 	    curSpeed = maxSpeed = distanceTraveled = 0.0f;
 	    lastLocation = null;
 
+		// Play the bike bell to signal our journey begins!
+	    soundpool.play(bikebell, 1.0f, 1.0f, 1, 0, 1.0f);
+	    intervalToNextRing = BELL_FIRST_INTERVAL;
+	    previousRing = 0;
+
+	    // Add the notify bar and blinking light
 		setNotification();
+
 
 		// Start listening for GPS updates!
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -140,6 +156,14 @@ public class RecordingService extends Service implements LocationListener {
 
 				// Update the status page every time, if we can.
 				notifyListeners();
+
+				// Ring the bell every few minutes
+				int duration = (int) ((trip.endTime - trip.startTime)/60000);
+				if (duration - previousRing >= intervalToNextRing) {
+				    previousRing = duration;
+				    intervalToNextRing = BELL_NEXT_INTERVAL;
+					remindUser(duration);
+				}
 			}
 		}
 	}
@@ -156,6 +180,28 @@ public class RecordingService extends Service implements LocationListener {
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 	}
 	// END LocationListener implementation:
+
+	public void remindUser(int duration) {
+	    soundpool.play(bikebell, 1.0f, 1.0f, 1, 0, 1.0f);
+
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		int icon = R.drawable.icon25;
+		CharSequence tickerText = String.format("Still recording (%d min)", previousRing);
+		long when = System.currentTimeMillis();
+
+		Notification notification = new Notification(icon, tickerText, when);
+		notification.flags = notification.flags | Notification.FLAG_ONGOING_EVENT | Notification.FLAG_SHOW_LIGHTS;
+
+		Context context = getApplicationContext();
+		CharSequence contentTitle = "CycleTracks - Recording";
+		CharSequence contentText = "Tap to finish your trip";
+		Intent notificationIntent = new Intent(context, RecordingActivity.class);
+		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+		notification.setLatestEventInfo(context, contentTitle, contentText,	contentIntent);
+
+		final int RECORDING_ID = 1;
+		mNotificationManager.notify(RECORDING_ID, notification);
+	}
 
 	private void setNotification() {
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
