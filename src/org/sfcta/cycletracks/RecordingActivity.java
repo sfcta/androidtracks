@@ -37,7 +37,6 @@ public class RecordingActivity extends Activity {
 				} else {
 					long id = rs.getCurrentTrip();
 					trip = TripData.fetchTrip(RecordingActivity.this, id);
-					trip.dirty=true;
 				}
 				rs.setListener(RecordingActivity.this);
 				unbindService(this);
@@ -112,7 +111,7 @@ public class RecordingActivity extends Activity {
 
         // Distance funky!
     	float miles = 0.0006212f * distance;
-    	txtDistance.setText(String.format("Distance travelled: %1.1f miles", miles));
+    	txtDistance.setText(String.format("Distance traveled: %1.1f miles", miles));
 	}
 
 	void cancelRecording() {

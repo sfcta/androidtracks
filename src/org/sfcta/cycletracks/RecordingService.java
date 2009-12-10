@@ -89,8 +89,6 @@ public class RecordingService extends Service implements LocationListener {
 
 	// ---end SERVICE methods -------------------------
 
-	// Start "business logic":
-
 	public void startRecording(TripData trip) {
 		this.state = STATE_RECORDING;
 		this.trip = trip;
@@ -190,7 +188,12 @@ public class RecordingService extends Service implements LocationListener {
 		long when = System.currentTimeMillis();
 
 		Notification notification = new Notification(icon, tickerText, when);
-		notification.flags = notification.flags | Notification.FLAG_ONGOING_EVENT | Notification.FLAG_SHOW_LIGHTS;
+		notification.flags = notification.flags |
+				Notification.FLAG_ONGOING_EVENT |
+				Notification.FLAG_SHOW_LIGHTS;
+		notification.ledARGB = 0xffff00ff;
+		notification.ledOnMS = 300;
+		notification.ledOffMS = 1200;
 
 		Context context = getApplicationContext();
 		CharSequence contentTitle = "CycleTracks - Recording";
@@ -211,11 +214,11 @@ public class RecordingService extends Service implements LocationListener {
 
 		Notification notification = new Notification(icon, tickerText, when);
 
-		// LED !!
 		notification.ledARGB = 0xffff00ff;
 		notification.ledOnMS = 300;
 		notification.ledOffMS = 1200;
 		notification.flags = notification.flags | Notification.FLAG_ONGOING_EVENT | Notification.FLAG_SHOW_LIGHTS;
+		String z = this.getResources().getString(R.raw.bikebell);
 
 		Context context = getApplicationContext();
 		CharSequence contentTitle = "CycleTracks - Recording";
