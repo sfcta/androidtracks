@@ -111,8 +111,8 @@ public class RecordingService extends Service implements LocationListener {
 	    curSpeed = maxSpeed = distanceTraveled = 0.0f;
 	    lastLocation = null;
 
-		// Play the bike bell to signal our journey begins!
-	    soundpool.play(bikebell, 1.0f, 1.0f, 1, 0, 1.0f);
+		// Set up the bike bell timing (but don't play it just yet)
+	    // soundpool.play(bikebell, 1.0f, 1.0f, 1, 0, 1.0f);
 	    intervalToNextRing = BELL_FIRST_INTERVAL;
 	    previousRing = 0;
 
