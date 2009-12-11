@@ -7,17 +7,17 @@
 <string name="startNewTrip">Start Trip!</string>
 <string name="pauseButtonLabel">Pause</string>
 <string name="finishedButtonLabel">Finish</string>
-<string-array name="trip_purposes"><item>Commute</item>
-<item>School</item><item>Work-Related</item><item>Exercise</item><item>Social</item>
 
-<item>Shopping</item>
-<item>Errand</item><item>Other</item>
-
-
-
-</string-array>
 <string name="enterTripInfo">And add any comments about your trip here</string>
 <string name="promptPurpose">Select the main purpose of this trip</string>
 <string name="uploadProgressTitle">Sending...</string>
 <string name="uploadProgressMessage">Sending your trip.\n\nThanks for using CycleTracks!</string>
+
+
+
+
+
+
+
+
 </resources>
