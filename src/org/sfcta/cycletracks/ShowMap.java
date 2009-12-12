@@ -66,7 +66,7 @@ public class ShowMap extends MapActivity {
 					&& cmds.getBoolean("uploadTrip", false)) {
 			    // And upload to the cloud database, too!  W00t W00t!
                 TripUploader uploader = new TripUploader(ShowMap.this);
-                uploader.uploadTrip(trip.tripid);
+                uploader.execute(trip.tripid);
 			}
 
 		} catch (Exception e) {

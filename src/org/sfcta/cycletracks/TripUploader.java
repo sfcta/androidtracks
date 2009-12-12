@@ -35,12 +35,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.provider.Settings.System;
 import android.util.Log;
 
-public class TripUploader {
+public class TripUploader extends AsyncTask <Long, Integer, Integer> {
     Context mCtx;
     DbAdapter mDb;
+    ProgressDialog pd;
 
     public static final String TRIP_COORDS_TIME = "rec";
     public static final String TRIP_COORDS_LAT = "lat";
@@ -59,6 +61,7 @@ public class TripUploader {
     public static final String USER_CYCLING_FREQUENCY = "cyclingFreq";
 
     public TripUploader(Context ctx) {
+        super();
         this.mCtx = ctx;
         this.mDb = new DbAdapter(this.mCtx);
     }
@@ -193,93 +196,6 @@ public class TripUploader {
         return nameValuePairs;
     }
 
-    /**
-     * @param tripId The first trip to upload. Other unsent trips will be sent afterwards.
-     */
-    public void uploadTrip(long tripId) {
-        CharSequence progTitle = mCtx.getText(R.string.uploadProgressTitle);
-        CharSequence progMessage = mCtx.getText(R.string.uploadProgressMessage);
-        ProgressDialog pd = ProgressDialog.show(this.mCtx, progTitle, progMessage, true, false);
-        UploadThread uploadThread = new UploadThread(pd, tripId);
-        uploadThread.start();
-    }
-
-    private class UploadThread extends Thread {
-        long tripId;
-        ProgressDialog pd;
-
-        UploadThread(ProgressDialog pd, long tripId){
-            this.tripId = tripId;
-            this.pd = pd;
-        }
-
-        @Override
-        public void run() {
-        	// First, send the trip user asked for:
-        	uploadOneTrip(tripId);
-
-        	// Then, automatically try and send previously-completed trips
-        	// that were not sent successfully.
-            Vector <Long> unsentTrips = new Vector <Long>();
-
-            mDb.openReadOnly();
-            Cursor cur = mDb.fetchUnsentTrips();
-            if (cur != null && cur.getCount()>0) {
-            	//pd.setMessage("Sent. You have previously unsent trips; submitting those now.");
-                while (!cur.isAfterLast()) {
-                	unsentTrips.add(new Long(cur.getLong(0)));
-                	cur.moveToNext();
-                }
-                cur.close();
-            }
-            mDb.close();
-
-            for (Long trip: unsentTrips) {
-                uploadOneTrip(trip);
-            }
-
-            pd.dismiss();
-        }
-
-        void uploadOneTrip(long currentTripId) {
-            List<NameValuePair> nameValuePairs;
-            try {
-                nameValuePairs = getPostData(currentTripId);
-            } catch (JSONException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return;
-            }
-            Log.v("PostData", nameValuePairs.toString());
-
-            HttpClient client = new DefaultHttpClient();
-            final String postUrl = "http://bikedatabase.sfcta.org/post/";
-            HttpPost postRequest = new HttpPost(postUrl);
-
-            try {
-                postRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                HttpResponse response = client.execute(postRequest);
-                String responseString = convertStreamToString(response.getEntity().getContent());
-                Log.v("httpResponse", responseString);
-                JSONObject responseData = new JSONObject(responseString);
-                if (responseData.getString("status").equals("success")) {
-                    mDb.open();
-                    mDb.updateTripStatus(currentTripId, TripData.STATUS_SENT);
-                    mDb.close();
-                }
-            } catch (IllegalStateException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (JSONException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
-
     private static String convertStreamToString(InputStream is) {
         /*
          * To convert the InputStream to String we use the BufferedReader.readLine()
@@ -305,5 +221,85 @@ public class TripUploader {
             }
         }
         return sb.toString();
+    }
+
+    boolean uploadOneTrip(long currentTripId) {
+        boolean result = false;
+
+        List<NameValuePair> nameValuePairs;
+        try {
+            nameValuePairs = getPostData(currentTripId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return result;
+        }
+        Log.v("PostData", nameValuePairs.toString());
+
+        HttpClient client = new DefaultHttpClient();
+        final String postUrl = "http://bikedatabase.sfcta.org/post/";
+        HttpPost postRequest = new HttpPost(postUrl);
+
+        try {
+            postRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            HttpResponse response = client.execute(postRequest);
+            String responseString = convertStreamToString(response.getEntity().getContent());
+            Log.v("httpResponse", responseString);
+            JSONObject responseData = new JSONObject(responseString);
+            if (responseData.getString("status").equals("success")) {
+                mDb.open();
+                mDb.updateTripStatus(currentTripId, TripData.STATUS_SENT);
+                mDb.close();
+                result = true;
+            }
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return result;
+    }
+
+    @Override
+    protected Integer doInBackground(Long... tripid) {
+        // First, send the trip user asked for:
+        uploadOneTrip(tripid[0]);
+
+        // Then, automatically try and send previously-completed trips
+        // that were not sent successfully.
+        Vector <Long> unsentTrips = new Vector <Long>();
+
+        mDb.openReadOnly();
+        Cursor cur = mDb.fetchUnsentTrips();
+        if (cur != null && cur.getCount()>0) {
+            //pd.setMessage("Sent. You have previously unsent trips; submitting those now.");
+            while (!cur.isAfterLast()) {
+                unsentTrips.add(new Long(cur.getLong(0)));
+                cur.moveToNext();
+            }
+            cur.close();
+        }
+        mDb.close();
+
+        for (Long trip: unsentTrips) {
+            uploadOneTrip(trip);
+        }
+        return new Integer(5);  // fakey signal!
+    }
+
+    @Override
+    protected void onPreExecute() {
+        CharSequence progTitle = mCtx.getText(R.string.uploadProgressTitle);
+        CharSequence progMessage = mCtx.getText(R.string.uploadProgressMessage);
+        pd = ProgressDialog.show(this.mCtx, progTitle, progMessage, true, false);
+    }
+
+    @Override
+    protected void onPostExecute(Integer t) {
+        pd.dismiss();
     }
 }
