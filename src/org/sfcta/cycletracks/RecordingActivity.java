@@ -135,8 +135,11 @@ public class RecordingActivity extends Activity {
         TextView txtDuration = (TextView) findViewById(R.id.TextDuration);
         TextView txtCurSpeed = (TextView) findViewById(R.id.TextSpeed);
         TextView txtMaxSpeed = (TextView) findViewById(R.id.TextMaxSpeed);
-
-        txtStat.setText(""+points+" data points received...");
+        if (points>0) {
+            txtStat.setText(""+points+" data points received...");
+        } else {
+            txtStat.setText("Waiting for GPS fix...");
+        }
         txtCurSpeed.setText(String.format("Current speed: %1.1f mph", spdCurrent));
         txtMaxSpeed.setText(String.format("Maximum speed: %1.1f mph", spdMax));
 

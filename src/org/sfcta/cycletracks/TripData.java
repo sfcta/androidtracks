@@ -55,7 +55,7 @@ public class TripData {
 		startTime = System.currentTimeMillis();
 		endTime = System.currentTimeMillis();
         numpoints = 0;
-        latestlat = 0; latestlgt = 0;
+        latestlat = 800; latestlgt = 800;
         distance = 0;
 
         lathigh = (int) (-100 * 1E6);
@@ -147,13 +147,13 @@ public class TripData {
 		gpspoints.addOverlay(opoint);
 	}
 
-	void addPointNow(Location loc, double currentTime, float dst) {
+	boolean addPointNow(Location loc, double currentTime, float dst) {
 		int lat = (int) (loc.getLatitude() * 1E6);
 		int lgt = (int) (loc.getLongitude() * 1E6);
 
 		// Skip duplicates
 		if (latestlat == lat && latestlgt == lgt)
-			return;
+			return true;
 
 		float accuracy = loc.getAccuracy();
 		double altitude = loc.getAltitude();
@@ -175,10 +175,12 @@ public class TripData {
 		latestlgt = lgt;
 
         mDb.open();
-        mDb.addCoordToTrip(tripid, pt);
-        mDb.updateTrip(tripid, "", startTime, "", "", "",
+        boolean rtn = mDb.addCoordToTrip(tripid, pt);
+        rtn = rtn && mDb.updateTrip(tripid, "", startTime, "", "", "",
                 lathigh, latlow, lgthigh, lgtlow, distance);
         mDb.close();
+
+        return rtn;
 	}
 
 	public boolean updateTripStatus(int tripStatus) {

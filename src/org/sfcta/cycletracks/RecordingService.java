@@ -23,6 +23,7 @@ import android.media.SoundPool;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
 public class RecordingService extends Service implements LocationListener {
 	RecordingActivity recordActivity;
@@ -119,7 +120,6 @@ public class RecordingService extends Service implements LocationListener {
 	    // Add the notify bar and blinking light
 		setNotification();
 
-
 		// Start listening for GPS updates!
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
@@ -177,7 +177,10 @@ public class RecordingService extends Service implements LocationListener {
 
 				latestUpdate = currentTime;
 				updateTripStats(loc);
-				trip.addPointNow(loc, currentTime, distanceTraveled);
+				boolean rtn = trip.addPointNow(loc, currentTime, distanceTraveled);
+				if (!rtn) {
+	                Log.e("FAIL", "Couldn't write to DB");
+				}
 
 				// Update the status page every time, if we can.
 				notifyListeners();

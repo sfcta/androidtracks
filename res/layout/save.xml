@@ -16,12 +16,12 @@
 
 </TableRow><TableRow android:id="@+id/TableRow01" android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_marginLeft="2px" android:layout_marginRight="4px"><ToggleButton android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="1" android:textSize="11px" android:textOff="Social" android:textOn="Social" android:id="@+id/ToggleSocial" android:drawableTop="@drawable/social"></ToggleButton><ToggleButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:textSize="11px" android:textOff="Shopping" android:textOn="Shopping" android:id="@+id/ToggleShopping" android:drawableTop="@drawable/shopping"></ToggleButton>
 <ToggleButton android:layout_width="wrap_content" android:layout_height="fill_parent" android:textOff="Errand" android:textOn="Errand" android:id="@+id/ToggleErrand" android:textSize="11px" android:drawableTop="@drawable/errands" android:layout_weight="0.7"></ToggleButton><ToggleButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:textSize="11px" android:textOff="Other" android:textOn="Other" android:id="@+id/ToggleOther" android:drawableTop="@drawable/other"></ToggleButton>
-</TableRow></TableLayout><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5px" android:paddingBottom="2px" android:paddingTop="4px" android:textSize="13px" android:id="@+id/TextPurpDescription" android:text="     " android:lines="3" android:bufferType="spannable"></TextView>
+</TableRow></TableLayout><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5px" android:paddingBottom="2px" android:paddingTop="4px" android:id="@+id/TextPurpDescription" android:text="     " android:lines="3" android:bufferType="spannable" android:textSize="14px"></TextView>
 			<EditText android:bufferType="editable"
 				android:cursorVisible="true" android:layout_width="fill_parent"
 				android:selectAllOnFocus="true" android:layout_height="fill_parent"
 				android:id="@+id/NotesField" android:layout_marginTop="10px"
-				android:inputType="textShortMessage" android:hint="Comments about your trip" android:layout_marginRight="2px" android:layout_marginLeft="2px"></EditText>
+				android:inputType="textShortMessage" android:hint="Comments about your trip" android:layout_marginRight="2px" android:layout_marginLeft="2px" android:nextFocusDown="@+id/ButtonSubmit" android:nextFocusRight="@+id/ButtonSubmit"></EditText>
 			<Button android:layout_height="wrap_content"
 				android:layout_marginTop="5px" android:layout_width="fill_parent"
 				android:textStyle="bold" android:textSize="18px"
