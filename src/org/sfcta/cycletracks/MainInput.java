@@ -78,7 +78,7 @@ public class MainInput extends Activity {
 					// Idle. First run? Switch to user prefs screen if there are no prefs stored yet
 			        SharedPreferences settings = getSharedPreferences("PREFS", 0);
 			        if (settings.getAll().isEmpty()) {
-			            startActivity(new Intent(MainInput.this, UserInfoActivity.class));
+                        showWelcomeDialog();
 			        }
 					// Not first run - set up the list view of saved trips
 					ListView listSavedTrips = (ListView) findViewById(R.id.ListSavedTrips);
@@ -110,7 +110,7 @@ public class MainInput extends Activity {
 
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Yout phone's GPS is disabled.\n\nCycleTracks needs GPS to determine your location.\n\nGo to System Settings now to enable GPS?")
+        builder.setMessage("Your phone's GPS is disabled. CycleTracks needs GPS to determine your location.\n\nGo to System Settings now to enable GPS?")
                .setCancelable(false)
                .setPositiveButton("GPS Settings...", new DialogInterface.OnClickListener() {
                    public void onClick(final DialogInterface dialog, final int id) {
@@ -127,6 +127,20 @@ public class MainInput extends Activity {
                         dialog.cancel();
                    }
                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void showWelcomeDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Please enter your personal details so we can learn a bit about you.\n\nThen, try to use CycleTracks every time you ride. Your trip routes will be sent to the SFCTA so we can plan for better biking!\n\nThanks,\nThe SFCTA CycleTracks team")
+               .setCancelable(false).setTitle("Welcome to CycleTracks!")
+               .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                   public void onClick(final DialogInterface dialog, final int id) {
+                       startActivity(new Intent(MainInput.this, UserInfoActivity.class));
+                   }
+               });
+
         final AlertDialog alert = builder.create();
         alert.show();
     }
