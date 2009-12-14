@@ -13,16 +13,20 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -92,11 +96,40 @@ public class MainInput extends Activity {
 		final Intent i = new Intent(this, RecordingActivity.class);
 		startButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				startActivity(i);
-				MainInput.this.finish();
+			    // Before we go to record, check GPS status
+			    final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+			    if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+			        buildAlertMessageNoGps();
+			    } else {
+	                startActivity(i);
+	                MainInput.this.finish();
+			    }
 			}
 		});
 	}
+
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Yout phone's GPS is disabled.\n\nCycleTracks needs GPS to determine your location.\n\nGo to System Settings now to enable GPS?")
+               .setCancelable(false)
+               .setPositiveButton("GPS Settings...", new DialogInterface.OnClickListener() {
+                   public void onClick(final DialogInterface dialog, final int id) {
+                       final ComponentName toLaunch = new ComponentName("com.android.settings","com.android.settings.SecuritySettings");
+                       final Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                       intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                       intent.setComponent(toLaunch);
+                       intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                       startActivityForResult(intent, 0);
+                   }
+               })
+               .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                   public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                   }
+               });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
 
 	void populateList(ListView lv) {
 		// Get list from the real phone database. W00t!
