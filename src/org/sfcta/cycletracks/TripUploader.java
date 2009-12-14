@@ -38,8 +38,9 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.provider.Settings.System;
 import android.util.Log;
+import android.widget.Toast;
 
-public class TripUploader extends AsyncTask <Long, Integer, Integer> {
+public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
     Context mCtx;
     DbAdapter mDb;
     ProgressDialog pd;
@@ -265,9 +266,9 @@ public class TripUploader extends AsyncTask <Long, Integer, Integer> {
     }
 
     @Override
-    protected Integer doInBackground(Long... tripid) {
+    protected Boolean doInBackground(Long... tripid) {
         // First, send the trip user asked for:
-        uploadOneTrip(tripid[0]);
+        Boolean result = uploadOneTrip(tripid[0]);
 
         // Then, automatically try and send previously-completed trips
         // that were not sent successfully.
@@ -286,9 +287,9 @@ public class TripUploader extends AsyncTask <Long, Integer, Integer> {
         mDb.close();
 
         for (Long trip: unsentTrips) {
-            uploadOneTrip(trip);
+            result &= uploadOneTrip(trip);
         }
-        return new Integer(5);  // fakey signal!
+        return result;
     }
 
     @Override
@@ -299,7 +300,12 @@ public class TripUploader extends AsyncTask <Long, Integer, Integer> {
     }
 
     @Override
-    protected void onPostExecute(Integer t) {
+    protected void onPostExecute(Boolean result) {
         pd.dismiss();
+        if (result) {
+            Toast.makeText(mCtx.getApplicationContext(),"Trip uploaded successfully.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(mCtx.getApplicationContext(),"Upload failed. Will retry after next trip is completed.", Toast.LENGTH_SHORT).show();
+        }
     }
 }
