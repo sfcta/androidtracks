@@ -1,4 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LinearLayout android:id="@+id/LinearLayout01" android:layout_above="@+id/mapview" xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="fill_parent" android:layout_width="fill_parent" android:orientation="vertical"><com.google.android.maps.MapView android:id="@+id/mapview" android:layout_width="fill_parent" android:layout_height="fill_parent" android:clickable="true" android:apiKey="07G9nrkmXAJfPqZ4u3KRZLT0Lsa1VPKse9vy24g" android:fitsSystemWindows="true"/>
+<LinearLayout android:id="@+id/LinearLayout01"
+	android:layout_above="@+id/mapview" xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="fill_parent" android:layout_width="fill_parent"
+	android:orientation="vertical">
+	<RelativeLayout android:id="@+id/RelativeLayout01"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:paddingLeft="4px" android:paddingTop="4px"
+		android:paddingRight="6px">
+		<TextView android:text="T1" android:id="@+id/TextViewT1"
+			android:layout_height="wrap_content" android:layout_width="wrap_content"
+			android:layout_alignParentLeft="true" android:layout_marginLeft="2px"
+			android:textSize="20px" android:textStyle="bold"></TextView>
+		<TextView android:text="T3" android:id="@+id/TextViewT3"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_alignParentRight="true" android:textSize="20px"
+			android:textStyle="bold"></TextView>
+	</RelativeLayout>
+	<TextView android:layout_height="wrap_content" android:id="@+id/TextViewT2"
+		android:layout_width="fill_parent" android:layout_marginLeft="7px"
+		android:text="T2" android:paddingBottom="8px"
+		android:layout_marginRight="7px"></TextView>
+	<com.google.android.maps.MapView
+		android:id="@+id/mapview" android:layout_width="fill_parent"
+		android:clickable="true" android:apiKey="07G9nrkmXAJfPqZ4u3KRZLT0Lsa1VPKse9vy24g"
+		android:fitsSystemWindows="true" android:layout_height="fill_parent"/>
 	
+
+
+
 </LinearLayout>

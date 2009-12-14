@@ -15,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -47,6 +48,15 @@ public class ShowMap extends MapActivity {
 
             TripData trip = TripData.fetchTrip(this, tripid);
 
+            // Show trip details
+            TextView t1 = (TextView) findViewById(R.id.TextViewT1);
+            TextView t2 = (TextView) findViewById(R.id.TextViewT2);
+            TextView t3 = (TextView) findViewById(R.id.TextViewT3);
+            t1.setText(trip.purp);
+            t2.setText(trip.info);
+            t3.setText(trip.fancystart);
+
+            // Center & zoom the map
 			int latcenter = (trip.lathigh + trip.latlow) / 2;
 			int lgtcenter = (trip.lgthigh + trip.lgtlow) / 2;
 			GeoPoint center = new GeoPoint(latcenter, lgtcenter);

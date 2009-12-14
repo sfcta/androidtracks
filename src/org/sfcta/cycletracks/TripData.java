@@ -23,7 +23,7 @@ public class TripData {
 	int numpoints, lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
 	int status;
 	float distance;
-
+	String purp, fancystart, info;
 	private ItemizedOverlayTrack gpspoints;
 
 	DbAdapter mDb;
@@ -62,6 +62,7 @@ public class TripData {
 		latlow = (int) (100 * 1E6);
 		lgtlow = (int) (180 * 1E6);
 		lgthigh = (int) (-180 * 1E6);
+		purp = fancystart = info = "";
 
 		updateTrip();
 	}
@@ -79,7 +80,12 @@ public class TripData {
 	    lgtlow =  tripdetails.getInt(tripdetails.getColumnIndex("lgtlo"));
 	    status =  tripdetails.getInt(tripdetails.getColumnIndex("status"));
 	    endTime = tripdetails.getDouble(tripdetails.getColumnIndex("endtime"));
-	    distance = tripdetails.getFloat(tripdetails.getColumnIndex("distance"));
+        distance = tripdetails.getFloat(tripdetails.getColumnIndex("distance"));
+
+        purp = tripdetails.getString(tripdetails.getColumnIndex("purp"));
+        fancystart = tripdetails.getString(tripdetails.getColumnIndex("fancystart"));
+        info = tripdetails.getString(tripdetails.getColumnIndex("fancyinfo"));
+
 	    tripdetails.close();
 
 		Cursor points = mDb.fetchAllCoordsForTrip(tripid);
