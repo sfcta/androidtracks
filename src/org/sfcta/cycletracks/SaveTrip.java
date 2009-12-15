@@ -36,7 +36,7 @@ import android.widget.ToggleButton;
 public class SaveTrip extends Activity {
 	long tripid;
 	HashMap <Integer, ToggleButton> purpButtons = new HashMap<Integer,ToggleButton>();
-	String purpose;
+	String purpose = "";
 
 	HashMap <Integer, String> purpDescriptions = new HashMap<Integer, String>();
 

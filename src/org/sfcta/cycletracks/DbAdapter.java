@@ -173,8 +173,9 @@ public class DbAdapter {
     	try {
             Cursor mCursor = mDb.query(true, DATA_TABLE_COORDS, new String[] {
                     K_POINT_LAT, K_POINT_LGT, K_POINT_TIME,
-                    K_POINT_ACC, K_POINT_ALT, K_POINT_SPEED }, K_POINT_TRIP + "="
-                    + tripid, null, null, null, null, null);
+                    K_POINT_ACC, K_POINT_ALT, K_POINT_SPEED },
+                    K_POINT_TRIP + "=" + tripid,
+                    null, null, null, K_POINT_TIME, null);
 
             if (mCursor != null) {
                 mCursor.moveToFirst();

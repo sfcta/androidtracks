@@ -21,7 +21,8 @@ public class TripData {
 	long tripid;
 	double startTime = 0;
 	double endTime = 0;
-	int numpoints, lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
+	int numpoints = 0;
+	int lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
 	int status;
 	float distance;
 	String purp, fancystart, info;
@@ -91,8 +92,10 @@ public class TripData {
 	    tripdetails.close();
 
 		Cursor points = mDb.fetchAllCoordsForTrip(tripid);
-		numpoints = points.getCount();
-		points.close();
+		if (points != null) {
+	        numpoints = points.getCount();
+	        points.close();
+		}
 
 	    mDb.close();
 	}
@@ -128,19 +131,18 @@ public class TripData {
             int COL_TIME = points.getColumnIndex("time");
             numpoints = points.getCount();
 
+            points.moveToLast();
+            this.endpoint   = new CyclePoint(points.getInt(COL_LAT), points.getInt(COL_LGT), points.getDouble(COL_TIME));
+
+            points.moveToFirst();
+            this.startpoint = new CyclePoint(points.getInt(COL_LAT), points.getInt(COL_LGT), points.getDouble(COL_TIME));
+
 			while (!points.isAfterLast()) {
                 int lat = points.getInt(COL_LAT);
                 int lgt = points.getInt(COL_LGT);
                 double time = points.getDouble(COL_TIME);
 
                 addPointToSavedMap(lat, lgt, time);
-
-                if (points.getPosition()==0)
-                    this.startpoint = new CyclePoint(lat,lgt,time);
-                else if (points.getPosition() == numpoints-1) {
-                    this.endpoint = new CyclePoint(lat,lgt,time);
-                }
-
 				points.moveToNext();
 			}
 			points.close();

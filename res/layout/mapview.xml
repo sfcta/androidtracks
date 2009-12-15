@@ -24,8 +24,4 @@
 		android:id="@+id/mapview" android:layout_width="fill_parent"
 		android:clickable="true" android:apiKey="07G9nrkmXAJfPqZ4u3KRZLT0Lsa1VPKse9vy24g"
 		android:fitsSystemWindows="true" android:layout_height="fill_parent"/>
-	
-
-
-
 </LinearLayout>
