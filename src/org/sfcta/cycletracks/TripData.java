@@ -14,6 +14,7 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 
+import com.google.android.maps.GeoPoint;
 import com.google.android.maps.OverlayItem;
 
 public class TripData {
@@ -25,6 +26,7 @@ public class TripData {
 	float distance;
 	String purp, fancystart, info;
 	private ItemizedOverlayTrack gpspoints;
+	GeoPoint startpoint, endpoint;
 
 	DbAdapter mDb;
 
@@ -132,6 +134,12 @@ public class TripData {
                 double time = points.getDouble(COL_TIME);
 
                 addPointToSavedMap(lat, lgt, time);
+
+                if (points.getPosition()==0)
+                    this.startpoint = new CyclePoint(lat,lgt,time);
+                else if (points.getPosition() == numpoints-1) {
+                    this.endpoint = new CyclePoint(lat,lgt,time);
+                }
 
 				points.moveToNext();
 			}

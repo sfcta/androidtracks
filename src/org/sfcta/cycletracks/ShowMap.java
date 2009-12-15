@@ -11,6 +11,10 @@ package org.sfcta.cycletracks;
 
 import java.util.List;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -96,9 +100,11 @@ public class ShowMap extends MapActivity {
 	}
 
 	private class AddPointsToMapLayerTask extends AsyncTask <TripData, Integer, ItemizedOverlayTrack> {
+	    TripData trip;
+
 		@Override
 		protected ItemizedOverlayTrack doInBackground(TripData... trips) {
-	        TripData trip = trips[0]; // always get just the first trip
+	        trip = trips[0]; // always get just the first trip
 
 			drawable = getResources().getDrawable(R.drawable.point);
             ShowMap.this.gpspoints = trip.getPoints(drawable);
@@ -108,9 +114,48 @@ public class ShowMap extends MapActivity {
 
 		@Override
 		protected void onPostExecute(ItemizedOverlayTrack gpspoints) {
+		    // Add the trail
 			mapOverlays.add(ShowMap.this.gpspoints);
+
+			// Add start & end pins
+			if (trip.startpoint != null) {
+			    mapOverlays.add(new PushPinOverlay(trip.startpoint, R.drawable.pingreen));
+			}
+            if (trip.endpoint != null) {
+                mapOverlays.add(new PushPinOverlay(trip.endpoint, R.drawable.pinpurple));
+            }
+
+            // Redraw the map
 			mapView.invalidate();
 		}
 	}
+
+    class PushPinOverlay extends com.google.android.maps.Overlay
+    {
+        GeoPoint p;
+        int d;
+
+        public PushPinOverlay(GeoPoint p, int drawrsrc) {
+            super();
+            this.p=p;
+            this.d=drawrsrc;
+        }
+
+        @Override
+        public boolean draw(Canvas canvas, MapView mapView, boolean shadow, long when) {
+            super.draw(canvas, mapView, shadow);
+
+            //---translate the GeoPoint to screen pixels---
+            Point screenPts = new Point();
+            mapView.getProjection().toPixels(p, screenPts);
+
+            //---add the marker---
+            Bitmap bmp = BitmapFactory.decodeResource(
+                getResources(), d);
+            canvas.drawBitmap(bmp, screenPts.x-4, screenPts.y-46, null);
+            return true;
+        }
+    }
+
 }
 
