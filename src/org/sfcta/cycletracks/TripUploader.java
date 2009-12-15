@@ -301,11 +301,15 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
-        pd.dismiss();
-        if (result) {
-            Toast.makeText(mCtx.getApplicationContext(),"Trip uploaded successfully.", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(mCtx.getApplicationContext(),"Upload failed. Will retry after next trip is completed.", Toast.LENGTH_SHORT).show();
+        try {
+            pd.dismiss();
+            if (result) {
+                Toast.makeText(mCtx.getApplicationContext(),"Trip uploaded successfully.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(mCtx.getApplicationContext(),"Upload failed. Will retry after next trip is completed.", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            // Just don't toast if the view has gone out of context
         }
     }
 }
