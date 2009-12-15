@@ -19,10 +19,10 @@
 <service android:name="RecordingService" android:enabled="true" android:exported="true"></service><uses-library android:name="com.google.android.maps"></uses-library>
 </application>
 
-<uses-sdk android:minSdkVersion="3" />
+<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4"/>
 
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
 <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 
-
-</manifest> 
+<supports-screens android:normalScreens="true" android:anyDensity="true"/>
+</manifest>
