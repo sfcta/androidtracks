@@ -306,7 +306,7 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
             if (result) {
                 Toast.makeText(mCtx.getApplicationContext(),"Trip uploaded successfully.", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(mCtx.getApplicationContext(),"Upload failed. Will retry after next trip is completed.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mCtx.getApplicationContext(),"Upload failed. Will retry after next trip is completed.", Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
             // Just don't toast if the view has gone out of context

@@ -28,6 +28,8 @@ public class TripData {
 	String purp, fancystart, info;
 	private ItemizedOverlayTrack gpspoints;
 	GeoPoint startpoint, endpoint;
+	double totalPauseTime = 0;
+	double pauseStartedAt = 0;
 
 	DbAdapter mDb;
 
@@ -179,7 +181,7 @@ public class TripData {
 				altitude, speed);
 
         numpoints++;
-        endTime = currentTime;
+        endTime = currentTime - this.totalPauseTime;
         distance = dst;
 
 		latlow = Math.min(latlow, lat);

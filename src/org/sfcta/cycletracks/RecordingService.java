@@ -45,7 +45,7 @@ public class RecordingService extends Service implements LocationListener {
 
 	public final static int STATE_IDLE = 0;
 	public final static int STATE_RECORDING = 1;
-	public final static int STATE_PAUSED = 2;  //TODO: may not need this one.
+	public final static int STATE_PAUSED = 2;
 	public final static int STATE_FULL = 3;
 
 	int state = STATE_IDLE;
