@@ -7,18 +7,18 @@
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		android:paddingLeft="4px" android:paddingTop="4px"
 		android:paddingRight="6px">
-		<TextView android:text="T1" android:id="@+id/TextViewT1"
+		<TextView android:id="@+id/TextViewT1"
 			android:layout_height="wrap_content" android:layout_width="wrap_content"
 			android:layout_alignParentLeft="true" android:layout_marginLeft="2px"
-			android:textSize="20px" android:textStyle="bold"></TextView>
-		<TextView android:text="T3" android:id="@+id/TextViewT3"
+			android:textSize="20px" android:textStyle="bold" android:text="Map of your trip:"></TextView>
+		<TextView android:id="@+id/TextViewT3"
 			android:layout_width="wrap_content" android:layout_height="wrap_content"
 			android:layout_alignParentRight="true" android:textSize="20px"
 			android:textStyle="bold"></TextView>
 	</RelativeLayout>
 	<TextView android:layout_height="wrap_content" android:id="@+id/TextViewT2"
 		android:layout_width="fill_parent" android:layout_marginLeft="7px"
-		android:text="T2" android:paddingBottom="8px"
+		android:paddingBottom="8px"
 		android:layout_marginRight="7px"></TextView>
 	<com.google.android.maps.MapView
 		android:id="@+id/mapview" android:layout_width="fill_parent"
