@@ -5,21 +5,21 @@
 	android:orientation="vertical">
 	<RelativeLayout android:id="@+id/RelativeLayout01"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
-		android:paddingLeft="4px" android:paddingTop="4px"
-		android:paddingRight="6px">
+		android:paddingLeft="4sp" android:paddingTop="4sp"
+		android:paddingRight="6sp">
 		<TextView android:id="@+id/TextViewT1"
 			android:layout_height="wrap_content" android:layout_width="wrap_content"
-			android:layout_alignParentLeft="true" android:layout_marginLeft="2px"
-			android:textSize="20px" android:textStyle="bold" android:text="Map of your trip:"></TextView>
+			android:layout_alignParentLeft="true" android:layout_marginLeft="2sp"
+			android:textSize="20sp" android:textStyle="bold" android:text="Map of your trip:"></TextView>
 		<TextView android:id="@+id/TextViewT3"
 			android:layout_width="wrap_content" android:layout_height="wrap_content"
-			android:layout_alignParentRight="true" android:textSize="20px"
+			android:layout_alignParentRight="true" android:textSize="20sp"
 			android:textStyle="bold"></TextView>
 	</RelativeLayout>
 	<TextView android:layout_height="wrap_content" android:id="@+id/TextViewT2"
-		android:layout_width="fill_parent" android:layout_marginLeft="7px"
-		android:paddingBottom="8px"
-		android:layout_marginRight="7px"></TextView>
+		android:layout_width="fill_parent" android:layout_marginLeft="7sp"
+		android:paddingBottom="8sp"
+		android:layout_marginRight="7sp"></TextView>
 	<com.google.android.maps.MapView
 		android:id="@+id/mapview" android:layout_width="fill_parent"
 		android:clickable="true" android:apiKey="07G9nrkmXAJfPqZ4u3KRZLT0Lsa1VPKse9vy24g"
