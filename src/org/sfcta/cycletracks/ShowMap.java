@@ -66,7 +66,7 @@ public class ShowMap extends MapActivity {
 			GeoPoint center = new GeoPoint(latcenter, lgtcenter);
 			MapController mc = mapView.getController();
 			mc.animateTo(center);
-			mc.zoomToSpan(trip.lathigh - trip.latlow, trip.lgthigh - trip.lgtlow);
+			mc.zoomToSpan(10+trip.lathigh - trip.latlow, 10+trip.lgthigh - trip.lgtlow);
 
 			if (gpspoints == null) {
 				AddPointsToMapLayerTask maptask = new AddPointsToMapLayerTask();
@@ -146,13 +146,15 @@ public class ShowMap extends MapActivity {
             super.draw(canvas, mapView, shadow);
 
             //---translate the GeoPoint to screen pixels---
-            Point screenPts = new Point();
-            mapView.getProjection().toPixels(p, screenPts);
+            Point screenPoint = new Point();
+            mapView.getProjection().toPixels(p, screenPoint);
 
             //---add the marker---
-            Bitmap bmp = BitmapFactory.decodeResource(
-                getResources(), d);
-            canvas.drawBitmap(bmp, screenPts.x-4, screenPts.y-46, null);
+            Bitmap bmp = BitmapFactory.decodeResource(getResources(), d);
+            int height = bmp.getScaledHeight(canvas);
+            int width = (int)(0.133333 * bmp.getScaledWidth(canvas));  // 4/30 pixels: how far right we want the pushpin
+
+            canvas.drawBitmap(bmp, screenPoint.x-width, screenPoint.y-height, null);
             return true;
         }
     }
