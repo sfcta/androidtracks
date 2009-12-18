@@ -34,12 +34,14 @@ public class RecordingActivity extends Activity {
 	Button pauseButton;
 	Button finishButton;
 	Timer timer;
+	float curDistance;
 
     TextView txtStat;
     TextView txtDistance;
     TextView txtDuration;
     TextView txtCurSpeed;
     TextView txtMaxSpeed;
+    TextView txtAvgSpeed;
 
     final SimpleDateFormat sdf = new SimpleDateFormat("H:mm:ss");
 
@@ -62,6 +64,7 @@ public class RecordingActivity extends Activity {
         txtDuration = (TextView) findViewById(R.id.TextDuration);
         txtCurSpeed = (TextView) findViewById(R.id.TextSpeed);
         txtMaxSpeed = (TextView) findViewById(R.id.TextMaxSpeed);
+        txtAvgSpeed = (TextView) findViewById(R.id.TextAvgSpeed);
 
 		pauseButton = (Button) findViewById(R.id.ButtonPause);
 		finishButton = (Button) findViewById(R.id.ButtonFinished);
@@ -168,17 +171,19 @@ public class RecordingActivity extends Activity {
 	}
 
 	public void updateStatus(int points, float distance, float spdCurrent, float spdMax) {
-	    //TODO: check task status before doing this
+	    this.curDistance = distance;
+
+	    //TODO: check task status before doing this?
         if (points>0) {
             txtStat.setText(""+points+" data points received...");
         } else {
             txtStat.setText("Waiting for GPS fix...");
         }
-        txtCurSpeed.setText(String.format("Current speed: %1.1f mph", spdCurrent));
-        txtMaxSpeed.setText(String.format("Maximum speed: %1.1f mph", spdMax));
+        txtCurSpeed.setText(String.format("%1.1f mph", spdCurrent));
+        txtMaxSpeed.setText(String.format("Max Speed: %1.1f mph", spdMax));
 
     	float miles = 0.0006212f * distance;
-    	txtDistance.setText(String.format("Distance traveled: %1.1f miles", miles));
+    	txtDistance.setText(String.format("%1.1f miles", miles));
 	}
 
 	void setListener() {
@@ -230,8 +235,14 @@ public class RecordingActivity extends Activity {
 
     void updateTimer() {
         if (trip != null && isRecording) {
-            double dd = System.currentTimeMillis() - trip.startTime - trip.totalPauseTime;
-            txtDuration.setText(String.format("Time Elapsed: %ss", sdf.format(dd)));
+            double dd = System.currentTimeMillis()
+                        - trip.startTime
+                        - trip.totalPauseTime;
+
+            txtDuration.setText(sdf.format(dd));
+
+            double avgSpeed = 3600.0 * 0.6212 * this.curDistance / dd;
+            txtAvgSpeed.setText(String.format("%1.1f mph", avgSpeed));
         }
     }
 

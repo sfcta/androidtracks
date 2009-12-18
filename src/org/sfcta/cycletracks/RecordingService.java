@@ -33,6 +33,7 @@ public class RecordingService extends Service implements LocationListener {
 	// Bike bell variables
 	static int BELL_FIRST_INTERVAL = 15;
 	static int BELL_NEXT_INTERVAL = 5;
+
 	SoundPool soundpool;
 	int bikebell, intervalToNextRing, previousRing;
 
@@ -61,7 +62,7 @@ public class RecordingService extends Service implements LocationListener {
 	public void onCreate() {
 		super.onCreate();
 	    soundpool = new SoundPool(1,AudioManager.STREAM_NOTIFICATION,0);
-	    bikebell = soundpool.load(this.getApplicationContext(), R.raw.bikebell,1);
+	    bikebell = soundpool.load(this.getBaseContext(), R.raw.bikebell,1);
 	}
 
 	@Override
