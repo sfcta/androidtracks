@@ -17,10 +17,16 @@ class CyclePoint extends GeoPoint {
 	public float speed;
 	public double time;
 
-	public CyclePoint(int lat, int lgt, double currentTime) {
-		super(lat, lgt);
-		this.time = currentTime;
-	}
+    public CyclePoint(int lat, int lgt, double currentTime) {
+        super(lat, lgt);
+        this.time = currentTime;
+    }
+
+    public CyclePoint(int lat, int lgt, double currentTime, float accuracy) {
+        super(lat, lgt);
+        this.time = currentTime;
+        this.accuracy = accuracy;
+    }
 
 	public CyclePoint(int lat, int lgt, double currentTime, float accuracy, double altitude, float speed) {
 		super(lat, lgt);

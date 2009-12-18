@@ -14,7 +14,9 @@ import java.util.List;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Paint.Style;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,6 +34,7 @@ public class ShowMap extends MapActivity {
 	List<Overlay> mapOverlays;
 	Drawable drawable;
 	ItemizedOverlayTrack gpspoints;
+	float[] lineCoords;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -114,8 +117,11 @@ public class ShowMap extends MapActivity {
 
 		@Override
 		protected void onPostExecute(ItemizedOverlayTrack gpspoints) {
-		    // Add the trail
+		    // Add the points
 			mapOverlays.add(ShowMap.this.gpspoints);
+
+			// Add the lines!  W00t!
+            mapOverlays.add(new LineOverlay(ShowMap.this.gpspoints));
 
 			// Add start & end pins
 			if (trip.startpoint != null) {
@@ -130,7 +136,65 @@ public class ShowMap extends MapActivity {
 		}
 	}
 
-    class PushPinOverlay extends com.google.android.maps.Overlay
+    class LineOverlay extends com.google.android.maps.Overlay
+    {
+        ItemizedOverlayTrack track;
+
+        public LineOverlay(ItemizedOverlayTrack track) {
+            super();
+            this.track = track;
+        }
+
+        @Override
+        public boolean draw(Canvas canvas, MapView mapView, boolean shadow, long when) {
+            super.draw(canvas, mapView, shadow);
+
+            // Need at least two points to draw a line, duh
+            if (track.size()<2) return true;
+
+            // Build array of points
+            float[] points = new float[4 * track.size()];
+            int segments = 0;
+            int startx = -1; int starty = -1;
+
+            for (int i=0; i<track.size(); i++) {
+                CyclePoint z = (CyclePoint) track.getItem(i).getPoint();
+
+                // Skip lousy points
+                if (z.accuracy > 8) {
+                    startx = -1;
+                    continue;
+                }
+
+                // If this is the beginning of a new segment, great
+                Point screenPoint = new Point();
+                mapView.getProjection().toPixels(z, screenPoint);
+
+                if (startx == -1) {
+                    startx = screenPoint.x;
+                    starty = screenPoint.y;
+                    continue;
+                }
+                int numpts = segments*4;
+                points[numpts] = startx;
+                points[numpts+1] = starty;
+                points[numpts+2] = startx = screenPoint.x;
+                points[numpts+3] = starty = screenPoint.y;
+                segments++;
+            }
+
+            // Line style
+            Paint paint = new Paint();
+            paint.setARGB(255,0,0,255);
+            paint.setStrokeWidth(5);
+            paint.setStyle(Style.FILL_AND_STROKE);
+
+            canvas.drawLines(points, 0, segments*4, paint);
+            return false;
+        }
+    }
+
+	class PushPinOverlay extends com.google.android.maps.Overlay
     {
         GeoPoint p;
         int d;
@@ -158,6 +222,4 @@ public class ShowMap extends MapActivity {
             return true;
         }
     }
-
 }
-

@@ -131,6 +131,8 @@ public class TripData {
             int COL_LAT = points.getColumnIndex("lat");
             int COL_LGT = points.getColumnIndex("lgt");
             int COL_TIME = points.getColumnIndex("time");
+            int COL_ACC  = points.getColumnIndex(DbAdapter.K_POINT_ACC);
+
             numpoints = points.getCount();
 
             points.moveToLast();
@@ -143,8 +145,9 @@ public class TripData {
                 int lat = points.getInt(COL_LAT);
                 int lgt = points.getInt(COL_LGT);
                 double time = points.getDouble(COL_TIME);
+                float acc = (float) points.getDouble(COL_ACC);
 
-                addPointToSavedMap(lat, lgt, time);
+                addPointToSavedMap(lat, lgt, time, acc);
 				points.moveToNext();
 			}
 			points.close();
@@ -158,8 +161,8 @@ public class TripData {
 		return gpspoints;
 	}
 
-	private void addPointToSavedMap(int lat, int lgt, double currentTime) {
-		CyclePoint pt = new CyclePoint(lat, lgt, currentTime);
+	private void addPointToSavedMap(int lat, int lgt, double currentTime, float acc) {
+		CyclePoint pt = new CyclePoint(lat, lgt, currentTime, acc);
 
 		OverlayItem opoint = new OverlayItem(pt, null, null);
 		gpspoints.addOverlay(opoint);
