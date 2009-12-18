@@ -167,7 +167,7 @@ public class RecordingActivity extends Activity {
 		});
 	}
 
-	public void updateStatus(int points, float distance, double duration, float spdCurrent, float spdMax) {
+	public void updateStatus(int points, float distance, float spdCurrent, float spdMax) {
 	    //TODO: check task status before doing this
         if (points>0) {
             txtStat.setText(""+points+" data points received...");
@@ -177,9 +177,6 @@ public class RecordingActivity extends Activity {
         txtCurSpeed.setText(String.format("Current speed: %1.1f mph", spdCurrent));
         txtMaxSpeed.setText(String.format("Maximum speed: %1.1f mph", spdMax));
 
-        txtDuration.setText(String.format("Time Elapsed: %ss", sdf.format(duration)));
-
-        // Distance funky!
     	float miles = 0.0006212f * distance;
     	txtDistance.setText(String.format("Distance traveled: %1.1f miles", miles));
 	}
