@@ -31,7 +31,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -43,7 +42,6 @@ import android.widget.Toast;
 public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
     Context mCtx;
     DbAdapter mDb;
-    ProgressDialog pd;
 
     public static final String TRIP_COORDS_TIME = "rec";
     public static final String TRIP_COORDS_LAT = "lat";
@@ -294,19 +292,16 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
 
     @Override
     protected void onPreExecute() {
-        CharSequence progTitle = mCtx.getText(R.string.uploadProgressTitle);
-        CharSequence progMessage = mCtx.getText(R.string.uploadProgressMessage);
-        pd = ProgressDialog.show(this.mCtx, progTitle, progMessage, true, false);
+        Toast.makeText(mCtx.getApplicationContext(),"Submitting trip.  Thanks for using CycleTracks!", Toast.LENGTH_LONG).show();
     }
 
     @Override
     protected void onPostExecute(Boolean result) {
         try {
-            pd.dismiss();
             if (result) {
                 Toast.makeText(mCtx.getApplicationContext(),"Trip uploaded successfully.", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(mCtx.getApplicationContext(),"Upload failed. Will retry after next trip is completed.", Toast.LENGTH_LONG).show();
+                Toast.makeText(mCtx.getApplicationContext(),"CycleTracks couldn't upload the trip, and will retry when your next trip is completed.", Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
             // Just don't toast if the view has gone out of context

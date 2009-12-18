@@ -21,6 +21,8 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Window;
 import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
@@ -39,6 +41,7 @@ public class ShowMap extends MapActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.mapview);
 
 		try {
@@ -92,15 +95,19 @@ public class ShowMap extends MapActivity {
 	}
 
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
-
-	@Override
 	protected boolean isRouteDisplayed() {
 		// Auto-generated method stub
 		return false;
 	}
+
+	// Make sure overlays get zapped when we go BACK
+	@Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && mapView!=null) {
+            mapView.getOverlays().clear();
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
 	private class AddPointsToMapLayerTask extends AsyncTask <TripData, Integer, ItemizedOverlayTrack> {
 	    TripData trip;
@@ -136,6 +143,7 @@ public class ShowMap extends MapActivity {
 		}
 	}
 
+
     class LineOverlay extends com.google.android.maps.Overlay
     {
         ItemizedOverlayTrack track;
@@ -161,7 +169,7 @@ public class ShowMap extends MapActivity {
                 CyclePoint z = (CyclePoint) track.getItem(i).getPoint();
 
                 // Skip lousy points
-                if (z.accuracy > 8) {
+                if (z.accuracy > 12) {
                     startx = -1;
                     continue;
                 }
