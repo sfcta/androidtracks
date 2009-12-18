@@ -72,7 +72,8 @@ public class ShowMap extends MapActivity {
 			GeoPoint center = new GeoPoint(latcenter, lgtcenter);
 			MapController mc = mapView.getController();
 			mc.animateTo(center);
-			mc.zoomToSpan(10+trip.lathigh - trip.latlow, 10+trip.lgthigh - trip.lgtlow);
+			// Add 500 to map span, to guarantee pins fit on map
+			mc.zoomToSpan(500+trip.lathigh - trip.latlow, 500+trip.lgthigh - trip.lgtlow);
 
 			if (gpspoints == null) {
 				AddPointsToMapLayerTask maptask = new AddPointsToMapLayerTask();
@@ -169,7 +170,7 @@ public class ShowMap extends MapActivity {
                 CyclePoint z = (CyclePoint) track.getItem(i).getPoint();
 
                 // Skip lousy points
-                if (z.accuracy > 12) {
+                if (z.accuracy > 8) {
                     startx = -1;
                     continue;
                 }

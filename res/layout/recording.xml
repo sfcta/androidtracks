@@ -4,13 +4,13 @@
 	xmlns:android="http://schemas.android.com/apk/res/android">
 	<LinearLayout android:layout_below="@+id/TextRecordStats"
 		android:layout_height="wrap_content" android:orientation="vertical"
-		android:id="@+id/StatsLinearLayout" android:layout_width="fill_parent">
+		android:id="@+id/StatsLinearLayout" android:layout_width="fill_parent" android:layout_marginLeft="3sp">
 		<TextView android:layout_height="wrap_content"
 			android:layout_alignParentTop="true" android:id="@+id/TextRecordStats"
 			android:text="Points collected: 0" android:layout_width="fill_parent"></TextView>
 			
 		<RelativeLayout android:id="@+id/RelativeLayout02"
-			android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_marginTop="20sp">
+			android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_marginTop="5sp">
 			<TextView android:id="@+id/TextView011" android:layout_width="wrap_content"
 				android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:textStyle="bold" android:layout_marginTop="5sp" android:text="Distance:" android:textSize="26sp"></TextView>
 			<TextView android:layout_height="wrap_content" android:id="@+id/TextDistance"
@@ -30,7 +30,7 @@
         </RelativeLayout>
 
         <RelativeLayout android:id="@+id/RelativeLayout03"
-            android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_marginTop="40sp">
+            android:layout_height="wrap_content" android:layout_width="fill_parent">
             <TextView android:id="@+id/TextView013" android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:text="Current Speed:"
                 android:layout_alignParentLeft="true" android:textStyle="bold" android:layout_marginTop="15sp" android:textSize="26sp"></TextView>
