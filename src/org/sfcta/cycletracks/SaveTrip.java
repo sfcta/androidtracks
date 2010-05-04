@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.text.Html;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -134,6 +135,9 @@ public class SaveTrip extends Activity {
 		// Submit btn
 		final Button btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
 		btnSubmit.setEnabled(false);
+
+		// Don't pop up the soft keyboard until user clicks!
+		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 	}
 
 	// submit btn is only activated after the service.finishedRecording() is completed.

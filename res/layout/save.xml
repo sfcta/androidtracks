@@ -77,7 +77,7 @@
 				android:inputType="textShortMessage" android:hint="Comments about your trip"
 				android:layout_marginRight="2sp" android:layout_marginLeft="2sp"
 				android:nextFocusDown="@+id/ButtonSubmit" android:nextFocusRight="@+id/ButtonSubmit"
-				android:nextFocusUp="@+id/ToggleSocial"></EditText>
+				android:nextFocusUp="@+id/ToggleSocial" android:imeOptions="actionDone"></EditText>
 			<Button android:layout_height="wrap_content"
 				android:layout_marginTop="5sp" android:layout_width="fill_parent"
 				android:textStyle="bold" android:textSize="18sp"

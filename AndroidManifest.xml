@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="org.sfcta.cycletracks"
-      android:versionCode="7" android:versionName="1.02">
+      android:versionCode="8" android:versionName="1.03">
 <application android:label="@string/app_name" android:debuggable="false" android:icon="@drawable/icon72">
         <activity android:label="@string/app_name" android:name=".MainInput" android:launchMode="singleTask">
             <intent-filter>
