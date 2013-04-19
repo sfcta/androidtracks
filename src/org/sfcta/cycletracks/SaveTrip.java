@@ -24,8 +24,8 @@ package org.sfcta.cycletracks;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.TimeZone;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -42,6 +42,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -159,6 +160,7 @@ public class SaveTrip extends Activity {
 		btnSubmit.setEnabled(true);
 
 		btnSubmit.setOnClickListener(new View.OnClickListener() {
+
 			public void onClick(View v) {
 
 				TripData trip = TripData.fetchTrip(SaveTrip.this, tripid);
@@ -170,6 +172,10 @@ public class SaveTrip extends Activity {
 					Toast.makeText(getBaseContext(), "You must select a trip purpose before submitting! Choose from the purposes above.", Toast.LENGTH_SHORT).show();
 					return;
 				}
+
+				RatingBar safetyRating = (RatingBar) findViewById(R.id.rateSafety);
+				RatingBar convenienceRating = (RatingBar) findViewById(R.id.rateConvenience);
+				RatingBar easeRating = (RatingBar) findViewById(R.id.rateEase);
 
 				EditText notes = (EditText) findViewById(R.id.NotesField);
 
@@ -188,6 +194,9 @@ public class SaveTrip extends Activity {
 				trip.updateTrip(
 						purpose,
 						fancyStartTime, fancyEndInfo,
+                        safetyRating.getRating(),
+                        convenienceRating.getRating(),
+                        easeRating.getRating(),
 						notes.getEditableText().toString());
 				trip.updateTripStatus(TripData.STATUS_COMPLETE);
 				resetService();

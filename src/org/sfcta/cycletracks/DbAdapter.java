@@ -43,7 +43,7 @@ import android.util.Log;
  * SDK**
  */
 public class DbAdapter {
-    private static final int DATABASE_VERSION = 20;
+    public static final int DATABASE_VERSION = 2;
 
     public static final String K_TRIP_ROWID = "_id";
     public static final String K_TRIP_PURP = "purp";
@@ -51,6 +51,9 @@ public class DbAdapter {
     public static final String K_TRIP_END = "endtime";
     public static final String K_TRIP_FANCYSTART = "fancystart";
     public static final String K_TRIP_FANCYINFO = "fancyinfo";
+    public static final String K_TRIP_SAFETY = "safety";
+    public static final String K_TRIP_CONVENIENCE = "convenience";
+    public static final String K_TRIP_EASE = "ease";
     public static final String K_TRIP_NOTE = "note";
     public static final String K_TRIP_DISTANCE = "distance";
     public static final String K_TRIP_LATHI = "lathi";
@@ -77,7 +80,7 @@ public class DbAdapter {
      */
     private static final String TABLE_CREATE_TRIPS = "create table trips "
     	+ "(_id integer primary key autoincrement, purp text, start double, endtime double, "
-    	+ "fancystart text, fancyinfo text, distance float, note text,"
+    	+ "fancystart text, fancyinfo text, distance float, safety float, convenience float, ease float, note text,"
         + "lathi integer, latlo integer, lgthi integer, lgtlo integer, status integer);";
 
     private static final String TABLE_CREATE_COORDS = "create table coords "
@@ -293,6 +296,7 @@ public class DbAdapter {
     public Cursor fetchTrip(long rowId) throws SQLException {
         Cursor mCursor = mDb.query(true, DATA_TABLE_TRIPS, new String[] {
                 K_TRIP_ROWID, K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART,
+                K_TRIP_SAFETY, K_TRIP_CONVENIENCE, K_TRIP_EASE,
                 K_TRIP_NOTE, K_TRIP_LATHI, K_TRIP_LATLO, K_TRIP_LGTHI,
                 K_TRIP_LGTLO, K_TRIP_STATUS, K_TRIP_END, K_TRIP_FANCYINFO, K_TRIP_DISTANCE },
 
@@ -306,12 +310,15 @@ public class DbAdapter {
     }
 
     public boolean updateTrip(long tripid, String purp, double starttime,
-            String fancystart, String fancyinfo, String note, int lathigh, int latlow,
+            String fancystart, String fancyinfo, float safety, float convenience, float ease, String note, int lathigh, int latlow,
             int lgthigh, int lgtlow, float distance) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(K_TRIP_PURP, purp);
         initialValues.put(K_TRIP_START, starttime);
         initialValues.put(K_TRIP_FANCYSTART, fancystart);
+        initialValues.put(K_TRIP_SAFETY, safety);
+        initialValues.put(K_TRIP_CONVENIENCE, convenience);
+        initialValues.put(K_TRIP_EASE, ease);
         initialValues.put(K_TRIP_NOTE, note);
         initialValues.put(K_TRIP_LATHI, lathigh);
         initialValues.put(K_TRIP_LATLO, latlow);

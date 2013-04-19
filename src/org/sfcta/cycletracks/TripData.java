@@ -181,8 +181,8 @@ public class TripData {
 	}
 
 	boolean addPointNow(Location loc, double currentTime, float dst) {
-		int lat = (int) (loc.getLatitude() * 1E6);
-		int lgt = (int) (loc.getLongitude() * 1E6);
+		int lat = Double.valueOf(loc.getLatitude() * 1.0E6).intValue();
+		int lgt = Double.valueOf(loc.getLongitude() * 1.0E6).intValue();
 
 		// Skip duplicates
 		if (latestlat == lat && latestlgt == lgt)
@@ -209,7 +209,7 @@ public class TripData {
 
         mDb.open();
         boolean rtn = mDb.addCoordToTrip(tripid, pt);
-        rtn = rtn && mDb.updateTrip(tripid, "", startTime, "", "", "",
+        rtn = rtn && mDb.updateTrip(tripid, "", startTime, "", "", 3.0f, 3.0f, 3.0f, "",
                 lathigh, latlow, lgthigh, lgtlow, distance);
         mDb.close();
 
@@ -232,11 +232,11 @@ public class TripData {
 		return rtn;
 	}
 
-	public void updateTrip() { updateTrip("","","",""); }
-	public void updateTrip(String purpose, String fancyStart, String fancyInfo, String notes) {
+	public void updateTrip() { updateTrip("","","",3.0f,3.0f,3.0f,""); }
+	public void updateTrip(String purpose, String fancyStart, String fancyInfo, float safety, float convenience, float ease, String notes) {
 		// Save the trip details to the phone database. W00t!
 		mDb.open();
-		mDb.updateTrip(tripid, purpose,	startTime, fancyStart, fancyInfo, notes,
+		mDb.updateTrip(tripid, purpose,	startTime, fancyStart, fancyInfo, safety, convenience, ease, notes,
 				lathigh, latlow, lgthigh, lgtlow, distance);
 		mDb.close();
 	}

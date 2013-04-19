@@ -162,7 +162,7 @@ public class RecordingActivity extends Activity {
                     }
 					// Save trip so far (points and extent, but no purpose or notes)
 					fi = new Intent(RecordingActivity.this, SaveTrip.class);
-					trip.updateTrip("","","","");
+					trip.updateTrip("","","",3, 3, 3, "");
 				}
 				// Otherwise, cancel and go back to main screen
 				else {

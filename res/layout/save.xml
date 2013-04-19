@@ -4,9 +4,14 @@
 	android:layout_height="wrap_content">
 	<RelativeLayout android:layout_width="fill_parent"
 		android:layout_height="fill_parent">
-		<LinearLayout android:layout_toLeftOf="@+id/TextView02"
-			android:id="@+id/LinearLayout02" android:orientation="vertical"
-			android:layout_width="fill_parent" android:layout_height="wrap_content">
+
+		<LinearLayout
+		    android:id="@+id/LinearLayout02"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_toLeftOf="@+id/TextView02"
+		    android:orientation="vertical" >
+
 			<TextView android:id="@+id/TextView01" android:layout_width="wrap_content"
 				android:layout_height="wrap_content" android:textSize="16sp"
 				android:paddingTop="8sp" android:layout_marginLeft="5sp"
@@ -67,9 +72,63 @@
 			</TableLayout>
 			<TextView android:layout_width="wrap_content"
 				android:layout_height="wrap_content" android:layout_marginLeft="5sp"
-				android:paddingBottom="2sp" android:paddingTop="4sp"
+				android:paddingBottom="1sp" android:paddingTop="1sp"
 				android:id="@+id/TextPurpDescription" android:text="     "
-				android:lines="3" android:bufferType="spannable" android:textSize="14sp"></TextView>
+				android:lines="1" android:bufferType="spannable" android:textSize="14sp"></TextView>
+
+			<TextView
+			    android:id="@+id/textView1"
+			    android:layout_width="fill_parent"
+			    android:layout_height="wrap_content"
+			    android:gravity="center"
+			    android:text="Rate your trip"
+			    android:textAppearance="?android:attr/textAppearanceLarge" />
+
+			<TextView
+			    android:id="@+id/textView2"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:text="Safety"
+			    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+			<RatingBar
+			    android:id="@+id/rateSafety"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+		        android:numStars="5"
+        		android:stepSize="0.5"
+        		android:rating="3.0" />
+
+			<TextView
+			    android:id="@+id/textView3"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:text="Convenience"
+			    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+			<RatingBar
+			    android:id="@+id/rateConvenience"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+		        android:numStars="5"
+        		android:stepSize="0.5"
+        		android:rating="3.0" />
+
+			<TextView
+			    android:id="@+id/textView4"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:text="Easy"
+			    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+			<RatingBar
+			    android:id="@+id/rateEase"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+		        android:numStars="5"
+        		android:stepSize="0.5"
+        		android:rating="3.0" />
+
 			<EditText android:bufferType="editable"
 				android:cursorVisible="true" android:layout_width="fill_parent"
 				android:selectAllOnFocus="true" android:layout_height="fill_parent"
