@@ -49,4 +49,6 @@ http.createServer(function (req, res) {
   res.writeHead(200);
   res.end(dummyHTML);
 }).listen(1337, '127.0.0.1');
-// console.log('Server running at http://127.0.0.1:1337/');
+/* Last bit of instrumentation
+ * console.log('Server running at http://127.0.0.1:1337/');
+ */
