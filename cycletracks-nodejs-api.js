@@ -5,7 +5,7 @@
 
 var qs = require('querystring');
 var http = require('http');
-var tracks = require('nano')('https://terandrisaingediduallner:IvnKC0TX8oeeYYaNMt8UFBBy@openbike.cloudant.com/openbike');
+var tracks = require('nano')('https://ougeremseratontsedisamen:QLbVnxIDp0cHSqGgtOiMDyCR@openbike.cloudant.com/openbike');
 
 http.createServer(function (req, res) {
   // Only process POST requests (below, if non-POST, we show a debug form)
@@ -54,5 +54,5 @@ http.createServer(function (req, res) {
   }
 }).listen(1337);
 
-// console.log('Server running at http://127.0.0.1:1337/');
+console.log('Server running on port 1337');
  
