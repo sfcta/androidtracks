@@ -21,173 +21,199 @@
 
 package org.sfcta.cycletracks;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.os.AsyncTask;
-import android.provider.Settings;
-import android.provider.Settings.System;
-import android.util.Log;
-import android.widget.Toast;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Vector;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.os.AsyncTask;
+import android.provider.Settings.System;
+import android.util.Log;
+import android.widget.Toast;
 
 public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
-    private static final int COORDINATES_PER_POST = 5;
     Context mCtx;
     DbAdapter mDb;
 
+    public static final String TRIP_COORDS_TIME = "rec";
+    public static final String TRIP_COORDS_LAT = "lat";
+    public static final String TRIP_COORDS_LON = "lon";
+    public static final String TRIP_COORDS_ALT = "alt";
+    public static final String TRIP_COORDS_SPEED = "spd";
+    public static final String TRIP_COORDS_HACCURACY = "hac";
+    public static final String TRIP_COORDS_VACCURACY = "vac";
+
+    public static final String USER_AGE = "age";
+    public static final String USER_EMAIL = "email";
+    public static final String USER_GENDER = "gender";
+    public static final String USER_ZIP_HOME = "homeZIP";
+    public static final String USER_ZIP_WORK = "workZIP";
+    public static final String USER_ZIP_SCHOOL = "schoolZIP";
+    public static final String USER_CYCLING_FREQUENCY = "cyclingFreq";
+
     public TripUploader(Context ctx) {
         super();
-        mCtx = ctx;
-        mDb = new DbAdapter(mCtx);
+        this.mCtx = ctx;
+        this.mDb = new DbAdapter(this.mCtx);
     }
 
-    private List<String> getCoordinateData(long tripId, String uuid)  {
-
-    	// build strings of coordinates
-        //the_geom,time,altitude,speed,safety,convenience,ease,haccuracy,vaccuracy,trip_id
-
-        mDb.openReadOnly();
-        Cursor tripCursor = mDb.fetchTrip(tripId);
-
-        float ease = tripCursor.getFloat(tripCursor.getColumnIndex(DbAdapter.K_TRIP_EASE));
-        float safety = tripCursor.getFloat(tripCursor.getColumnIndex(DbAdapter.K_TRIP_SAFETY));
-        float convenience = tripCursor.getFloat(tripCursor.getColumnIndex(DbAdapter.K_TRIP_CONVENIENCE));
-        tripCursor.close();
-
-        Cursor tripCoordsCursor = mDb.fetchAllCoordsForTrip(tripId);
-        List<String> data = new ArrayList<String>(tripCoordsCursor.getCount());
-
+    private JSONObject getCoordsJSON(long tripId) throws JSONException {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    	while (!tripCoordsCursor.isAfterLast()) {
-            StringBuilder coord = new StringBuilder();
-            double accuracy = tripCoordsCursor.getDouble(tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_ACC));
-            coord.append("ST_GeomFromText('POINT(")
-                    .append(tripCoordsCursor.getDouble(tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_LGT)) / 1.0E6)
-                    .append(' ')
-                    .append(tripCoordsCursor.getDouble(tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_LAT)) / 1.0E6)
-                    .append(")', 4326),'")
-                    .append(df.format(tripCoordsCursor.getDouble(tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_TIME))))
-                    .append("','")
-                    .append(tripCoordsCursor.getDouble(tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_ALT)))
-                    .append("','")
-                    .append(tripCoordsCursor.getDouble(tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_SPEED)))
-                    .append("','")
-                    .append(safety)
-                    .append("','")
-                    .append(convenience)
-                    .append("','")
-                    .append(ease)
-                    .append("','")
-                    .append(accuracy)
-                    .append("','")
-                    .append(accuracy)
-                    .append("','")
-                    .append(uuid)
-                    .append('\'');
-            data.add(coord.toString());
+        mDb.openReadOnly();
+        Cursor tripCoordsCursor = mDb.fetchAllCoordsForTrip(tripId);
 
+        // Build the map between JSON fieldname and phone db fieldname:
+        Map<String, Integer> fieldMap = new HashMap<String, Integer>();
+        fieldMap.put(TRIP_COORDS_TIME,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_TIME));
+        fieldMap.put(TRIP_COORDS_LAT,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_LAT));
+        fieldMap.put(TRIP_COORDS_LON,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_LGT));
+        fieldMap.put(TRIP_COORDS_ALT,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_ALT));
+        fieldMap.put(TRIP_COORDS_SPEED,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_SPEED));
+        fieldMap.put(TRIP_COORDS_HACCURACY,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_ACC));
+        fieldMap.put(TRIP_COORDS_VACCURACY,
+        		tripCoordsCursor.getColumnIndex(DbAdapter.K_POINT_ACC));
+
+        // Build JSON objects for each coordinate:
+        JSONObject tripCoords = new JSONObject();
+        while (!tripCoordsCursor.isAfterLast()) {
+            JSONObject coord = new JSONObject();
+
+            coord.put(TRIP_COORDS_TIME,
+            		df.format(tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_TIME))));
+            coord.put(TRIP_COORDS_LAT,
+            		tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_LAT)) / 1E6);
+            coord.put(TRIP_COORDS_LON,
+            		tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_LON)) / 1E6);
+            coord.put(TRIP_COORDS_ALT,
+            		tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_ALT)));
+            coord.put(TRIP_COORDS_SPEED,
+            		tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_SPEED)));
+            coord.put(TRIP_COORDS_HACCURACY,
+            		tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_HACCURACY)));
+            coord.put(TRIP_COORDS_VACCURACY,
+            		tripCoordsCursor.getDouble(fieldMap.get(TRIP_COORDS_VACCURACY)));
+
+            tripCoords.put(coord.getString("rec"), coord);
             tripCoordsCursor.moveToNext();
         }
         tripCoordsCursor.close();
         mDb.close();
-
-        return data;
+        return tripCoords;
     }
 
-    private String getQuotedStringOrNull(SharedPreferences settings, int index) {
-        String value = settings.getString(Integer.toString(index), null);
-        if(value == null || value.trim().equals(""))
-        {
-            return "null";
+    private JSONObject getUserJSON() throws JSONException {
+        JSONObject user = new JSONObject();
+        Map<String, Integer> fieldMap = new HashMap<String, Integer>();
+        fieldMap.put(USER_AGE, new Integer(UserInfoActivity.PREF_AGE));
+        fieldMap.put(USER_EMAIL, new Integer(UserInfoActivity.PREF_EMAIL));
+        fieldMap.put(USER_GENDER, new Integer(UserInfoActivity.PREF_GENDER));
+        fieldMap.put(USER_ZIP_HOME, new Integer(UserInfoActivity.PREF_ZIPHOME));
+        fieldMap.put(USER_ZIP_WORK, new Integer(UserInfoActivity.PREF_ZIPWORK));
+        fieldMap.put(USER_ZIP_SCHOOL, new Integer(UserInfoActivity.PREF_ZIPSCHOOL));
+
+        SharedPreferences settings = this.mCtx.getSharedPreferences("PREFS", 0);
+        for (Entry<String, Integer> entry : fieldMap.entrySet()) {
+               user.put(entry.getKey(), settings.getString(entry.getValue().toString(), null));
         }
-        else
-        {
-            return '\''+value+'\'';
-        }
+        user.put(USER_CYCLING_FREQUENCY, Integer.parseInt(settings.getString(""+UserInfoActivity.PREF_CYCLEFREQ, "0"))/100);
+        return user;
     }
 
-    private String getUserData() {
-        SharedPreferences settings = mCtx.getSharedPreferences("PREFS", 0);
-
-        StringBuilder user = new StringBuilder();
-        user.append(getQuotedStringOrNull(settings, UserInfoActivity.PREF_AGE)).append(',');
-        user.append(getQuotedStringOrNull(settings, UserInfoActivity.PREF_EMAIL)).append(',');
-        user.append(getQuotedStringOrNull(settings, UserInfoActivity.PREF_GENDER)).append(',');
-        user.append(getQuotedStringOrNull(settings, UserInfoActivity.PREF_ZIPHOME)).append(',');
-        user.append(getQuotedStringOrNull(settings, UserInfoActivity.PREF_ZIPWORK)).append(',');
-        user.append(getQuotedStringOrNull(settings, UserInfoActivity.PREF_ZIPSCHOOL)).append(',');
-        user.append('\'').append(Integer.toString(Integer.parseInt(settings.getString(Integer.toString(UserInfoActivity.PREF_CYCLEFREQ), "0"))/100)).append("',");
-        user.append('\'').append(getDeviceId()).append('\'');
-        return user.toString();
-    }
-
-    public String getDeviceId() {
-        String androidId = System.getString(mCtx.getContentResolver(),
-                Settings.Secure.ANDROID_ID);
-        String androidBase = "androidDeviceId-";
-
-        if (androidId == null) { // This happens when running in the Emulator
-            return "android-RunningAsTestingDeleteMe";
-        }
-        return androidBase.concat(androidId);
-    }
-
-    private String getTripData(long tripId, String uuid) {
-        String deviceId = getDeviceId();
-
+    private Vector<String> getTripData(long tripId) {
+        Vector<String> tripData = new Vector<String>();
         mDb.openReadOnly();
         Cursor tripCursor = mDb.fetchTrip(tripId);
 
-        String notes = tripCursor.getString(tripCursor
-                                                    .getColumnIndex(DbAdapter.K_TRIP_NOTE));
-        String purpose = tripCursor.getString(tripCursor
-                .getColumnIndex(DbAdapter.K_TRIP_PURP));
-        Double startTime = tripCursor.getDouble(tripCursor
-                                                        .getColumnIndex(DbAdapter.K_TRIP_START));
-        Double endTime = tripCursor.getDouble(tripCursor
-                                                      .getColumnIndex(DbAdapter.K_TRIP_END));
+        String note = tripCursor.getString(tripCursor.getColumnIndex(DbAdapter.K_TRIP_NOTE));
+        String purpose = tripCursor.getString(tripCursor.getColumnIndex(DbAdapter.K_TRIP_PURP));
+        Double startTime = tripCursor.getDouble(tripCursor.getColumnIndex(DbAdapter.K_TRIP_START));
+        Double endTime = tripCursor.getDouble(tripCursor.getColumnIndex(DbAdapter.K_TRIP_END));
+        Float ease = tripCursor.getFloat(tripCursor.getColumnIndex(DbAdapter.K_TRIP_EASE));
+        Float safety = tripCursor.getFloat(tripCursor.getColumnIndex(DbAdapter.K_TRIP_SAFETY));
+        Float convenience = tripCursor.getFloat(tripCursor.getColumnIndex(DbAdapter.K_TRIP_CONVENIENCE));
         tripCursor.close();
         mDb.close();
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        tripData.add(note);
+        tripData.add(purpose);
+        tripData.add(df.format(startTime));
+        tripData.add(df.format(endTime));
+        tripData.add(ease.toString());
+        tripData.add(safety.toString());
+        tripData.add(convenience.toString());
 
-        // query format device_id,trip_id,notes,purpose,start,end,version
+        return tripData;
+    }
 
-        StringBuilder queryValues = new StringBuilder();
-        queryValues.append('\'').append(deviceId).append("\',");
-        queryValues.append('\'').append(uuid).append("\',");
-        if(notes.trim().equals(""))
-        {
-            queryValues.append("null,");
+    public String getDeviceId() {
+        String androidId = System.getString(this.mCtx.getContentResolver(),
+                System.ANDROID_ID);
+        String androidBase = "androidDeviceId-";
+
+        if (androidId == null) { // This happens when running in the Emulator
+            final String emulatorId = "android-RunningAsTestingDeleteMe";
+            return emulatorId;
         }
-        else
-        {
-            queryValues.append('\'').append(notes).append("\',");
-        }
-        queryValues.append('\'').append(purpose).append("\',");
-        queryValues.append('\'').append(df.format(startTime)).append("\',");
-        queryValues.append('\'').append(df.format(endTime)).append("\',");
-        queryValues.append("\'"+ DbAdapter.DATABASE_VERSION).append('\'');
+        String deviceId = androidBase.concat(androidId);
+        return deviceId;
+    }
 
-        return queryValues.toString();
+    private List<NameValuePair> getPostData(long tripId) throws JSONException {
+        JSONObject coords = getCoordsJSON(tripId);
+        JSONObject user = getUserJSON();
+        String deviceId = getDeviceId();
+        Vector<String> tripData = getTripData(tripId);
+        String notes = tripData.get(0);
+        String purpose = tripData.get(1);
+        String startTime = tripData.get(2);
+        String endTime = tripData.get(3);
+        String ease = tripData.get(4);
+        String safety = tripData.get(5);
+        String convenience = tripData.get(6);
+
+
+        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+        nameValuePairs.add(new BasicNameValuePair("coords", coords.toString()));
+        nameValuePairs.add(new BasicNameValuePair("user", user.toString()));
+        nameValuePairs.add(new BasicNameValuePair("device", deviceId));
+        nameValuePairs.add(new BasicNameValuePair("notes", notes));
+        nameValuePairs.add(new BasicNameValuePair("purpose", purpose));
+        nameValuePairs.add(new BasicNameValuePair("start", startTime));
+        nameValuePairs.add(new BasicNameValuePair("end", endTime));
+        nameValuePairs.add(new BasicNameValuePair("ease", ease));
+        nameValuePairs.add(new BasicNameValuePair("safety", safety));
+        nameValuePairs.add(new BasicNameValuePair("convenience", convenience));
+        nameValuePairs.add(new BasicNameValuePair("version", "2"));
+
+        return nameValuePairs;
     }
 
     private static String convertStreamToString(InputStream is) {
@@ -197,22 +223,17 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
          * there's no more data to read. Each line will appended to a StringBuilder
          * and returned as String.
          */
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
 
         String line = null;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         try {
             while ((line = reader.readLine()) != null) {
-                sb.append(line).append('\n');
+                sb.append(line + "\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            try {
-                reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             try {
                 is.close();
             } catch (IOException e) {
@@ -223,103 +244,44 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
     }
 
     boolean uploadOneTrip(long currentTripId) {
+        boolean result = false;
 
-        String userValues = getUserData();
-        Log.v("UserData", userValues);
-
-        String uuid = getUniqueTripId();
-
-        String tripValues = getTripData(currentTripId, uuid);
-        Log.v("TripData", tripValues);
-
-        List<String> coordinateValues = getCoordinateData(currentTripId, uuid);
-
-        String userQuery = "INSERT INTO users(\"age\",\"email\",\"gender\",\"zip_home\",\"zip_work\",\"zip_school\",\"cycling_frequency\",\"device_id\") VALUES(" + userValues + ')';
-        String tripQuery = "INSERT INTO trips(\"device_id\",\"trip_id\",\"notes\",\"purpose\",\"start\",\"end\",\"version\") VALUES (" + tripValues + ')';
-
-        // Break up the coordinates into groups to avoid running out of string space
-        List<String> coordQueries = new LinkedList<String>();
-        int i = 0;
-        StringBuilder coordsQuery = new StringBuilder();
-        String coordsInsert = "INSERT INTO coordinates(\"the_geom\",\"time\",\"altitude\",\"speed\",\"safety\",\"convenience\",\"ease\",\"haccuracy\",\"vaccuracy\",\"trip_id\") VALUES (";
-        coordsQuery.append(coordsInsert);
-        for(String coordinate : coordinateValues)
-        {
-            Log.v("CoordData", coordinate);
-            coordsQuery.append(coordinate);
-            coordsQuery.append("), (");
-            if(++i >= COORDINATES_PER_POST)
-            {
-                coordsQuery.delete(coordsQuery.lastIndexOf(","), coordsQuery.length());
-                coordQueries.add(coordsQuery.toString());
-                coordsQuery = new StringBuilder();
-                coordsQuery.append(coordsInsert);
-            }
-        }
-        coordsQuery.delete(coordsQuery.lastIndexOf(","), coordsQuery.length());
-        coordQueries.add(coordsQuery.toString());
-
-        boolean success = false;
-        boolean postSuccess = postQuery(userQuery);
-        postSuccess = postSuccess && postQuery(tripQuery);
-        for(String query : coordQueries)
-        {
-            postSuccess = postSuccess && postQuery(query);
-        }
-
-        if (postSuccess) {
-            mDb.open();
-            mDb.updateTripStatus(currentTripId, TripData.STATUS_SENT);
-            mDb.close();
-            success = true;
-        }
-
-        return success;
-    }
-
-    private String getUniqueTripId()
-    {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(getDeviceId());
-        buffer.append('-');
-        buffer.append(java.lang.System.currentTimeMillis());
-        return buffer.toString();
-    }
-
-    private boolean postQuery(String query)
-    {
-        String encodedQuery = "";
+        List<NameValuePair> nameValuePairs;
         try {
-            encodedQuery = URLEncoder.encode(query, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            Log.v("httpError", e.getMessage(), e);
-            return false;
+            nameValuePairs = getPostData(currentTripId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return result;
         }
-        Log.v("postQuery", query);
+        Log.v("PostData", nameValuePairs.toString());
 
-        final String postUrl = "http://openbike.cartodb.com/api/v2/sql?q=" + encodedQuery + "&api_key=274e353c1814bc0308f94e82ea18ff10a1a4bb4a";
-        Log.v("postUrl", postUrl);
-
+        HttpClient client = new DefaultHttpClient();
+        final String postUrl = "http://10.0.0.166:1337";
         HttpPost postRequest = new HttpPost(postUrl);
-        Log.v("postRequest", postRequest.toString());
 
         try {
-            HttpClient client = new DefaultHttpClient();
+            postRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             HttpResponse response = client.execute(postRequest);
             String responseString = convertStreamToString(response.getEntity().getContent());
             Log.v("httpResponse", responseString);
             JSONObject responseData = new JSONObject(responseString);
-            return Integer.parseInt(responseData.getString("total_rows")) > 0;
+            if (responseData.getString("status").equals("success")) {
+                mDb.open();
+                mDb.updateTripStatus(currentTripId, TripData.STATUS_SENT);
+                mDb.close();
+                result = true;
+            }
         } catch (IllegalStateException e) {
-            Log.v("httpError", e.getMessage(), e);
+            e.printStackTrace();
             return false;
         } catch (IOException e) {
-            Log.v("httpError", e.getMessage(), e);
+            e.printStackTrace();
             return false;
         } catch (JSONException e) {
-            Log.v("httpError", e.getMessage(), e);
+            e.printStackTrace();
             return false;
         }
+        return result;
     }
 
     @Override
@@ -329,14 +291,14 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
 
         // Then, automatically try and send previously-completed trips
         // that were not sent successfully.
-        List<Long> unsentTrips = new LinkedList<Long>();
+        Vector <Long> unsentTrips = new Vector <Long>();
 
         mDb.openReadOnly();
         Cursor cur = mDb.fetchUnsentTrips();
         if (cur != null && cur.getCount()>0) {
             //pd.setMessage("Sent. You have previously unsent trips; submitting those now.");
             while (!cur.isAfterLast()) {
-                unsentTrips.add(cur.getLong(0));
+                unsentTrips.add(new Long(cur.getLong(0)));
                 cur.moveToNext();
             }
             cur.close();
