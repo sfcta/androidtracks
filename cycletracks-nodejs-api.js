@@ -5,7 +5,7 @@
 
 var qs = require('querystring');
 var http = require('http');
-var tracks = require('nano')('https://pespecklyperilenlypitypi:syo5S0OaYP5L7BB5UEnqnd7K@martinremy.cloudant.com/cocycletracks');
+var tracks = require('nano')('https://terandrisaingediduallner:IvnKC0TX8oeeYYaNMt8UFBBy@openbike.cloudant.com/openbike');
 
 http.createServer(function (req, res) {
   // Only process POST requests (below, if non-POST, we show a debug form)
@@ -16,7 +16,7 @@ http.createServer(function (req, res) {
     req.on('end', function() {
       // Filter out the odd empty request.
       if (body) {
-        console.log( 'Received via POST: ' + body );
+        // console.log( 'Received via POST: ' + body );
         // decodedBody = decodeURIComponent( body );
         // console.log('Decoded: ' + decodedBody);
 
@@ -30,7 +30,7 @@ http.createServer(function (req, res) {
           return;
         }
 
-        console.log('Updating CouchDB with ' + JSON.stringify(couchInput));
+        // console.log('Updating CouchDB with ' + JSON.stringify(couchInput));
 
         // Create a (probably) unique name for 
         var epoch = new Date().getTime().toString() + '_' + ( Math.floor( Math.random() * 1000 ) + 1 );
@@ -54,5 +54,5 @@ http.createServer(function (req, res) {
   }
 }).listen(1337);
 
-console.log('Server running at http://127.0.0.1:1337/');
+// console.log('Server running at http://127.0.0.1:1337/');
  
