@@ -256,7 +256,7 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
         Log.v("PostData", nameValuePairs.toString());
 
         HttpClient client = new DefaultHttpClient();
-        final String postUrl = "http://upload.openbike.co";
+        final String postUrl = "http://openbike.co:1337";
         HttpPost postRequest = new HttpPost(postUrl);
 
         try {
