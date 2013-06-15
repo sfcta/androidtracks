@@ -19,6 +19,29 @@
  *   along with CycleTracks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//4A:12:0D:09:BD:12:6E:E9:90:63:45:E2:E4:F2:5F:24:47:EE:80:14
+//SHA-1 of debug.keystore - https://developers.google.com/maps/documentation/android/start
+/*
+ * Key for Android apps (with certificates)
+API key:
+AIzaSyBsMS0AQ68bro0VByGEcs123SEWJ5t7zy8
+Android apps:
+4A:12:0D:09:BD:12:6E:E9:90:63:45:E2:E4:F2:5F:24:47:EE:80:14;org.sfcta.cycletracks
+
+https://docs.google.com/document/pub?id=19nQzvKP-CVLd7_VrpwnHfl-AE9fjbJySowONZZtNHzw
+//find location of lib by going into sdk downloads and hovering over map lib in extras
+ *
+ * Attribution Requirements. If you use the Google Maps Android API in your application, you must include the Google Play Services attribution text as part of a "Legal Notices" section in your application. Including legal notices as an independent menu item, or as part of an "About" menu item, is recommended. The attribution text is available by making a call to GooglePlayServicesUtil.getOpenSourceSoftwareLicenseInfo.
+ *
+ *
+ *adding supprt v4 - http://developer.android.com/tools/extras/support-library.html#SettingUp
+ *
+ *helpful - http://stackoverflow.com/questions/13719263/unable-instantiate-android-gms-maps-mapfragment
+ *
+http://stackoverflow.com/questions/16589821/android-app-crashes-after-sdk-tools-update-version-noclassdeffound-tool-versio
+
+found a bug - after you record track and submit it and are on map page, an orientation change triggers a resubmission and you see toast
+ */
 package org.sfcta.cycletracks;
 
 import android.graphics.Bitmap;
@@ -30,23 +53,25 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Window;
 import android.widget.TextView;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.maps.GeoPoint;
-import com.google.android.maps.MapActivity;
-import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 
-import java.util.List;
-
-public class ShowMap extends MapActivity {
-	private MapView mapView;
-	List<Overlay> mapOverlays;
+public class ShowMap extends FragmentActivity {
 	Drawable drawable;
 	ItemizedOverlayTrack gpspoints;
+	GoogleMap mMap;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -54,14 +79,17 @@ public class ShowMap extends MapActivity {
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.mapview);
 
-		try {
-			// Set zoom controls
-			mapView = (MapView) findViewById(R.id.mapview);
-			mapView.setBuiltInZoomControls(true);
+		mMap = ((SupportMapFragment)  getSupportFragmentManager().findFragmentById(R.id.map))
+	               .getMap();
 
-			// Set up the point layer
-			mapOverlays = mapView.getOverlays();
-			if (mapOverlays != null) mapOverlays.clear();
+
+
+		try {
+
+			mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+			mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+			mMap.setMyLocationEnabled(true);
+
 
 	        Bundle cmds = getIntent().getExtras();
             long tripid = cmds.getLong("showtrip");
@@ -77,19 +105,26 @@ public class ShowMap extends MapActivity {
             t3.setText(trip.fancystart);
 
             // Center & zoom the map
-			int latcenter = (trip.lathigh + trip.latlow) / 2;
-			int lgtcenter = (trip.lgthigh + trip.lgtlow) / 2;
-			GeoPoint center = new GeoPoint(latcenter, lgtcenter);
-			MapController mc = mapView.getController();
-			mc.animateTo(center);
-			// Add 500 to map span, to guarantee pins fit on map
-			mc.zoomToSpan(500+trip.lathigh - trip.latlow, 500+trip.lgthigh - trip.lgtlow);
+            //need to divide by 1 power 6 to get values that will play nice
+            double higha = (trip.lathigh / 1E6);
+            double lowa = (trip.latlow / 1E6);
+            double higho = (trip.lgthigh / 1E6);
+            double lowo = (trip.lgtlow / 1E6);
+            double latcenter = (higha + lowa) / 2;
+			double lgtcenter = (higho + lowo) / 2;
+			LatLng center = new LatLng(latcenter, lgtcenter);
+			//debug output,
+			Log.d("MARK", "lat ctr: " + latcenter + ", lon ctr: " + lgtcenter);
+			//values for zoom are 1 to 21 with 21 being way zoomed in 15 is about a block radius
+			//could get fancier here and alter the zoom level by the overall distance
+			//but good enough for now
+			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15.0f));
 
 			if (gpspoints == null) {
 				AddPointsToMapLayerTask maptask = new AddPointsToMapLayerTask();
 				maptask.execute(trip);
 			} else {
-				mapOverlays.add(gpspoints);
+//				mapOverlays.add(gpspoints);
 			}
 
 			if (trip.status < TripData.STATUS_SENT
@@ -105,17 +140,17 @@ public class ShowMap extends MapActivity {
 		}
 	}
 
-	@Override
-	protected boolean isRouteDisplayed() {
-		// Auto-generated method stub
-		return false;
-	}
+//	@Override
+//	protected boolean isRouteDisplayed() {
+//		// Auto-generated method stub
+//		return false;
+//	}
 
 	// Make sure overlays get zapped when we go BACK
 	@Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && mapView!=null) {
-            mapView.getOverlays().clear();
+        if (keyCode == KeyEvent.KEYCODE_BACK && mMap!=null) {
+            mMap.clear();
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -136,21 +171,21 @@ public class ShowMap extends MapActivity {
 		@Override
 		protected void onPostExecute(ItemizedOverlayTrack gpspoints) {
 		    // Add the points
-			mapOverlays.add(ShowMap.this.gpspoints);
+//			mapOverlays.add(ShowMap.this.gpspoints);
 
 			// Add the lines!  W00t!
-            mapOverlays.add(new LineOverlay(ShowMap.this.gpspoints));
+//            mapOverlays.add(new LineOverlay(ShowMap.this.gpspoints));
 
 			// Add start & end pins
 			if (trip.startpoint != null) {
-			    mapOverlays.add(new PushPinOverlay(trip.startpoint, R.drawable.pingreen));
+//			    mapOverlays.add(new PushPinOverlay(trip.startpoint, R.drawable.pingreen));
 			}
             if (trip.endpoint != null) {
-                mapOverlays.add(new PushPinOverlay(trip.endpoint, R.drawable.pinpurple));
+//                mapOverlays.add(new PushPinOverlay(trip.endpoint, R.drawable.pinpurple));
             }
 
             // Redraw the map
-			mapView.invalidate();
+//			mapView.invalidate();
 		}
 	}
 
@@ -158,7 +193,7 @@ public class ShowMap extends MapActivity {
     private static class LineOverlay extends Overlay
     {
         private static final float REQ_ACCURACY_FOR_LINES = 25.0f;  // Was 8.0, increased because test data was coming in at 20.0
-        private ItemizedOverlayTrack track;
+        private final ItemizedOverlayTrack track;
 
         public LineOverlay(ItemizedOverlayTrack track) {
             super();

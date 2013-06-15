@@ -14,15 +14,30 @@
 
 <activity android:name="SaveTrip" android:finishOnTaskLaunch="true" android:launchMode="singleInstance"></activity>
 
-<activity android:name="ShowMap" android:finishOnTaskLaunch="true" android:launchMode="singleTop"></activity>
+<activity android:name=".ShowMap" android:finishOnTaskLaunch="true" android:launchMode="singleTop"></activity>
 <activity android:name="UserInfoActivity" android:finishOnTaskLaunch="true" android:launchMode="singleInstance"></activity>
 <service android:name="RecordingService" android:enabled="true" android:exported="true"></service><uses-library android:name="com.google.android.maps"></uses-library>
+<meta-data
+    android:name="com.google.android.maps.v2.API_KEY"
+    android:value="AIzaSyBsMS0AQ68bro0VByGEcs123SEWJ5t7zy8"/>
 </application>
 
 <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="10"/>
+ 
 
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
 <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+<!--  additions for G maps v2 -->
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+<!-- The following two permissions are not required to use
+     Google Maps Android API v2, but are recommended. -->
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
 
 <supports-screens android:normalScreens="true" android:anyDensity="true"/>
+<uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true"/>
 </manifest>

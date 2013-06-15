@@ -1,27 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LinearLayout android:id="@+id/LinearLayout01"
-	android:layout_above="@+id/mapview" xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_height="fill_parent" android:layout_width="fill_parent"
-	android:orientation="vertical">
-	<RelativeLayout android:id="@+id/RelativeLayout01"
-		android:layout_width="wrap_content" android:layout_height="wrap_content"
-		android:paddingLeft="4sp" android:paddingTop="4sp"
-		android:paddingRight="6sp">
-		<TextView android:id="@+id/TextViewT1"
-			android:layout_height="wrap_content" android:layout_width="wrap_content"
-			android:layout_alignParentLeft="true" android:layout_marginLeft="2sp"
-			android:textSize="20sp" android:textStyle="bold" android:text="Map of your trip:"></TextView>
-		<TextView android:id="@+id/TextViewT3"
-			android:layout_width="wrap_content" android:layout_height="wrap_content"
-			android:layout_alignParentRight="true" android:textSize="20sp"
-			android:textStyle="bold"></TextView>
-	</RelativeLayout>
-	<TextView android:layout_height="wrap_content" android:id="@+id/TextViewT2"
-		android:layout_width="fill_parent" android:layout_marginLeft="7sp"
-		android:paddingBottom="8sp"
-		android:layout_marginRight="7sp"></TextView>
-	<com.google.android.maps.MapView
-		android:id="@+id/mapview" android:layout_width="fill_parent"
-		android:clickable="true" android:apiKey="AIzaSyD6GOpWwX84K5LLeyxf_FA1AqRxzhNCem4"
-		android:fitsSystemWindows="true" android:layout_height="fill_parent"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/LinearLayout01"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/RelativeLayout01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="4sp"
+        android:paddingRight="6sp"
+        android:paddingTop="4sp" >
+
+        <TextView
+            android:id="@+id/TextViewT1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="2sp"
+            android:text="Map of your trip:"
+            android:textSize="20sp"
+            android:textStyle="bold" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/TextViewT3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:textSize="20sp"
+            android:textStyle="bold" >
+        </TextView>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/TextViewT2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="7sp"
+        android:layout_marginRight="7sp"
+        android:paddingBottom="8sp" >
+    </TextView>
+
+    <fragment
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="com.google.android.gms.maps.SupportMapFragment" />
+
 </LinearLayout>
