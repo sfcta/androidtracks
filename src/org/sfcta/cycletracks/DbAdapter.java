@@ -335,6 +335,8 @@ public class DbAdapter {
         ContentValues initialValues = new ContentValues();
         initialValues.put(K_TRIP_STATUS, tripStatus);
 
+        Log.d("MARK", "Updating trip status for trip " + tripid + " to " + tripStatus);
+
         return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "="
                 + tripid, null) > 0;
     }

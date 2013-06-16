@@ -267,7 +267,8 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
             JSONObject responseData = new JSONObject(responseString);
             if (responseData.getString("status").equals("success")) {
                 mDb.open();
-                mDb.updateTripStatus(currentTripId, TripData.STATUS_SENT);
+                boolean updateResult = mDb.updateTripStatus(currentTripId, TripData.STATUS_SENT);
+                Log.d("MARK", "updateTripStatus db result: " + updateResult);
                 mDb.close();
                 result = true;
             }
