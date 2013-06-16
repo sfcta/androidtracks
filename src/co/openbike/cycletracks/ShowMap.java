@@ -44,7 +44,7 @@
 
  found a bug - after you record track and submit it and are on map page, an orientation change triggers a resubmission and you see toast
  */
-package org.sfcta.cycletracks;
+package co.openbike.cycletracks;
 
 import java.util.ArrayList;
 

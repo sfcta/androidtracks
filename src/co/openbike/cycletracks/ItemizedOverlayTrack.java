@@ -19,32 +19,39 @@
  *   along with CycleTracks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.sfcta.cycletracks;
+package co.openbike.cycletracks;
 
-import com.google.android.maps.GeoPoint;
+// This is all from the hello-mapview tutorial
 
-class CyclePoint extends GeoPoint {
-	public float accuracy;
-	public double altitude;
-	public float speed;
-	public double time;
+import java.util.ArrayList;
 
-    public CyclePoint(int lat, int lgt, double currentTime) {
-        super(lat, lgt);
-        this.time = currentTime;
-    }
+import android.graphics.drawable.Drawable;
 
-    public CyclePoint(int lat, int lgt, double currentTime, float accuracy) {
-        super(lat, lgt);
-        this.time = currentTime;
-        this.accuracy = accuracy;
-    }
+import com.google.android.maps.ItemizedOverlay;
+import com.google.android.maps.OverlayItem;
 
-	public CyclePoint(int lat, int lgt, double currentTime, float accuracy, double altitude, float speed) {
-		super(lat, lgt);
-		this.time = currentTime;
-		this.accuracy = accuracy;
-		this.altitude = altitude;
-		this.speed = speed;
+public class ItemizedOverlayTrack extends ItemizedOverlay<OverlayItem> {
+	private final ArrayList<OverlayItem> overlays = new ArrayList<OverlayItem>();
+
+	public ItemizedOverlayTrack(Drawable defaultMarker) {
+		super(boundCenter(defaultMarker));
+	}
+
+	@Override
+	protected OverlayItem createItem(int i) {
+			return overlays.get(i);
+	}
+
+	@Override
+	public int size() {
+		return overlays.size();
+	}
+
+	public void addOverlay(OverlayItem overlay) {
+		overlays.add(overlay);
+	}
+
+	public void repopulate() {
+		populate();
 	}
 }

@@ -19,7 +19,7 @@
  *   along with CycleTracks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.sfcta.cycletracks;
+package co.openbike.cycletracks;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
