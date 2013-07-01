@@ -4,9 +4,18 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-
-
-<Button android:layout_height="wrap_content" android:id="@+id/ButtonStart" android:text="@string/startNewTrip" android:textStyle="bold" android:layout_width="fill_parent" android:drawableLeft="@drawable/bike" android:layout_margin="8sp" android:hapticFeedbackEnabled="true" android:textSize="24sp"></Button><TextView android:layout_height="wrap_content" android:id="@+id/TextViewPreviousTrips" android:text="@string/previous_trips" android:layout_width="fill_parent" android:gravity="center"></TextView><ListView android:layout_height="wrap_content" android:id="@+id/ListSavedTrips" android:layout_width="fill_parent"></ListView>
+<Button
+    android:id="@+id/ButtonStart"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8sp"
+    android:background="@drawable/custom_button"
+    android:drawableLeft="@drawable/bike"
+    android:hapticFeedbackEnabled="true"
+    android:text="@string/startNewTrip"
+    android:textSize="24sp"
+    android:textStyle="bold" >
+</Button><TextView android:layout_height="wrap_content" android:id="@+id/TextViewPreviousTrips" android:text="@string/previous_trips" android:layout_width="fill_parent" android:gravity="center"></TextView><ListView android:layout_height="wrap_content" android:id="@+id/ListSavedTrips" android:layout_width="fill_parent"></ListView>
 
 
 

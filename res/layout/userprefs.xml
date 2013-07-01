@@ -6,7 +6,7 @@
 		android:layout_height="wrap_content" android:orientation="vertical">
 		<TextView android:id="@+id/TextView01" android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:layout_marginRight="5sp"
-			android:layout_marginBottom="10sp" android:layout_marginLeft="12sp" android:layout_marginTop="5sp" android:text="Thanks for using CycleTracks!  Please enter your user details here.  It's optional, anonymous, and will really help us understand different people's biking preferences."></TextView>
+			android:layout_marginBottom="10sp" android:layout_marginLeft="12sp" android:layout_marginTop="5sp" android:text="Thanks for using OpenBike!  Please enter your user details here.  It's optional, anonymous, and will really help us understand different people's biking preferences."></TextView>
 		<TextView android:id="@+id/TextView05" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:layout_marginLeft="15sp" android:text="Age"></TextView><RelativeLayout android:id="@+id/RelativeLayout02" android:layout_height="wrap_content" android:layout_width="fill_parent"><EditText android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10sp" android:layout_weight="1" android:id="@+id/TextAge" android:hint="Age" android:inputType="number" android:lines="1" android:layout_alignParentLeft="true"></EditText><RadioGroup android:id="@+id/RadioGroup01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginLeft="20sp" android:layout_weight="2" android:layout_alignParentRight="true" android:layout_marginRight="10sp">
 				<RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ButtonMale" android:text="Male" android:layout_marginLeft="10sp" android:textStyle="bold" android:textSize="14sp"></RadioButton>
 				<RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Female" android:layout_marginLeft="10sp" android:id="@+id/ButtonFemale" android:textStyle="bold" android:textSize="14sp"></RadioButton>
@@ -38,7 +38,7 @@
 		</LinearLayout>
 		
 		<TextView android:id="@+id/TextView04" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:layout_marginTop="20sp" android:textStyle="bold" android:layout_marginRight="5sp" android:layout_marginLeft="15sp" android:text="Email address:  for news and updates !!"></TextView>
+			android:layout_height="wrap_content" android:layout_marginTop="20sp" android:textStyle="bold" android:layout_marginRight="5sp" android:layout_marginLeft="15sp" android:text="Email address:  for news and updates!"></TextView>
 		<EditText android:layout_height="wrap_content"
 			android:layout_marginLeft="10sp" android:layout_width="fill_parent"
 			android:layout_marginRight="10sp" android:id="@+id/TextEmail" android:hint="email address" android:lines="1" android:inputType="textEmailAddress"></EditText>

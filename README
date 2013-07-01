@@ -1,3 +1,8 @@
+Modified for OpenBike
+-----------
+OpenBike adds qualitative ratings for safety, ease of use, and convenience. 
+The modified codebase has been updated with OpenBike related services.
+
 CycleTracks
 -----------
 Copyright 2009, 2010 San Francisco County Transportation Authority
