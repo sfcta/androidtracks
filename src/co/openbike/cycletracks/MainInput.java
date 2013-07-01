@@ -122,7 +122,7 @@ public class MainInput extends Activity {
 
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Your phone's GPS is disabled. CycleTracks needs GPS to determine your location.\n\nGo to System Settings now to enable GPS?")
+        builder.setMessage("Your phone's GPS is disabled. OpenBike needs GPS to determine your location.\n\nGo to System Settings now to enable GPS?")
                .setCancelable(false)
                .setPositiveButton("GPS Settings...", new DialogInterface.OnClickListener() {
                    public void onClick(final DialogInterface dialog, final int id) {
@@ -145,8 +145,8 @@ public class MainInput extends Activity {
 
     private void showWelcomeDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Please enter your personal details so we can learn a bit about you.\n\nThen, try to use CycleTracks every time you ride. Your trip routes will be sent to the SFCTA so we can plan for better biking!\n\nThanks,\nThe SFCTA CycleTracks team")
-               .setCancelable(false).setTitle("Welcome to CycleTracks!")
+        builder.setMessage("Please enter your personal details so we can learn a bit about you.\n\nThen, try to use OpenBike every time you ride. Your trip routes will Help plan for better biking!\n\nThanks,\nOpenBike")
+               .setCancelable(false).setTitle("Welcome to OpenBike!")
                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                    public void onClick(final DialogInterface dialog, final int id) {
                        startActivity(new Intent(MainInput.this, UserInfoActivity.class));
@@ -263,7 +263,7 @@ public class MainInput extends Activity {
             return true;
         case MENU_HELP:
         	Intent myIntent = new Intent(Intent.ACTION_VIEW,
-        			Uri.parse("http://www.sfcta.org/cycletracks-androidhelp.html"));
+        			Uri.parse("http://openbike.co/about"));
    			startActivity(myIntent);
             return true;
         }

@@ -250,7 +250,7 @@ public class RecordingService extends Service implements LocationListener {
 		notification.ledOffMS = 3000;
 
 		Context context = this;
-		CharSequence contentTitle = "CycleTracks - Recording";
+		CharSequence contentTitle = "OpenBike - Recording";
 		CharSequence contentText = "Tap to finish your trip";
 		Intent notificationIntent = new Intent(context, RecordingActivity.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
@@ -277,7 +277,7 @@ public class RecordingService extends Service implements LocationListener {
 				Notification.FLAG_NO_CLEAR;
 
 		Context context = this;
-		CharSequence contentTitle = "CycleTracks - Recording";
+		CharSequence contentTitle = "OpenBike - Recording";
 		CharSequence contentText = "Tap to finish your trip";
 		Intent notificationIntent = new Intent(context, RecordingActivity.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);

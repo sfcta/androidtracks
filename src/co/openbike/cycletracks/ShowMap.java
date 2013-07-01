@@ -92,7 +92,7 @@ public class ShowMap extends FragmentActivity {
 
 		try {
 
-			mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+			mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 			mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0))
 					.title("Marker"));
 			mMap.setMyLocationEnabled(true);

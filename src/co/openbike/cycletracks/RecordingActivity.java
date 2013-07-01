@@ -97,14 +97,14 @@ public class RecordingActivity extends Activity {
 						rs.startRecording(trip);
 						isRecording = true;
 						RecordingActivity.this.pauseButton.setEnabled(true);
-						RecordingActivity.this.setTitle("CycleTracks - Recording...");
+						RecordingActivity.this.setTitle("OpenBike - Recording...");
 						break;
 					case RecordingService.STATE_RECORDING:
 						long id = rs.getCurrentTrip();
 						trip = TripData.fetchTrip(RecordingActivity.this, id);
 						isRecording = true;
 						RecordingActivity.this.pauseButton.setEnabled(true);
-						RecordingActivity.this.setTitle("CycleTracks - Recording...");
+						RecordingActivity.this.setTitle("OpenBike - Recording...");
 						break;
 					case RecordingService.STATE_PAUSED:
 						long tid = rs.getCurrentTrip();
@@ -112,7 +112,7 @@ public class RecordingActivity extends Activity {
 						trip = TripData.fetchTrip(RecordingActivity.this, tid);
 						RecordingActivity.this.pauseButton.setEnabled(true);
 						RecordingActivity.this.pauseButton.setText("Resume");
-						RecordingActivity.this.setTitle("CycleTracks - Paused...");
+						RecordingActivity.this.setTitle("OpenBike - Paused...");
 						break;
 					case RecordingService.STATE_FULL:
 						// Should never get here, right?
@@ -131,7 +131,7 @@ public class RecordingActivity extends Activity {
 				isRecording = !isRecording;
 				if (isRecording) {
 					pauseButton.setText("Pause");
-					RecordingActivity.this.setTitle("CycleTracks - Recording...");
+					RecordingActivity.this.setTitle("OpenBike - Recording...");
 					// Don't include pause time in trip duration
 					if (trip.pauseStartedAt > 0) {
 	                    trip.totalPauseTime += (System.currentTimeMillis() - trip.pauseStartedAt);
@@ -140,7 +140,7 @@ public class RecordingActivity extends Activity {
 					Toast.makeText(getBaseContext(),"GPS restarted. It may take a moment to resync.", Toast.LENGTH_LONG).show();
 				} else {
 					pauseButton.setText("Resume");
-					RecordingActivity.this.setTitle("CycleTracks - Paused...");
+					RecordingActivity.this.setTitle("OpenBike - Paused...");
 					trip.pauseStartedAt = System.currentTimeMillis();
 					Toast.makeText(getBaseContext(),"Recording paused; GPS now offline", Toast.LENGTH_LONG).show();
 				}
